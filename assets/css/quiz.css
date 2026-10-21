@@ -101,6 +101,7 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-media--sm { max-width: 360px; margin-left: auto; margin-right: auto; }
 .qz-media--portrait { max-width: 320px; margin-left: auto; margin-right: auto; }
 .qz-media--flush { margin-top: 0; }
+.qz-media--print { max-width: 320px; margin: 18px auto 0; border-color: var(--line-2); border-radius: 16px; }
 
 .qz-cta { margin-top: 24px; min-height: 60px; font-size: clamp(13.5px, 3.8vw, 15px); }
 .btn--pulse::before {

@@ -141,9 +141,9 @@
         (chips.length ? '<div class="qz-chips">' + chips.map(function (c) {
           return '<div class="qz-chip"><span>' + c[0] + "</span><strong>" + c[1] + "</strong></div>";
         }).join("") + "</div>" : "") +
+        '<div class="qz-alert"><p class="qz-alert__title">⚠️ ' + s.alertTitle + "</p><p>" + s.alertText + "</p></div>" +
         '<div class="qz-media">' + img(s.image, "", true) + "</div>" +
         '<p class="qz-text">' + s.text + "</p>" +
-        '<div class="qz-alert"><p class="qz-alert__title">⚠️ ' + s.alertTitle + "</p><p>" + s.alertText + "</p></div>" +
         '<div class="qz-case">' +
         '<h2 class="qz-h2">' + s.caseTitle + "</h2>" +
         '<p class="qz-text">' + s.caseText + "</p>" +
@@ -157,6 +157,7 @@
         '<audio preload="none" src="' + s.audio.src + '"></audio>' +
         "</div>" +
         '<p class="qz-audio__hint">' + s.audioHint + "</p>" +
+        (s.casePrint ? '<div class="qz-media qz-media--print">' + img(s.casePrint) + "</div>" : "") +
         "</div>" +
         '<p class="qz-proof">' + s.proof + "</p>" +
         cta(s.cta) +
@@ -262,7 +263,7 @@
     if (!name) return;
     var srcs = [];
     if (name === "about") srcs = [D.about.image.src];
-    else if (name === "result") srcs = [D.result.image.src, D.result.casePhoto.src];
+    else if (name === "result") srcs = [D.result.image.src, D.result.casePhoto.src].concat(D.result.casePrint ? [D.result.casePrint.src] : []);
     else if (name === "gift") srcs = [D.gift.image];
     else if (name === "bonus") srcs = D.bonus.items.map(function (b) { return b.image.src; });
     else if (name === "offer") srcs = [D.offer.banner.src];
