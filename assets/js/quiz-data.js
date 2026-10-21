@@ -170,7 +170,7 @@ window.QUIZ_DATA = {
     ],
     stackTitle: '🎁 Tudo o que você recebe hoje',
     stack: [
-      { title: 'Método Primeira Renda', text: 'Treinamento passo a passo + estratégias prontas' },
+      { title: 'Método Primeira Renda', text: 'Treinamento passo a passo + estratégias prontas', image: 'assets/img/quiz/logo-mpr.webp' },
       { title: 'Bônus 01 · Estrutura de Vendas', text: 'A estrutura para vender sem curso e sem aparecer', image: 'assets/img/quiz/bonus-1.webp' },
       { title: 'Bônus 02 · +2.500 Vídeos Prontos', text: 'Vídeos virais prontos para postar todos os dias', image: 'assets/img/quiz/bonus-2.webp' },
       { title: 'Bônus extra · Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp' },
