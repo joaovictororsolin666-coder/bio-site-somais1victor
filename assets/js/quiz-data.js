@@ -141,7 +141,7 @@ window.QUIZ_DATA = {
         tag: 'BÔNUS 02',
         title: '+2.500 Vídeos Prontos',
         text: 'Acesse mais de 2.500 vídeos virais prontos pra postar, viralizar e vender todos os dias. Mais fácil que isso não existe!',
-        image: { src: 'assets/img/quiz/bonus-2.webp', w: 600, h: 750, alt: 'Bônus +2.500 vídeos prontos' }
+        image: { src: 'assets/img/quiz/bonus-2-v2.webp', w: 600, h: 600, alt: 'Bônus +2.500 vídeos prontos' }
       }
     ],
     warning: '(Não desperdice essa oportunidade, hein 🤨)',
@@ -172,7 +172,7 @@ window.QUIZ_DATA = {
     stack: [
       { title: 'Método Primeira Renda', text: 'Treinamento passo a passo + estratégias prontas', image: 'assets/img/quiz/logo-mpr.webp' },
       { title: 'Bônus 01 · Estrutura de Vendas', text: 'A estrutura para vender sem curso e sem aparecer', image: 'assets/img/quiz/bonus-1-v2.webp' },
-      { title: 'Bônus 02 · +2.500 Vídeos Prontos', text: 'Vídeos virais prontos para postar todos os dias', image: 'assets/img/quiz/bonus-2.webp' },
+      { title: 'Bônus 02 · +2.500 Vídeos Prontos', text: 'Vídeos virais prontos para postar todos os dias', image: 'assets/img/quiz/bonus-2-v2.webp' },
       { title: 'Bônus extra · Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp' },
       { title: 'Bônus extra · Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp' }
     ],
