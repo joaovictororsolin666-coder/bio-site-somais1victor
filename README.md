@@ -1,0 +1,103 @@
+# Victor Gomes — Link na bio
+
+Site estático (HTML + CSS + JS puro, sem frameworks e sem build). Leve, mobile-first e pronto para hospedar em qualquer lugar.
+
+```
+index.html              página principal
+privacidade.html        Política de Privacidade (modelo — complete os [campos])
+termos.html             Termos de Uso (modelo — complete os [campos])
+assets/css/style.css    todo o visual (cores em :root no topo)
+assets/js/config.js     ⚙️ links, formulário e rastreamento — edite aqui
+assets/js/main.js       comportamento (não precisa mexer)
+assets/img/             favicon, imagem de compartilhamento e suas fotos
+integracoes/google-apps-script.gs   receptor do formulário → Google Planilhas
+```
+
+## 1. Links dos botões
+
+Em `assets/js/config.js`:
+
+```js
+links: { metodoPrimeiraRenda: "https://seu-funil.com/..." }
+```
+
+As UTMs do visitante são repassadas automaticamente ao link do funil. Quem chega sem UTM recebe `utm_source=instagram&utm_medium=bio` (editável em `utmPadrao`). Dica: na bio do Instagram, use o domínio puro; em stories/anúncios, adicione UTMs (ex.: `?utm_source=instagram&utm_medium=stories&utm_campaign=lancamento`).
+
+## 2. Imagens
+
+Use **WebP ou AVIF** (converta grátis em squoosh.app). Salve em `assets/img/` e substitua os placeholders — o código pronto está em comentários no `index.html`:
+
+| Imagem | Arquivo sugerido | Tamanho |
+|---|---|---|
+| Foto de perfil (já aplicada) | `victor.webp` + `victor.jpg` (fallback) | 400×400 (quadrada) |
+| Card Método Primeira Renda (já aplicado) | `mpr-800.webp` + `mpr-1200.webp` | 1200×504 |
+| Card Mentoria | `mentoria.avif` / `mentoria.webp` | 1200×525 (16:7) |
+| Compartilhamento (WhatsApp) | `og-image.jpg` (já incluída, pode trocar) | 1200×630 |
+
+Mantenha os atributos `width`/`height` para não haver deslocamento de layout.
+
+## 3. Formulário (aplicações da mentoria)
+
+O formulário **só mostra "Aplicação recebida" quando o servidor confirma** (`{ "ok": true }`). Sem `form.endpoint` configurado, ele mostra erro.
+
+### Opção A — Google Planilhas (grátis, recomendado)
+
+1. Crie uma planilha em sheets.google.com.
+2. Menu **Extensões → Apps Script**. Apague o conteúdo e cole `integracoes/google-apps-script.gs`.
+3. (Opcional) preencha `NOTIFY_EMAIL` para receber um e-mail a cada aplicação.
+4. **Implantar → Nova implantação → tipo "App da Web"**. *Executar como:* Eu. *Quem pode acessar:* Qualquer pessoa. Autorize.
+5. Copie a URL `https://script.google.com/macros/s/.../exec` e cole em `config.js → form.endpoint`.
+6. Teste: envie uma aplicação e confira a aba **Aplicações** na planilha.
+
+> Ao alterar o script, use **Implantar → Gerenciar implantações → editar → Nova versão** para manter a mesma URL.
+
+### Opção B — Formspree
+
+Crie um formulário em formspree.io e cole a URL `https://formspree.io/f/XXXX` em `form.endpoint`. Nada mais é necessário.
+
+Os dados enviados incluem as respostas, o consentimento, as UTMs, o site de origem e a página de entrada.
+
+## 4. Rastreamento (Meta Pixel e Google Analytics 4)
+
+Em `config.js → tracking`, preencha `gaId` e/ou `metaPixelId`. Enquanto estiverem vazios, nada é carregado.
+
+Com `requireConsent: true` (padrão), aparece um aviso de cookies e os rastreadores só carregam após o visitante clicar em **Aceitar**. O link "Cookies" no rodapé permite mudar a escolha.
+
+| Ação | GA4 | Meta |
+|---|---|---|
+| Clique no Método Primeira Renda | `click_metodo_primeira_renda` | `ClickMetodoPrimeiraRenda` (custom) |
+| Clique na Mentoria | `click_mentoria` | `ClickMentoria` (custom) |
+| Aplicação enviada com sucesso | `generate_lead` | `Lead` (padrão) |
+
+Todos os eventos levam as UTMs como parâmetros. Para testar, use `debug: true` e abra o console do navegador.
+
+## 5. SEO e compartilhamento
+
+No `index.html`, troque **todas** as ocorrências de `https://SEU-DOMINIO.com.br` pelo seu domínio (canonical, `og:url`, `og:image`, JSON-LD). O WhatsApp exige URL absoluta na imagem.
+
+## 6. Publicar
+
+Qualquer hospedagem estática serve. As mais simples:
+
+- **Netlify**: app.netlify.com/drop → arraste a pasta do projeto.
+- **Vercel** ou **Cloudflare Pages**: importe a pasta/repositório, sem comando de build.
+
+Depois aponte seu domínio e coloque o link na bio.
+
+## 7. Testar localmente
+
+Abra `index.html` no navegador, ou rode um servidor simples na pasta:
+
+```bash
+npx serve .
+```
+
+## Checklist antes de publicar
+
+- [ ] Link do funil em `config.js`
+- [ ] `form.endpoint` configurado e testado (aplicação aparece na planilha)
+- [ ] Imagens dos cards em WebP/AVIF
+- [ ] Domínio trocado no `index.html`
+- [ ] Campos `[...]` preenchidos em `privacidade.html` e `termos.html`
+- [ ] IDs do Pixel/GA (se for usar)
+- [ ] Faixas de investimento do formulário revisadas (`index.html`)
