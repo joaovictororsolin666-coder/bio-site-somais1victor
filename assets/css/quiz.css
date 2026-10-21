@@ -336,7 +336,8 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-stack__list { display: grid; gap: 12px; margin: 18px 0 0; padding: 0; list-style: none; }
 .qz-stack__list li { display: flex; align-items: center; gap: 12px; }
 .qz-stack__list img { flex: none; width: 48px; height: 60px; border-radius: 8px; background: #000; object-fit: cover; }
-.qz-stack__list img[src*="logo-mpr"] { object-fit: contain; box-shadow: inset 0 0 0 1px var(--line-2); }
+.qz-stack__list img[src*="logo-mpr"],
+.qz-stack__list img[src*="robo-vendas"] { object-fit: contain; box-shadow: inset 0 0 0 1px var(--line-2); }
 .qz-stack__check { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border-radius: 12px; background: var(--green); color: var(--green-ink); font-size: 22px; font-weight: 800; }
 .qz-stack__list strong { display: block; font-size: 15px; line-height: 1.3; }
 .qz-stack__list span { display: block; margin-top: 2px; color: var(--muted); font-size: 13.5px; line-height: 1.35; }

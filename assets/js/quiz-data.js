@@ -174,7 +174,7 @@ window.QUIZ_DATA = {
       { title: 'Bônus 01 · Estrutura de Vendas', text: 'A estrutura para vender sem curso e sem aparecer', image: 'assets/img/quiz/bonus-1.webp' },
       { title: 'Bônus 02 · +2.500 Vídeos Prontos', text: 'Vídeos virais prontos para postar todos os dias', image: 'assets/img/quiz/bonus-2.webp' },
       { title: 'Bônus extra · Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp' },
-      { title: 'Bônus extra · Robô de Vendas no Automático', image: 'assets/img/quiz/extra-2.webp' }
+      { title: 'Bônus extra · Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp' }
     ],
     cta: 'SIM! QUERO SER O MEU PRÓPRIO CHEFE',
     trust: '🔒 Pagamento 100% seguro · 🔓 Acesso imediato',
