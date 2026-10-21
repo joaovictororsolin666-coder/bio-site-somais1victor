@@ -7,7 +7,7 @@ window.QUIZ_DATA = {
   intro: {
     title: 'Como fazer seus primeiros <span class="hl">R$5.000/mês</span> vendendo produtos digitais com vídeos simples, sem precisar aparecer!',
     tag: 'Mesmo que você seja totalmente iniciante',
-    image: { src: 'assets/img/quiz/capa.webp', w: 800, h: 450, alt: 'Victor Gomes com notificações de vendas aprovadas' },
+    image: { src: 'assets/img/quiz/capa-v2.webp', w: 800, h: 450, alt: 'Victor Gomes com notificações de vendas aprovadas' },
     text: 'Não perca mais tempo apenas <mark>"rolando a tela"</mark> e vendo a vida dos outros. Chegou a hora de transformar <strong>visualizações em dinheiro no seu bolso</strong> com a fórmula que realmente funciona.',
     cta: 'DESCOBRIR COMO FUNCIONA',
     note: 'Leva menos de 1 minuto · 7 perguntas rápidas'
