@@ -73,7 +73,7 @@ Todos os eventos levam as UTMs como parâmetros. Para testar, use `debug: true` 
 
 ## 5. SEO e compartilhamento
 
-No `index.html`, troque **todas** as ocorrências de `https://SEU-DOMINIO.com.br` pelo seu domínio (canonical, `og:url`, `og:image`, JSON-LD). O WhatsApp exige URL absoluta na imagem.
+O `index.html` usa o endereço do GitHub Pages (`https://joaovictororsolin666-coder.github.io/bio-site-somais1victor/`) no canonical, `og:url`, `og:image` e JSON-LD. Se passar a usar domínio próprio, troque **todas** essas ocorrências. O WhatsApp exige URL absoluta na imagem.
 
 ## 6. Publicar
 
@@ -97,7 +97,6 @@ npx serve .
 - [ ] Link do funil em `config.js`
 - [ ] `form.endpoint` configurado e testado (aplicação aparece na planilha)
 - [ ] Imagens dos cards em WebP/AVIF
-- [ ] Domínio trocado no `index.html`
 - [ ] Campos `[...]` preenchidos em `privacidade.html` e `termos.html`
 - [ ] IDs do Pixel/GA (se for usar)
 - [ ] Faixas de investimento do formulário revisadas (`index.html`)
