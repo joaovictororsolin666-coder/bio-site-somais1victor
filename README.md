@@ -25,13 +25,14 @@ As UTMs do visitante são repassadas automaticamente ao link do funil. Quem cheg
 
 ## Quiz do Método Primeira Renda (`quiz.html`)
 
-O botão "QUERO COMEÇAR AGORA" leva ao quiz: capa → 7 perguntas → apresentação → análise → resultado personalizado → presente → bônus → oferta → checkout Kiwify.
+O botão "QUERO COMEÇAR AGORA" leva ao quiz: capa → 7 perguntas → apresentação → análise → resultado personalizado → presente → bônus → oferta → checkout NeonPay.
 
 - **Textos, perguntas e imagens:** `assets/js/quiz-data.js`
 - **Link do checkout e preço exibido:** `assets/js/config.js` → `links.checkoutMPR` e `oferta`
 - **Imagens e áudio:** `assets/img/quiz/`
 - **Eventos:** `quiz_start`, `quiz_complete` (Meta `ViewContent`) e `begin_checkout` (Meta `InitiateCheckout`). As UTMs seguem até o checkout.
-- Para pular o quiz e mandar direto ao checkout, troque `links.metodoPrimeiraRenda` pelo link da Kiwify.
+- **UTMs no checkout:** as do visitante vão primeiro; se faltarem, entram `utm_campaign=mpr` e `utm_content=funil_quiz` (`links.checkoutUtms`). `utm_term` mostra o botão clicado: `oferta`, `garantia` ou `fixo`.
+- Para pular o quiz e mandar direto ao checkout, troque `links.metodoPrimeiraRenda` pelo link do checkout.
 
 ## 2. Imagens
 

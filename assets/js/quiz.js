@@ -54,13 +54,25 @@
       '<span class="btn__label">' + label + "</span>" + ARROW + "</button>";
   }
 
-  function checkoutUrl() {
-    var url = (CFG.links || {}).checkoutMPR;
-    return url ? VG.withUtms(url) : "#";
+  // Link do checkout: UTMs do visitante + UTMs fixas do funil (só onde faltar) + botão clicado em utm_term
+  function checkoutUrl(term) {
+    var links = CFG.links || {};
+    if (!links.checkoutMPR) return "#";
+    try {
+      var u = new URL(VG.withUtms(links.checkoutMPR));
+      var fixed = links.checkoutUtms || {};
+      Object.keys(fixed).forEach(function (k) {
+        if (!u.searchParams.has(k)) u.searchParams.set(k, fixed[k]);
+      });
+      if (term && !u.searchParams.has("utm_term")) u.searchParams.set("utm_term", term);
+      return u.toString();
+    } catch (e) {
+      return links.checkoutMPR;
+    }
   }
 
-  function checkoutCta(label, extraCls) {
-    return '<a class="btn btn--primary btn--pulse qz-cta ' + (extraCls || "") + '" href="' + checkoutUrl() + '" data-checkout>' +
+  function checkoutCta(label, term, extraCls) {
+    return '<a class="btn btn--primary btn--pulse qz-cta ' + (extraCls || "") + '" href="' + checkoutUrl(term) + '" data-checkout>' +
       '<span class="btn__label">' + label + "</span>" + ARROW + "</a>";
   }
 
@@ -232,7 +244,7 @@
             "<div><strong>" + it.title + "</strong>" + (it.text ? "<span>" + it.text + "</span>" : "") + "</div></li>";
         }).join("") + "</ul>" +
         priceHtml +
-        checkoutCta(s.cta) +
+        checkoutCta(s.cta, "oferta") +
         '<p class="qz-trust">' + s.trust + "</p>" +
         "</div>" +
 
@@ -241,7 +253,7 @@
         '<p class="qz-text">' + s.guarantee.text + "</p>" +
         '<ul class="qz-guarantee__list">' + s.guarantee.list.map(function (t) { return "<li>✅ " + t + "</li>"; }).join("") + "</ul>" +
         '<p class="qz-guarantee__footer">' + s.guarantee.footer + "</p>" +
-        checkoutCta(s.guarantee.cta) +
+        checkoutCta(s.guarantee.cta, "garantia") +
         "</div>" +
 
         '<h2 class="qz-h2 qz-center qz-gap">Dúvidas frequentes</h2>' +
@@ -465,7 +477,7 @@
     var price = $("#qz-price .qz-cta", root);
     var label = D.offer.stickyLabel;
     var parcelas = (CFG.oferta || {}).parcelas;
-    sticky.firstElementChild.innerHTML = '<a class="btn btn--primary qz-sticky__btn" href="' + checkoutUrl() + '" data-checkout>' +
+    sticky.firstElementChild.innerHTML = '<a class="btn btn--primary qz-sticky__btn" href="' + checkoutUrl("fixo") + '" data-checkout>' +
       '<span class="btn__label">' + label + (parcelas ? "<small>" + parcelas + "</small>" : "") + "</span>" + ARROW + "</a>";
     bindCheckout($("[data-checkout]", sticky));
 
