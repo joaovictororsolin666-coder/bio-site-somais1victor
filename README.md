@@ -23,6 +23,16 @@ links: { metodoPrimeiraRenda: "https://seu-funil.com/..." }
 
 As UTMs do visitante são repassadas automaticamente ao link do funil. Quem chega sem UTM recebe `utm_source=instagram&utm_medium=bio` (editável em `utmPadrao`). Dica: na bio do Instagram, use o domínio puro; em stories/anúncios, adicione UTMs (ex.: `?utm_source=instagram&utm_medium=stories&utm_campaign=lancamento`).
 
+## Quiz do Método Primeira Renda (`quiz.html`)
+
+O botão "QUERO COMEÇAR AGORA" leva ao quiz: capa → 7 perguntas → apresentação → análise → resultado personalizado → presente → bônus → oferta → checkout Kiwify.
+
+- **Textos, perguntas e imagens:** `assets/js/quiz-data.js`
+- **Link do checkout e preço exibido:** `assets/js/config.js` → `links.checkoutMPR` e `oferta`
+- **Imagens e áudio:** `assets/img/quiz/`
+- **Eventos:** `quiz_start`, `quiz_complete` (Meta `ViewContent`) e `begin_checkout` (Meta `InitiateCheckout`). As UTMs seguem até o checkout.
+- Para pular o quiz e mandar direto ao checkout, troque `links.metodoPrimeiraRenda` pelo link da Kiwify.
+
 ## 2. Imagens
 
 Use **WebP ou AVIF** (converta grátis em squoosh.app). Salve em `assets/img/` e substitua os placeholders — o código pronto está em comentários no `index.html`:

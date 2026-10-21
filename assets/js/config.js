@@ -5,14 +5,23 @@ window.SITE_CONFIG = {
 
   /* ── Links dos botões ── */
   links: {
-    // Funil de vendas do Método Primeira Renda (ex.: "https://pay.hotmart.com/XXXX")
-    metodoPrimeiraRenda: "",
+    // Botão do Método Primeira Renda → quiz (funil). Para pular o quiz, coloque aqui o link do checkout.
+    metodoPrimeiraRenda: "quiz.html",
+
+    // Checkout do MPR (botões da oferta no fim do quiz)
+    checkoutMPR: "https://pay.kiwify.com.br/X9MavXp",
 
     // Repassa as UTMs do visitante para o link do funil (mantém a origem rastreável)
     repassarUtms: true,
 
     // UTMs usadas quando o visitante chega sem nenhuma (ex.: clique direto na bio)
     utmPadrao: { utm_source: "instagram", utm_medium: "bio" }
+  },
+
+  /* ── Preço exibido na oferta do quiz (confira com o checkout ao mudar o preço) ── */
+  oferta: {
+    precoVista: "R$ 67",
+    parcelas: "12x de R$ 6,93"
   },
 
   /* ── Formulário de aplicação da mentoria ── */
@@ -37,7 +46,10 @@ window.SITE_CONFIG = {
     events: {
       mprClick:      { ga: "click_metodo_primeira_renda", meta: "ClickMetodoPrimeiraRenda" },
       mentoriaClick: { ga: "click_mentoria",              meta: "ClickMentoria" },
-      formSubmit:    { ga: "generate_lead",               meta: "Lead" }
+      formSubmit:    { ga: "generate_lead",               meta: "Lead" },
+      quizStart:     { ga: "quiz_start",                  meta: "QuizStart" },
+      quizComplete:  { ga: "quiz_complete",               meta: "ViewContent" },
+      checkoutClick: { ga: "begin_checkout",              meta: "InitiateCheckout" }
     }
   },
 

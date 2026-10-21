@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Método Primeira Renda | Victor Gomes</title>
+  <meta name="description" content="Descubra em menos de 1 minuto como fazer seus primeiros R$5.000/mês vendendo produtos digitais com vídeos simples, sem precisar aparecer.">
+  <meta name="theme-color" content="#080808">
+  <meta name="color-scheme" content="dark">
+
+  <link rel="canonical" href="https://joaovictororsolin666-coder.github.io/bio-site-somais1victor/quiz.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Victor Gomes">
+  <meta property="og:title" content="Método Primeira Renda — descubra como começar">
+  <meta property="og:description" content="Venda produtos digitais com vídeos simples, sem precisar aparecer. Responda 7 perguntas rápidas.">
+  <meta property="og:url" content="https://joaovictororsolin666-coder.github.io/bio-site-somais1victor/quiz.html">
+  <meta property="og:image" content="https://joaovictororsolin666-coder.github.io/bio-site-somais1victor/assets/img/mpr-1200.webp">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/quiz.css">
+  <link rel="preload" as="image" href="assets/img/quiz/capa.webp" fetchpriority="high">
+
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/quiz-data.js" defer></script>
+  <script src="assets/js/quiz.js" defer></script>
+</head>
+<body class="qz">
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="qz-header">
+    <div class="qz-header__inner">
+      <button class="qz-back" type="button" data-back aria-label="Voltar para a pergunta anterior" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <div class="qz-progress" role="progressbar" aria-label="Progresso do quiz" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span class="qz-progress__bar"></span>
+      </div>
+      <img class="qz-avatar" src="assets/img/victor.webp" alt="" width="36" height="36">
+    </div>
+  </header>
+
+  <main class="qz-main" id="app" aria-live="polite">
+    <noscript><p class="qz-text">Ative o JavaScript para fazer o quiz.</p></noscript>
+  </main>
+
+  <footer class="qz-footer">
+    <p>© 2026 Victor Gomes · <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></p>
+  </footer>
+
+  <!-- Botão fixo no celular, só na tela da oferta -->
+  <div class="qz-sticky" id="sticky-cta" aria-hidden="true">
+    <div class="qz-sticky__inner"></div>
+  </div>
+
+  <div class="cookie" id="cookie-banner" role="dialog" aria-live="polite" aria-label="Preferências de cookies" hidden>
+    <p>Usamos cookies de medição (Google Analytics e Meta) para entender o desempenho da página. Você pode aceitar ou recusar. <a href="privacidade.html">Saiba mais</a>.</p>
+    <div class="cookie__actions">
+      <button class="btn btn--ghost btn--sm" type="button" data-consent="denied">Recusar</button>
+      <button class="btn btn--primary btn--sm" type="button" data-consent="granted">Aceitar</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

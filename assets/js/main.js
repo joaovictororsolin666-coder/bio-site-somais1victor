@@ -197,6 +197,7 @@
 
   function initForm() {
     var dialog = $("#apply-dialog");
+    if (!dialog) return; // página sem o formulário (ex.: quiz)
     var form = $("#apply-form");
     var status = $(".form__status", form);
     var submitBtn = $(".btn--submit", form);
@@ -384,6 +385,9 @@
   }
 
   /* ───────────── Início ───────────── */
+
+  // Usado pelo quiz (assets/js/quiz.js)
+  window.VG = { track: Tracking.track, withUtms: withUtms, toast: toast };
 
   initLinks();
   initForm();
