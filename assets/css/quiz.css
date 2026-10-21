@@ -280,7 +280,7 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 /* ───────────── Bônus ───────────── */
 
 .qz-bonus { overflow: hidden; margin-top: 18px; border: 1px solid rgba(57, 229, 140, .35); border-radius: 20px; background: linear-gradient(180deg, #0f1612, #0c0e0d); text-align: left; }
-.qz-bonus__img { display: block; width: 100%; height: auto; max-height: 320px; object-fit: cover; }
+.qz-bonus__img { display: block; width: 100%; height: auto; max-height: 420px; object-fit: cover; }
 .qz-bonus__body { padding: 16px 18px 18px; }
 .qz-bonus__body p { margin: 8px 0 0; color: var(--muted); font-size: 15px; }
 .qz-bonus .qz-h2 { margin-top: 10px; }

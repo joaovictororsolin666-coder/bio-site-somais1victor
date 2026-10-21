@@ -135,7 +135,7 @@ window.QUIZ_DATA = {
         tag: 'BÔNUS 01',
         title: 'Estrutura de Vendas',
         text: 'Tenha toda a estrutura que me fez ganhar mais de 100 mil reais em poucos meses sem vender curso e sem aparecer.',
-        image: { src: 'assets/img/quiz/bonus-1.webp', w: 600, h: 589, alt: 'Bônus Estrutura de Vendas' }
+        image: { src: 'assets/img/quiz/bonus-1-v2.webp', w: 600, h: 600, alt: 'Bônus Estrutura de Vendas' }
       },
       {
         tag: 'BÔNUS 02',
@@ -171,7 +171,7 @@ window.QUIZ_DATA = {
     stackTitle: '🎁 Tudo o que você recebe hoje',
     stack: [
       { title: 'Método Primeira Renda', text: 'Treinamento passo a passo + estratégias prontas', image: 'assets/img/quiz/logo-mpr.webp' },
-      { title: 'Bônus 01 · Estrutura de Vendas', text: 'A estrutura para vender sem curso e sem aparecer', image: 'assets/img/quiz/bonus-1.webp' },
+      { title: 'Bônus 01 · Estrutura de Vendas', text: 'A estrutura para vender sem curso e sem aparecer', image: 'assets/img/quiz/bonus-1-v2.webp' },
       { title: 'Bônus 02 · +2.500 Vídeos Prontos', text: 'Vídeos virais prontos para postar todos os dias', image: 'assets/img/quiz/bonus-2.webp' },
       { title: 'Bônus extra · Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp' },
       { title: 'Bônus extra · Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp' }
