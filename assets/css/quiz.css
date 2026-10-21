@@ -57,7 +57,7 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
   box-shadow: 0 0 12px rgba(57, 229, 140, .6);
   transition: width .45s var(--ease);
 }
-.qz-avatar { justify-self: end; width: 36px; height: 36px; border: 2px solid rgba(57, 229, 140, .6); border-radius: 50%; object-fit: cover; }
+.qz-avatar { justify-self: end; width: 40px; height: 40px; border: 1px solid rgba(57, 229, 140, .45); border-radius: 10px; background: #000; object-fit: contain; }
 
 /* ───────────── Base das telas ───────────── */
 
