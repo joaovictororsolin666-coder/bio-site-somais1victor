@@ -6,7 +6,7 @@ window.SITE_CONFIG = {
   /* ── Links dos botões ── */
   links: {
     // Botão do Método Primeira Renda → quiz (funil). Para pular o quiz, coloque aqui o link do checkout.
-    metodoPrimeiraRenda: "quiz.html",
+    metodoPrimeiraRenda: "quiz",
 
     // Checkout do MPR (botões da oferta no fim do quiz)
     checkoutMPR: "https://checkout.neonpay.com.br/checkout/cmv6sesvu022k01of5d632afj?offer=VNOV5FS",

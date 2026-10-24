@@ -23,7 +23,7 @@ links: { metodoPrimeiraRenda: "https://seu-funil.com/..." }
 
 As UTMs do visitante são repassadas automaticamente ao link do funil. Quem chega sem UTM recebe `utm_source=instagram&utm_medium=bio` (editável em `utmPadrao`). Dica: na bio do Instagram, use o domínio puro; em stories/anúncios, adicione UTMs (ex.: `?utm_source=instagram&utm_medium=stories&utm_campaign=lancamento`).
 
-## Quiz do Método Primeira Renda (`quiz.html`)
+## Quiz do Método Primeira Renda (`/quiz`)
 
 O botão "QUERO COMEÇAR AGORA" leva ao quiz: capa → 7 perguntas → apresentação → análise → resultado personalizado → presente → bônus → oferta → checkout NeonPay.
 
@@ -84,7 +84,7 @@ Todos os eventos levam as UTMs como parâmetros. Para testar, use `debug: true` 
 
 ## 5. SEO e compartilhamento
 
-O `index.html` usa o endereço do GitHub Pages (`https://joaovictororsolin666-coder.github.io/bio-site-somais1victor/`) no canonical, `og:url`, `og:image` e JSON-LD. Se passar a usar domínio próprio, troque **todas** essas ocorrências. O WhatsApp exige URL absoluta na imagem.
+O site usa o domínio `https://www.ovictorgomes.com.br/` (Vercel, publicado a partir deste repositório) no canonical, `og:url`, `og:image` e JSON-LD do `index.html` e do `quiz.html`. Se trocar de domínio, troque **todas** essas ocorrências. O WhatsApp exige URL absoluta na imagem.
 
 ## 6. Publicar
 
