@@ -235,6 +235,7 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 
 .qz-alert { margin-top: 20px; padding: 16px; border: 1px solid rgba(250, 204, 21, .3); border-radius: 16px; background: rgba(250, 204, 21, .06); text-align: left; }
 .qz-alert p { margin: 0; font-size: 15px; }
+.qz-alert--top { margin: 4px 0 20px; }
 .qz-alert__title { margin-bottom: 8px !important; color: #fde68a; font-weight: 700; }
 
 .qz-case { margin-top: 24px; padding: 20px 16px; border: 1px solid var(--line); border-radius: 20px; background: #101010; }

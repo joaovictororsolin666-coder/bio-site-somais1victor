@@ -228,11 +228,11 @@
         .filter(function (c) { return c[1]; });
       return '<section class="qz-screen qz-center">' +
         '<p class="qz-badge"><span aria-hidden="true">✔</span> ' + s.badge + "</p>" +
+        '<div class="qz-alert qz-alert--top"><p class="qz-alert__title">⚠️ ' + s.alertTitle + "</p><p>" + s.alertText + "</p></div>" +
         '<h1 class="qz-title">' + s.title + "</h1>" +
         (chips.length ? '<div class="qz-chips">' + chips.map(function (c) {
           return '<div class="qz-chip"><span>' + c[0] + "</span><strong>" + c[1] + "</strong></div>";
         }).join("") + "</div>" : "") +
-        '<div class="qz-alert"><p class="qz-alert__title">⚠️ ' + s.alertTitle + "</p><p>" + s.alertText + "</p></div>" +
         '<div class="qz-media">' + img(s.image, "", true) + "</div>" +
         '<p class="qz-text">' + s.text + "</p>" +
         '<div class="qz-case">' +
