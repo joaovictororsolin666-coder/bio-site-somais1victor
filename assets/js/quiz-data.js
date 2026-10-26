@@ -85,8 +85,8 @@ window.QUIZ_DATA = {
 
   about: {
     // Cabeçalho de autor (foto + nome + @)
-    author: { name: 'Victor Orsolin', handle: '@victor_orsolin', avatar: 'assets/img/victor.webp', verified: true },
-    title: '<span class="hl">Quem é</span> Victor Orsolin?',
+    author: { name: 'Victor Gomes', handle: '@somais1victor', avatar: 'assets/img/victor.webp', verified: true },
+    title: '<span class="hl">Quem é</span> Victor Gomes?',
     paragraphs: [
       'Eu comecei no digital do <strong>absoluto zero</strong>, sem audiência, sem experiência e sem saber por onde começar.',
       'Até que descobri uma forma de <strong>vender produtos digitais usando vídeos simples, sem precisar aparecer e sem investir em anúncios.</strong>',
