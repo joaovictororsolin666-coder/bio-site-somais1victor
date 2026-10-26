@@ -615,7 +615,7 @@
       var s = pick(sources);
       rows.push({
         id: Math.random().toString(36).slice(2, 12), inicio: new Date(now - Math.random() * span),
-        disp: pick(devices), max: max, checkout: max >= LAST && Math.random() < 0.32 ? pick(["oferta", "oferta", "fixo", "garantia"]) : "",
+        disp: pick(devices), max: max, checkout: max >= LAST && Math.random() < 0.32 ? pick(["oferta", "oferta", "oferta", "garantia"]) : "",
         dur: 20 + max * 9 + Math.random() * 40, src: s[0], med: s[1], camp: s[2], ref: s[0] ? "" : "direto", resp: resp
       });
     }

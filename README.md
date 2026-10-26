@@ -31,7 +31,7 @@ O botão "QUERO COMEÇAR AGORA" leva ao quiz: capa → 7 perguntas → apresenta
 - **Link do checkout e preço exibido:** `assets/js/config.js` → `links.checkoutMPR` e `oferta`
 - **Imagens e áudio:** `assets/img/quiz/`
 - **Eventos:** `quiz_start`, `quiz_complete` (Meta `ViewContent`) e `begin_checkout` (Meta `InitiateCheckout`). As UTMs seguem até o checkout.
-- **UTMs no checkout:** as do visitante vão primeiro; se faltarem, entram `utm_campaign=mpr` e `utm_content=funil_quiz` (`links.checkoutUtms`). `utm_term` mostra o botão clicado: `oferta`, `garantia` ou `fixo`.
+- **UTMs no checkout:** as do visitante vão primeiro; se faltarem, entram `utm_campaign=mpr` e `utm_content=funil_quiz` (`links.checkoutUtms`). `utm_term` mostra o botão clicado: `oferta` ou `garantia`.
 - Para pular o quiz e mandar direto ao checkout, troque `links.metodoPrimeiraRenda` pelo link do checkout.
 
 ## Painel do funil (`/painel`)

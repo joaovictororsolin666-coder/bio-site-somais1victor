@@ -13,7 +13,7 @@ window.SITE_CONFIG = {
 
     // UTMs fixas no link do checkout para identificar vendas vindas do quiz.
     // As UTMs do visitante (anúncio, stories etc.) têm prioridade; estas só preenchem o que faltar.
-    // utm_term recebe o botão clicado: oferta, garantia ou fixo (botão do rodapé).
+    // utm_term recebe o botão clicado: oferta ou garantia.
     checkoutUtms: { utm_campaign: "mpr", utm_content: "funil_quiz" },
 
     // Repassa as UTMs do visitante para o link do funil (mantém a origem rastreável)

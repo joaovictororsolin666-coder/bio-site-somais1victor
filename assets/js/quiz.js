@@ -17,7 +17,6 @@
   var bar = $(".qz-progress__bar");
   var progress = $(".qz-progress");
   var backBtn = $("[data-back]");
-  var sticky = $("#sticky-cta");
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var Q = D.questions;
@@ -303,7 +302,7 @@
             "<div><strong>" + it.title + "</strong>" + (it.text ? "<span>" + it.text + "</span>" : "") + "</div></li>";
         }).join("") + "</ul>" +
         priceHtml +
-        checkoutCta(s.cta, "oferta") +
+        checkoutCta(s.cta, "oferta", "qz-cta--main") +
         '<p class="qz-trust">' + s.trust + "</p>" +
         "</div>" +
 
@@ -363,7 +362,6 @@
     bar.style.width = Math.max(pct, 4) + "%";
     progress.setAttribute("aria-valuenow", pct);
     backBtn.hidden = !!NO_BACK[name] || step === 0;
-    setSticky(false);
 
     if (animate && !reduceMotion && app.firstElementChild) {
       app.firstElementChild.classList.add("is-out");
@@ -533,42 +531,6 @@
     Journey.flush();
 
     $$("[data-checkout]", root).forEach(function (a) { bindCheckout(a); });
-
-    // Botão fixo: aparece quando o botão de compra principal não está na tela
-    var price = $("#qz-price .qz-cta", root);
-    var label = D.offer.stickyLabel;
-    var parcelas = (CFG.oferta || {}).parcelas;
-    sticky.firstElementChild.innerHTML = '<a class="btn btn--primary qz-sticky__btn" href="' + checkoutUrl("fixo") + '" data-checkout="fixo">' +
-      '<span class="btn__label">' + label + (parcelas ? "<small>" + parcelas + "</small>" : "") + "</span>" + ARROW + "</a>";
-    bindCheckout($("[data-checkout]", sticky));
-
-    // Visível depois de rolar um pouco, exceto enquanto o bloco de preço está na tela
-    var ticking = false;
-    if (onOfferScroll) window.removeEventListener("scroll", onOfferScroll);
-    onOfferScroll = function () {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(function () {
-        ticking = false;
-        if (FLOW[state.step] !== "offer" || !price) return;
-        var r = price.getBoundingClientRect();
-        var priceOnScreen = r.top < window.innerHeight - 80 && r.bottom > 80;
-        setSticky(window.scrollY > 500 && !priceOnScreen);
-      });
-    };
-    window.addEventListener("scroll", onOfferScroll, { passive: true });
-  }
-
-  var onOfferScroll = null;
-
-  function setSticky(on) {
-    if (!on && onOfferScroll && FLOW[state.step] !== "offer") {
-      window.removeEventListener("scroll", onOfferScroll);
-      onOfferScroll = null;
-    }
-    sticky.classList.toggle("is-visible", !!on);
-    sticky.setAttribute("aria-hidden", on ? "false" : "true");
-    sticky.inert = !on;
   }
 
   function bindCheckout(a) {
