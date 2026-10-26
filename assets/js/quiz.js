@@ -320,10 +320,11 @@
             "<div><strong>" + it.title + "</strong>" + (it.text ? "<span>" + it.text + "</span>" : "") + "</div></li>";
         }).join("") + "</ul>" +
         priceHtml +
-        modulesHtml(s.modules) +
         checkoutCta(s.cta, "oferta", "qz-cta--main") +
         '<p class="qz-trust">' + s.trust + "</p>" +
         "</div>" +
+
+        modulesHtml(s.modules) +
 
         '<div class="qz-guarantee">' + img(s.guarantee.image, "qz-guarantee__seal") +
         '<h2 class="qz-h2">' + s.guarantee.title + "</h2>" +

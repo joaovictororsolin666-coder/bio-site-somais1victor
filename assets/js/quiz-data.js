@@ -176,10 +176,9 @@ window.QUIZ_DATA = {
       { title: 'Bônus extra · Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp' },
       { title: 'Bônus extra · Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp' }
     ],
-    // Carrossel automático com as capas dos módulos (abaixo do preço)
+    // Carrossel automático com as capas dos módulos (bloco próprio, antes da garantia)
     modules: {
       title: '📚 O que você recebe ao entrar no método',
-      subtitle: '10 módulos para você começar do zero',
       items: [
         { src: 'assets/img/quiz/modulo-01.webp', title: 'Comece aqui' },
         { src: 'assets/img/quiz/modulo-02.webp', title: 'Produtos digitais' },
