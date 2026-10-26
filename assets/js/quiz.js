@@ -134,6 +134,23 @@
       '<span class="btn__label">' + label + "</span>" + ARROW + "</a>";
   }
 
+  // Carrossel infinito das capas dos módulos: a lista vai duas vezes e a faixa desliza meia largura
+  function modulesHtml(m) {
+    if (!m || !m.items || !m.items.length) return "";
+    var card = function (it, i, clone) {
+      return '<figure class="qz-module"' + (clone ? ' aria-hidden="true"' : "") + '>' +
+        '<img src="' + it.src + '" width="320" height="400" alt="' + (clone ? "" : "Módulo " + (i + 1) + ": " + it.title) + '" decoding="async">' +
+        '<span class="qz-module__n">' + ("0" + (i + 1)).slice(-2) + "</span></figure>";
+    };
+    return '<div class="qz-modules">' +
+      '<p class="qz-modules__title">' + m.title + "</p>" +
+      (m.subtitle ? '<p class="qz-modules__sub">' + m.subtitle + "</p>" : "") +
+      '<div class="qz-marquee"><div class="qz-marquee__track">' +
+      m.items.map(function (it, i) { return card(it, i, false); }).join("") +
+      m.items.map(function (it, i) { return card(it, i, true); }).join("") +
+      "</div></div></div>";
+  }
+
   function answerOf(key) {
     var q = Q.filter(function (x) { return x.key === key; })[0];
     var i = state.answers[key];
@@ -303,6 +320,7 @@
             "<div><strong>" + it.title + "</strong>" + (it.text ? "<span>" + it.text + "</span>" : "") + "</div></li>";
         }).join("") + "</ul>" +
         priceHtml +
+        modulesHtml(s.modules) +
         checkoutCta(s.cta, "oferta", "qz-cta--main") +
         '<p class="qz-trust">' + s.trust + "</p>" +
         "</div>" +

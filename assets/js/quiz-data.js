@@ -176,6 +176,23 @@ window.QUIZ_DATA = {
       { title: 'Bônus extra · Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp' },
       { title: 'Bônus extra · Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp' }
     ],
+    // Carrossel automático com as capas dos módulos (abaixo do preço)
+    modules: {
+      title: '📚 O que você recebe ao entrar no método',
+      subtitle: '10 módulos para você começar do zero',
+      items: [
+        { src: 'assets/img/quiz/modulo-01.webp', title: 'Comece aqui' },
+        { src: 'assets/img/quiz/modulo-02.webp', title: 'Produtos digitais' },
+        { src: 'assets/img/quiz/modulo-03.webp', title: 'Crie o seu produto' },
+        { src: 'assets/img/quiz/modulo-04.webp', title: 'Edição viral' },
+        { src: 'assets/img/quiz/modulo-05.webp', title: 'Primeira venda' },
+        { src: 'assets/img/quiz/modulo-06.webp', title: 'Decifrando o algoritmo' },
+        { src: 'assets/img/quiz/modulo-07.webp', title: 'Automatizando suas vendas' },
+        { src: 'assets/img/quiz/modulo-08.webp', title: 'Escalando com tráfego pago' },
+        { src: 'assets/img/quiz/modulo-09.webp', title: 'Produtos validados' },
+        { src: 'assets/img/quiz/modulo-10.webp', title: 'Entre para a comunidade' }
+      ]
+    },
     cta: 'SIM! QUERO SER O MEU PRÓPRIO CHEFE',
     trust: '🔒 Pagamento 100% seguro · 🔓 Acesso imediato',
     guarantee: {

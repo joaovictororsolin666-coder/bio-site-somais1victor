@@ -370,6 +370,62 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-price__main small { margin-right: 4px; color: var(--green); font-size: .42em; font-weight: 800; letter-spacing: 0; vertical-align: .9em; }
 .qz-price__alt { margin: 8px 0 0; color: var(--muted); font-size: 16px; }
 .qz-price__alt strong { color: var(--text); }
+/* Carrossel automático dos módulos */
+.qz-modules { margin-top: 22px; text-align: center; }
+.qz-modules__title { margin: 0; font-size: 16px; font-weight: 800; }
+.qz-modules__sub { margin: 4px 0 0; color: var(--muted); font-size: 13.5px; }
+.qz-marquee {
+  overflow: hidden;
+  margin: 14px -16px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.qz-marquee__track { display: flex; width: max-content; padding: 8px 0 14px; animation: qz-marquee 38s linear infinite; }
+.qz-marquee:hover .qz-marquee__track,
+.qz-marquee:active .qz-marquee__track { animation-play-state: paused; }
+.qz-module {
+  position: relative;
+  flex: none;
+  width: 112px;
+  margin: 0 10px 0 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 210, 90, .35);
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 10px 24px -12px rgba(255, 196, 60, .55);
+  transition: transform .3s var(--ease);
+}
+.qz-module img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
+.qz-module::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .22) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: qz-shine 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.qz-module:nth-child(3n + 2)::after { animation-delay: 1.5s; }
+.qz-module:nth-child(3n)::after { animation-delay: 3s; }
+.qz-module__n {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, .65);
+  color: #ffd666;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+@media (hover: hover) { .qz-module:hover { transform: translateY(-4px) scale(1.04); } }
+@keyframes qz-marquee { to { transform: translateX(-50%); } }
+@keyframes qz-shine { 0%, 55% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+@media (prefers-reduced-motion: reduce) {
+  .qz-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+}
+
 .qz-trust { margin: 12px 0 0; color: var(--dim); font-size: 12.5px; text-align: center; }
 
 .qz-guarantee { margin-top: 30px; padding: 22px 18px; border: 1px solid var(--line); border-radius: 22px; background: #101010; text-align: center; }
