@@ -366,9 +366,10 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 
 .qz-price { margin-top: 20px; padding-top: 18px; border-top: 1px dashed var(--line-2); text-align: center; }
 .qz-price__label { margin: 0; color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-.qz-price__main { margin: 6px 0 0; color: var(--green); font-size: clamp(36px, 11vw, 46px); font-weight: 800; line-height: 1.05; letter-spacing: -.02em; }
-.qz-price__main small { color: var(--text); font-size: .45em; font-weight: 700; letter-spacing: 0; }
-.qz-price__alt { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+.qz-price__main { margin: 6px 0 0; color: var(--green); font-size: clamp(56px, 17vw, 72px); font-weight: 800; line-height: 1; letter-spacing: -.03em; text-shadow: 0 0 28px rgba(57, 229, 140, .45); font-variant-numeric: tabular-nums; }
+.qz-price__main small { margin-right: 4px; color: var(--green); font-size: .42em; font-weight: 800; letter-spacing: 0; vertical-align: .9em; }
+.qz-price__alt { margin: 8px 0 0; color: var(--muted); font-size: 16px; }
+.qz-price__alt strong { color: var(--text); }
 .qz-trust { margin: 12px 0 0; color: var(--dim); font-size: 12.5px; text-align: center; }
 
 .qz-guarantee { margin-top: 30px; padding: 22px 18px; border: 1px solid var(--line); border-radius: 22px; background: #101010; text-align: center; }

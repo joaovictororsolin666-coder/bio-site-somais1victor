@@ -270,12 +270,13 @@
     offer: function () {
       var s = D.offer;
       var price = CFG.oferta || {};
-      var parts = (price.parcelas || "").split(" de ");
-      var priceHtml = price.parcelas ?
+      // Preço à vista em destaque (verde, grande) e o parcelado embaixo
+      var vista = (price.precoVista || "").replace(/^R\$\s*/, "");
+      var priceHtml = price.precoVista ?
         '<div class="qz-price">' +
         '<p class="qz-price__label">Acesso completo + todos os bônus</p>' +
-        '<p class="qz-price__main"><small>' + parts[0] + "</small> " + (parts[1] || "") + "</p>" +
-        (price.precoVista ? '<p class="qz-price__alt">ou ' + price.precoVista + " à vista</p>" : "") +
+        '<p class="qz-price__main"><small>R$</small>' + vista + "</p>" +
+        (price.parcelas ? '<p class="qz-price__alt">ou <strong>' + price.parcelas + "</strong></p>" : "") +
         "</div>" : "";
 
       return '<section class="qz-screen">' +
