@@ -211,6 +211,18 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-insight__list li { padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: #111; font-size: 15.5px; font-weight: 700; }
 .qz-insight__list li:last-child { border-color: rgba(57, 229, 140, .45); background: var(--green-soft); color: #d6fbe7; }
 
+/* Resultado em formato de diagnóstico */
+.qz-diag { margin-top: 20px; padding: 6px 16px 4px; border: 1px solid var(--line-2); border-radius: 18px; background: #101010; text-align: left; }
+.qz-diag__title { margin: 12px 0 6px; color: #d4d4d4; font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.qz-diag__row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 12px 0; border-top: 1px solid var(--line); }
+.qz-diag__row span { flex: none; color: var(--muted); font-size: 14px; }
+.qz-diag__row strong { color: var(--green); font-size: 15px; text-align: right; }
+.qz-result .qz-alert { margin-top: 14px; }
+.qz-fit { margin-top: 14px; padding: 16px; border: 1px solid rgba(57, 229, 140, .35); border-radius: 18px; background: rgba(57, 229, 140, .06); text-align: left; }
+.qz-fit__title { margin: 0 0 10px; font-size: 16px; font-weight: 800; }
+.qz-fit ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.qz-fit li { color: #d4d4d4; font-size: 14.5px; line-height: 1.45; }
+
 /* Recados personalizados no resultado */
 .qz-tips { display: grid; gap: 8px; margin-top: 14px; text-align: left; }
 .qz-tip { margin: 0; padding: 12px 14px; border: 1px solid rgba(57, 229, 140, .3); border-radius: 12px; background: rgba(57, 229, 140, .06); color: #d4d4d4; font-size: 14.5px; line-height: 1.45; }

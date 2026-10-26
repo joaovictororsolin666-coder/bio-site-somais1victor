@@ -258,23 +258,27 @@
 
     result: function () {
       var s = D.result;
-      var chips = [["Perfil", answerOf("experiencia")], ["Tempo", answerOf("tempo")], ["Meta", answerOf("meta")]]
-        .filter(function (c) { return c[1]; });
-      // Recados personalizados: objeção escolhida e faixa de idade
-      var tips = [];
+      // 1) Diagnóstico: as respostas da pessoa, em linhas
+      var rows = (s.diagRows || []).map(function (r) { return [r.label, answerOf(r.key)]; })
+        .filter(function (r) { return r[1]; });
+      // 2) Por que combina: experiência + objeção + idade + base
+      var fit = [];
+      var ex = optId("experiencia");
+      if (ex && s.fit && s.fit[ex]) fit.push(s.fit[ex]);
       var ob = optId("objecao");
-      if (ob && s.objection && s.objection[ob]) tips.push(s.objection[ob]);
-      if (optId("idade") === "30+" && s.over30) tips.push(s.over30);
-      return '<section class="qz-screen qz-center">' +
+      if (ob && s.objection && s.objection[ob]) fit.push(s.objection[ob]);
+      if (optId("idade") === "30+" && s.over30) fit.push(s.over30);
+      if (s.fitBase) fit.push(s.fitBase);
+      return '<section class="qz-screen qz-center qz-result">' +
         '<p class="qz-badge"><span aria-hidden="true">✔</span> ' + s.badge + "</p>" +
-        '<div class="qz-alert qz-alert--top"><p class="qz-alert__title">⚠️ ' + s.alertTitle + "</p><p>" + s.alertText + "</p></div>" +
         '<h1 class="qz-title">' + s.title + "</h1>" +
-        (chips.length ? '<div class="qz-chips">' + chips.map(function (c) {
-          return '<div class="qz-chip"><span>' + c[0] + "</span><strong>" + c[1] + "</strong></div>";
+        (s.subtitle ? '<p class="qz-sub">' + s.subtitle + "</p>" : "") +
+        (rows.length ? '<div class="qz-diag"><h2 class="qz-diag__title">' + s.diagTitle + "</h2>" + rows.map(function (r) {
+          return '<div class="qz-diag__row"><span>' + r[0] + "</span><strong>" + r[1] + "</strong></div>";
         }).join("") + "</div>" : "") +
-        (tips.length ? '<div class="qz-tips">' + tips.map(function (t) { return '<p class="qz-tip">' + t + "</p>"; }).join("") + "</div>" : "") +
-        '<div class="qz-media">' + img(s.image, "", true) + "</div>" +
-        '<p class="qz-text">' + s.text + "</p>" +
+        '<div class="qz-alert"><p class="qz-alert__title">⚠️ ' + s.alertTitle + "</p><p>" + s.alertText + "</p></div>" +
+        (fit.length ? '<div class="qz-fit"><h2 class="qz-fit__title">' + s.fitTitle + "</h2><ul>" +
+          fit.map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul></div>" : "") +
         '<div class="qz-case">' +
         '<h2 class="qz-h2">' + s.caseTitle + "</h2>" +
         '<p class="qz-text">' + s.caseText + "</p>" +
@@ -406,7 +410,7 @@
     if (!name) return;
     var srcs = [];
     if (name === "about") srcs = D.about.author ? [D.about.author.avatar] : [];
-    else if (name === "result") srcs = [D.result.image.src, D.result.casePhoto.src].concat(D.result.casePrint ? [D.result.casePrint.src] : []);
+    else if (name === "result") srcs = [D.result.casePhoto.src].concat(D.result.casePrint ? [D.result.casePrint.src] : []);
     else if (name === "gift") srcs = [D.gift.image];
     else if (name === "bonus") srcs = D.bonus.items.map(function (b) { return b.image.src; });
     else if (name === "offer") srcs = [D.offer.banner.src];

@@ -38,9 +38,9 @@ window.QUIZ_DATA = {
       key: 'experiencia',
       title: 'Você já tentou ganhar dinheiro vendendo produtos digitais na internet?',
       options: [
-        { emoji: '🙌', label: 'Nunca tentei, mas quero começar agora', short: 'Iniciante' },
-        { emoji: '😓', label: 'Já tentei, mas ainda não consegui vender', short: 'Já tentou, sem vendas' },
-        { emoji: '🚀', label: 'Sim, já vendo e quero aumentar meus resultados', short: 'Já vende' }
+        { emoji: '🙌', label: 'Nunca tentei, mas quero começar agora', short: 'Começando do zero', id: 'zero' },
+        { emoji: '😓', label: 'Já tentei, mas ainda não consegui vender', short: 'Já tentou, sem vendas', id: 'tentou' },
+        { emoji: '🚀', label: 'Sim, já vendo e quero aumentar meus resultados', short: 'Já vende', id: 'vende' }
       ]
     },
     {
@@ -140,12 +140,27 @@ window.QUIZ_DATA = {
   },
 
   result: {
-    badge: 'Seu resultado está pronto!',
-    title: 'Você está a um passo de descobrir como começar a vender na internet <span class="hl">sem precisar aparecer!</span>',
-    image: { src: 'assets/img/quiz/notificacoes.webp', w: 720, h: 411, alt: 'Notificações de vendas aprovadas' },
-    text: 'Com base nas suas respostas, vou te mostrar o método que utilizo para vender produtos digitais através de vídeos simples, mesmo começando do zero.',
-    alertTitle: 'O que pode estar te impedindo de vender não é falta de esforço...',
+    // Tela de resultado em formato de diagnóstico: respostas → bloqueio → por que combina → prova → botão
+    badge: 'Diagnóstico pronto!',
+    title: 'Seu perfil é <span class="hl">compatível</span> com o Método Primeira Renda',
+    subtitle: 'Analisei suas respostas. Veja o que elas mostram 👇',
+    diagTitle: '📋 Seu diagnóstico',
+    diagRows: [
+      { key: 'experiencia', label: 'Ponto de partida' },
+      { key: 'tempo', label: 'Tempo por dia' },
+      { key: 'meta', label: 'Meta' },
+      { key: 'objecao', label: 'Maior obstáculo' }
+    ],
+    alertTitle: 'O que está te impedindo de vender não é falta de esforço...',
     alertText: '❌ É não saber por onde começar e quais estratégias realmente aplicar!',
+    fitTitle: '✅ Por que o método combina com você',
+    // Pela resposta de "experiencia" (id da opção)
+    fit: {
+      zero: '🚀 O método foi feito para quem está <strong>começando do zero</strong>.',
+      tentou: '🎯 Você vai seguir <strong>estratégias prontas</strong>, sem tentativa e erro.',
+      vende: '📈 Você vai <strong>estruturar suas vendas</strong> para vender todos os dias.'
+    },
+    fitBase: '📱 Tudo pelo <strong>celular</strong>, com vídeos simples e <strong>sem precisar aparecer</strong>.',
     caseTitle: 'Como o caso da Poliana 👇',
     caseText: 'Entrou perdida, achando que nunca ia vender nada e em <mark>12 dias faturou mais de R$2.000,00</mark> usando o nosso <strong>Sistema de Vendas.</strong>',
     casePhoto: { src: 'assets/img/quiz/poliana.webp', w: 400, h: 534, alt: 'Poliana, aluna do MPR' },
@@ -157,13 +172,13 @@ window.QUIZ_DATA = {
     cta: 'QUERO APRENDER ESSE MÉTODO',
     // Recado personalizado pela resposta da pergunta "objecao" (id da opção)
     objection: {
-      comeco: '🧭 Você disse que <strong>não sabe por onde começar</strong>: o método é um <strong>passo a passo do zero</strong>, aula por aula.',
-      medo: '🛡️ Você tem <strong>medo de investir e não dar certo</strong>: por isso você tem <strong>7 dias de garantia</strong>. Se não gostar, recebe 100% de volta.',
-      tempo: '⏳ Você tem <strong>pouco tempo no dia</strong>: dá para começar <strong>usando apenas o celular</strong>, no seu ritmo.',
-      tentou: '🔁 Você <strong>já tentou outras coisas</strong>: aqui você usa <strong>estratégias prontas</strong> que já funcionam. Veja o caso da Poliana abaixo.'
+      comeco: '🧭 Não sabe por onde começar? O método é um <strong>passo a passo do zero</strong>, aula por aula.',
+      medo: '🛡️ Medo de investir? Você tem <strong>7 dias de garantia</strong>: se não gostar, recebe 100% de volta.',
+      tempo: '⏳ Pouco tempo? Dá para começar <strong>no seu ritmo</strong>, nos intervalos do dia.',
+      tentou: '🔁 Já tentou outras coisas? Aqui você aplica <strong>estratégias prontas</strong>. Veja o caso da Poliana abaixo.'
     },
     // Recado para quem tem mais de 30 anos
-    over30: '📱 <strong>Não precisa entender de tecnologia:</strong> tudo é feito pelo celular, com passo a passo.'
+    over30: '🤝 <strong>Não precisa entender de tecnologia:</strong> você segue o passo a passo, aula por aula.'
   },
 
   gift: {
