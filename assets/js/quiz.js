@@ -288,7 +288,7 @@
         '<div class="qz-pillars">' + s.pillars.map(function (p) {
           return '<div class="qz-pillar"><span class="qz-pillar__icon" aria-hidden="true">' + p.emoji + "</span>" +
             "<div><h2>" + p.title + "</h2><p>" + p.text + "</p></div></div>";
-        }).join("") + "</div>" +
+        }).join('<div class="qz-pillar-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15M5 12l7 7 7-7"/></svg></div>') + "</div>" +
 
         '<h2 class="qz-h2 qz-center qz-gap">' + s.proofTitle + "</h2>" +
         '<div class="qz-carousel" tabindex="0" aria-label="Resultados de alunos">' + s.proofs.map(function (p, i) {

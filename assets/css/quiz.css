@@ -292,7 +292,20 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 
 .qz-eyebrow { margin: 22px 0 8px; color: var(--green); font-size: 12px; font-weight: 800; letter-spacing: .14em; text-align: center; text-transform: uppercase; }
 
-.qz-pillars { display: grid; gap: 10px; margin-top: 24px; }
+.qz-pillars { display: grid; gap: 8px; margin-top: 24px; }
+.qz-pillar-arrow { display: grid; place-items: center; height: 28px; }
+.qz-pillar-arrow svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(57, 229, 140, .55));
+  animation: qz-arrow-down 1.6s ease-in-out infinite;
+}
+@keyframes qz-arrow-down { 50% { transform: translateY(4px); } }
 .qz-pillar { display: flex; gap: 14px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: #111; }
 .qz-pillar__icon { display: grid; place-items: center; flex: none; width: 46px; height: 46px; border-radius: 12px; background: var(--green-soft); font-size: 22px; }
 .qz-pillar h2 { margin: 2px 0 0; font-size: 14px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; }
