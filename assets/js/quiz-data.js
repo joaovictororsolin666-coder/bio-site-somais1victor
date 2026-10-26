@@ -10,18 +10,28 @@ window.QUIZ_DATA = {
     image: { src: 'assets/img/quiz/capa-v2.webp', w: 800, h: 450, alt: 'Victor Gomes com notificações de vendas aprovadas' },
     text: 'Não perca mais tempo apenas <mark>"rolando a tela"</mark> e vendo a vida dos outros. Chegou a hora de transformar <strong>visualizações em dinheiro no seu bolso</strong> com a fórmula que realmente funciona.',
     cta: 'DESCOBRIR COMO FUNCIONA',
-    note: 'Leva menos de 1 minuto · 7 perguntas rápidas'
+    note: 'Leva cerca de 1 minuto · 9 perguntas rápidas'
   },
 
   // "key" é o nome usado no resumo personalizado do resultado
   questions: [
     {
+      // Apresenta o mecanismo logo na primeira pergunta (eleva o nível de consciência)
+      key: 'metodo',
+      title: 'Você sabia que dá para vender produtos digitais usando vídeos simples, sem precisar aparecer?',
+      options: [
+        { emoji: '🤯', label: 'Não sabia, quero entender', id: 'nao-sabia' },
+        { emoji: '👀', label: 'Já ouvi falar, mas não sei como funciona', id: 'ouviu' },
+        { emoji: '😓', label: 'Sei, mas nunca consegui fazer funcionar', id: 'tentou' }
+      ]
+    },
+    {
       key: 'idade',
       title: 'Qual a sua idade?',
       options: [
-        { label: 'Entre 18 e 30 anos' },
-        { label: 'Mais de 30 anos' },
-        { label: 'Tenho menos de 18' }
+        { label: 'Entre 18 e 30 anos', id: '18-30' },
+        { label: 'Mais de 30 anos', id: '30+' },
+        { label: 'Tenho menos de 18', id: 'menor' }
       ]
     },
     {
@@ -34,13 +44,27 @@ window.QUIZ_DATA = {
       ]
     },
     {
-      key: 'rosto',
-      title: 'Você gostaria de aprender a vender sem precisar mostrar o rosto?',
+      // Pergunta de crença + tela de "virada" logo depois (insight)
+      key: 'crenca',
+      title: 'Na sua opinião, o que é preciso para fazer a primeira venda na internet?',
       options: [
-        { emoji: '🔥', label: 'Sim! É exatamente o que eu procuro!' },
-        { emoji: '🙁', label: 'Sim, mas não sei como fazer isso' },
-        { emoji: '📱', label: 'Não me importo de aparecer' }
-      ]
+        { emoji: '👥', label: 'Ter muitos seguidores' },
+        { emoji: '🎥', label: 'Aparecer nos vídeos' },
+        { emoji: '💰', label: 'Investir em anúncios' },
+        { emoji: '📦', label: 'Ter um produto próprio' }
+      ],
+      insight: {
+        badge: '💡 A verdade é que…',
+        title: 'Para começar, você <span class="hl">não precisa</span> do que a maioria pensa.',
+        text: 'No Método Primeira Renda você aprende a vender produtos digitais usando <strong>perfis dark e cortes de vídeos</strong>, mesmo começando do zero.',
+        points: [
+          '❌ Não precisa ter muitos seguidores',
+          '❌ Não precisa aparecer nos vídeos',
+          '❌ Não precisa investir em anúncios',
+          '✅ Precisa de um passo a passo e do seu celular'
+        ],
+        cta: 'FAZ SENTIDO, CONTINUAR'
+      }
     },
     {
       key: 'tempo',
@@ -70,6 +94,18 @@ window.QUIZ_DATA = {
         { emoji: '💸', label: 'De R$1.000 a R$3.000 por mês', short: 'R$1 mil a R$3 mil/mês' },
         { emoji: '🔥', label: 'De R$3.000 a R$5.000 por mês', short: 'R$3 mil a R$5 mil/mês' },
         { emoji: '🚀', label: 'Mais de R$5.000 por mês', short: '+R$5 mil/mês' }
+      ]
+    },
+    {
+      // Objeção principal: personaliza o resultado e a oferta (ver result.objection e offer.objectionNotes)
+      key: 'objecao',
+      title: 'O que mais te impede de começar hoje?',
+      subtitle: 'Seja sincero, isso muda o que vou te mostrar 👇',
+      options: [
+        { emoji: '🧭', label: 'Não sei por onde começar', id: 'comeco', short: 'Por onde começar' },
+        { emoji: '😟', label: 'Medo de investir e não dar certo', id: 'medo', short: 'Medo de investir' },
+        { emoji: '⏳', label: 'Tenho pouco tempo no dia', id: 'tempo', short: 'Pouco tempo' },
+        { emoji: '🔁', label: 'Já tentei outras coisas que não funcionaram', id: 'tentou', short: 'Já tentou antes' }
       ]
     },
     {
@@ -118,7 +154,16 @@ window.QUIZ_DATA = {
     audioHint: '🔊 Toque para ouvir o depoimento dela',
     casePrint: { src: 'assets/img/quiz/resultado-a.webp', w: 540, h: 957, alt: 'Print da conversa com a Poliana mostrando o resultado dela' },
     proof: 'Esse é apenas um dos milhares de resultados de quem coloca o método em prática! 🔥',
-    cta: 'QUERO APRENDER ESSE MÉTODO'
+    cta: 'QUERO APRENDER ESSE MÉTODO',
+    // Recado personalizado pela resposta da pergunta "objecao" (id da opção)
+    objection: {
+      comeco: '🧭 Você disse que <strong>não sabe por onde começar</strong>: o método é um <strong>passo a passo do zero</strong>, aula por aula.',
+      medo: '🛡️ Você tem <strong>medo de investir e não dar certo</strong>: por isso você tem <strong>7 dias de garantia</strong>. Se não gostar, recebe 100% de volta.',
+      tempo: '⏳ Você tem <strong>pouco tempo no dia</strong>: dá para começar <strong>usando apenas o celular</strong>, no seu ritmo.',
+      tentou: '🔁 Você <strong>já tentou outras coisas</strong>: aqui você usa <strong>estratégias prontas</strong> que já funcionam. Veja o caso da Poliana abaixo.'
+    },
+    // Recado para quem tem mais de 30 anos
+    over30: '📱 <strong>Não precisa entender de tecnologia:</strong> tudo é feito pelo celular, com passo a passo.'
   },
 
   gift: {
@@ -195,6 +240,14 @@ window.QUIZ_DATA = {
     },
     cta: 'SIM! QUERO SER O MEU PRÓPRIO CHEFE',
     trust: '🔒 Pagamento 100% seguro · 🔓 Acesso imediato',
+    // Linha logo abaixo do preço, pela objeção escolhida no quiz
+    objectionNotes: {
+      comeco: '🧭 Passo a passo do zero, aula por aula',
+      medo: '🛡️ Garantia de 7 dias: se não gostar, recebe 100% de volta',
+      tempo: '⏳ Comece pelo celular, no seu ritmo',
+      tentou: '🔁 Estratégias prontas para aplicar, sem tentativa e erro'
+    },
+    minorNote: 'Você marcou que tem menos de 18 anos: peça para um responsável maior de idade fazer a compra.',
     guarantee: {
       image: { src: 'assets/img/quiz/garantia.webp', w: 480, h: 320, alt: 'Selo de garantia de 7 dias' },
       title: 'Garantia incondicional de 7 dias',

@@ -20,13 +20,17 @@
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var Q = D.questions;
-  var FLOW = ["intro"].concat(Q.map(function (_, i) { return "q" + i; }), ["about", "loading", "result", "gift", "bonus", "offer"]);
+  // Perguntas com "insight" ganham uma tela de virada logo depois ("ins" + índice)
+  var FLOW = ["intro"];
+  Q.forEach(function (q, i) { FLOW.push("q" + i); if (q.insight) FLOW.push("ins" + i); });
+  FLOW = FLOW.concat(["about", "loading", "result", "gift", "bonus", "offer"]);
+  var FLOW_VERSION = 2; // painel usa para ler etapas antigas e novas
   var TRANSIENT = { loading: true };
   var NO_BACK = { intro: true, loading: true };
 
   /* ───────────── Estado (sobrevive a recarregar a página) ───────────── */
 
-  var STORE = "vg_quiz";
+  var STORE = "vg_quiz" + FLOW_VERSION;
   var state = { step: 0, answers: {} };
   try {
     var saved = JSON.parse(sessionStorage.getItem(STORE));
@@ -88,7 +92,7 @@
           p.append(k, a[k] || "");
         });
         p.append("respostas", JSON.stringify(j.answers));
-        p.append("etapas", JSON.stringify(j.steps));
+        p.append("etapas", JSON.stringify(Object.assign({ v: FLOW_VERSION }, j.steps)));
         if (navigator.sendBeacon(endpoint, p)) dirty = false;
       }
     };
@@ -151,6 +155,22 @@
       "</div></div></div>";
   }
 
+  // Linhas abaixo do preço conforme as respostas (objeção; aviso para menor de idade)
+  function priceNotes(s) {
+    var notes = [];
+    var ob = optId("objecao");
+    if (ob && s.objectionNotes && s.objectionNotes[ob]) notes.push('<p class="qz-price__note">' + s.objectionNotes[ob] + "</p>");
+    if (optId("idade") === "menor" && s.minorNote) notes.push('<p class="qz-price__note qz-price__note--warn">' + s.minorNote + "</p>");
+    return notes.join("");
+  }
+
+  // id da opção escolhida (ex.: objecao → "medo"; idade → "30+")
+  function optId(key) {
+    var q = Q.filter(function (x) { return x.key === key; })[0];
+    var i = state.answers[key];
+    return q && i != null && q.options[i] ? q.options[i].id || null : null;
+  }
+
   function answerOf(key) {
     var q = Q.filter(function (x) { return x.key === key; })[0];
     var i = state.answers[key];
@@ -206,6 +226,20 @@
         "</section>";
     },
 
+    // Tela de virada depois de uma pergunta de crença
+    insight: function (i) {
+      var q = Q[i], s = q.insight, chosen = state.answers[q.key];
+      var picked = chosen != null && q.options[chosen] ? q.options[chosen].label : "";
+      return '<section class="qz-screen qz-center qz-insight">' +
+        (picked ? '<p class="qz-insight__you">Você respondeu: <strong>' + picked + "</strong></p>" : "") +
+        '<p class="qz-insight__badge">' + s.badge + "</p>" +
+        '<h1 class="qz-title">' + s.title + "</h1>" +
+        '<p class="qz-text">' + s.text + "</p>" +
+        '<ul class="qz-insight__list">' + s.points.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul>" +
+        cta(s.cta) +
+        "</section>";
+    },
+
     loading: function () {
       var s = D.loading;
       return '<section class="qz-screen qz-center qz-loading">' +
@@ -226,6 +260,11 @@
       var s = D.result;
       var chips = [["Perfil", answerOf("experiencia")], ["Tempo", answerOf("tempo")], ["Meta", answerOf("meta")]]
         .filter(function (c) { return c[1]; });
+      // Recados personalizados: objeção escolhida e faixa de idade
+      var tips = [];
+      var ob = optId("objecao");
+      if (ob && s.objection && s.objection[ob]) tips.push(s.objection[ob]);
+      if (optId("idade") === "30+" && s.over30) tips.push(s.over30);
       return '<section class="qz-screen qz-center">' +
         '<p class="qz-badge"><span aria-hidden="true">✔</span> ' + s.badge + "</p>" +
         '<div class="qz-alert qz-alert--top"><p class="qz-alert__title">⚠️ ' + s.alertTitle + "</p><p>" + s.alertText + "</p></div>" +
@@ -233,6 +272,7 @@
         (chips.length ? '<div class="qz-chips">' + chips.map(function (c) {
           return '<div class="qz-chip"><span>' + c[0] + "</span><strong>" + c[1] + "</strong></div>";
         }).join("") + "</div>" : "") +
+        (tips.length ? '<div class="qz-tips">' + tips.map(function (t) { return '<p class="qz-tip">' + t + "</p>"; }).join("") + "</div>" : "") +
         '<div class="qz-media">' + img(s.image, "", true) + "</div>" +
         '<p class="qz-text">' + s.text + "</p>" +
         '<div class="qz-case">' +
@@ -300,6 +340,7 @@
         '<p class="qz-price__label">Acesso completo + todos os bônus</p>' +
         '<p class="qz-price__main"><small>R$</small>' + vista + "</p>" +
         (price.parcelas ? '<p class="qz-price__alt">ou <strong>' + price.parcelas + "</strong></p>" : "") +
+        priceNotes(s) +
         "</div>" : "";
 
       return '<section class="qz-screen">' +
@@ -355,6 +396,7 @@
 
   function htmlFor(name) {
     if (name.charAt(0) === "q" && name !== "q") return screens.question(+name.slice(1));
+    if (name.indexOf("ins") === 0) return screens.insight(+name.slice(3));
     return screens[name]();
   }
 

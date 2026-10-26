@@ -161,6 +161,7 @@ body.pn { background: #0b0b0b; font-size: 14px; }
 .pn-pill { display: inline-block; padding: 2px 8px; border: 1px solid rgba(57, 129, 229, .45); border-radius: 6px; color: #9cc3f5; font-size: 12px; font-weight: 700; }
 .pn-pill--ok { border-color: rgba(57, 229, 140, .5); background: var(--green-soft); color: var(--green); }
 .pn-left { color: #fca5a5; font-size: 12px; font-weight: 700; }
+.pn-na { color: var(--dim); }
 .pn-more { padding: 12px; text-align: center; border-top: 1px solid var(--line); }
 
 .pn-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }

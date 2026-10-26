@@ -202,6 +202,19 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
   .qz-back:hover { background: rgba(255, 255, 255, .08); }
 }
 
+/* ───────────── Tela de virada (insight) ───────────── */
+
+.qz-insight__you { display: inline-block; margin: 0 0 14px; padding: 6px 12px; border: 1px solid var(--line-2); border-radius: 999px; background: #121212; color: var(--muted); font-size: 13px; }
+.qz-insight__you strong { color: var(--text); }
+.qz-insight__badge { margin: 0 0 8px; color: #fde68a; font-size: 14px; font-weight: 800; letter-spacing: .02em; }
+.qz-insight__list { display: grid; gap: 10px; margin: 22px 0 0; padding: 0; list-style: none; text-align: left; }
+.qz-insight__list li { padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: #111; font-size: 15.5px; font-weight: 700; }
+.qz-insight__list li:last-child { border-color: rgba(57, 229, 140, .45); background: var(--green-soft); color: #d6fbe7; }
+
+/* Recados personalizados no resultado */
+.qz-tips { display: grid; gap: 8px; margin-top: 14px; text-align: left; }
+.qz-tip { margin: 0; padding: 12px 14px; border: 1px solid rgba(57, 229, 140, .3); border-radius: 12px; background: rgba(57, 229, 140, .06); color: #d4d4d4; font-size: 14.5px; line-height: 1.45; }
+
 /* ───────────── Carregando ───────────── */
 
 .qz-loading { padding-top: 4vh; }
@@ -385,6 +398,8 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-price__main small { margin-right: 4px; color: var(--green); font-size: .42em; font-weight: 800; letter-spacing: 0; vertical-align: .9em; }
 .qz-price__alt { margin: 8px 0 0; color: var(--muted); font-size: 16px; }
 .qz-price__alt strong { color: var(--text); }
+.qz-price__note { margin: 12px auto 0; padding: 8px 12px; max-width: 340px; border-radius: 10px; background: var(--green-soft); color: #d6fbe7; font-size: 13.5px; font-weight: 700; }
+.qz-price__note--warn { background: rgba(250, 204, 21, .08); color: #fde68a; font-weight: 600; }
 /* Carrossel automático dos módulos */
 .qz-modules {
   margin-top: 30px;

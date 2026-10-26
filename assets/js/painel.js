@@ -27,20 +27,24 @@
   /* ───────────── Etapas do quiz (mesma ordem do quiz.js) ───────────── */
 
   var Q = D.questions || [];
-  var QSHORT = { idade: "Idade", experiencia: "Experiência", rosto: "Sem aparecer", tempo: "Tempo/dia", situacao: "Situação", meta: "Meta", disposicao: "Disposição" };
-  var base = Q.length;
-  var IDX = { about: base + 1, loading: base + 2, result: base + 3, gift: base + 4, bonus: base + 5, offer: base + 6 };
-  var LAST = IDX.offer;
-  var STEPS = [{ i: 0, label: "Início", kind: "click" }]
-    .concat(Q.map(function (q, n) { return { i: n + 1, label: "P" + (n + 1) + " · " + (QSHORT[q.key] || q.key), kind: "answer", key: q.key }; }))
-    .concat([
-      { i: IDX.about, label: "Apresentação", kind: "click" },
-      { i: IDX.loading, label: "Análise", kind: "auto" },
-      { i: IDX.result, label: "Resultado", kind: "click" },
-      { i: IDX.gift, label: "Presente", kind: "click" },
-      { i: IDX.bonus, label: "Bônus", kind: "click" },
-      { i: IDX.offer, label: "Oferta", kind: "offer" }
-    ]);
+  var QSHORT = { metodo: "Conhece o método", idade: "Idade", experiencia: "Experiência", crenca: "Crença", rosto: "Sem aparecer", tempo: "Tempo/dia", situacao: "Situação", meta: "Meta", objecao: "Objeção", disposicao: "Disposição" };
+  var TAIL = ["about", "loading", "result", "gift", "bonus", "offer"];
+
+  // Etapas por NOME (independente da versão do quiz). Versão 2 = fluxo atual, montado igual ao quiz.js.
+  var NEW_NAMES = ["intro"];
+  Q.forEach(function (q) { NEW_NAMES.push("q:" + q.key); if (q.insight) NEW_NAMES.push("ins:" + q.key); });
+  NEW_NAMES = NEW_NAMES.concat(TAIL);
+  // Versão 1 = quiz antigo (7 perguntas), para ler as visitas registradas antes da mudança
+  var OLD_NAMES = ["intro", "q:idade", "q:experiencia", "q:rosto", "q:tempo", "q:situacao", "q:meta", "q:disposicao"].concat(TAIL);
+
+  var TAIL_LABELS = { about: "Apresentação", loading: "Análise", result: "Resultado", gift: "Presente", bonus: "Bônus", offer: "Oferta" };
+  var qn = 0;
+  var STEPS = NEW_NAMES.map(function (name, i) {
+    if (name === "intro") return { i: i, name: name, label: "Início", kind: "click" };
+    if (name.indexOf("q:") === 0) { qn++; var key = name.slice(2); return { i: i, name: name, label: "P" + qn + " · " + (QSHORT[key] || key), kind: "answer", key: key }; }
+    if (name.indexOf("ins:") === 0) return { i: i, name: name, label: "Virada", kind: "click" };
+    return { i: i, name: name, label: TAIL_LABELS[name], kind: name === "loading" ? "auto" : name === "offer" ? "offer" : "click" };
+  });
 
   var state = { senha: "", dias: 1, tab: "performance", all: [], cur: [], prev: [], now: new Date(), shown: 150, search: "" };
 
@@ -76,8 +80,23 @@
       ref: String(r.referrer || "")
     };
     try { o.resp = typeof r.respostas === "string" ? JSON.parse(r.respostas || "{}") : (r.respostas || {}); } catch (e) { o.resp = {}; }
+    var et = {};
+    try { et = typeof r.etapas === "string" ? JSON.parse(r.etapas || "{}") : (r.etapas || {}); } catch (e) { et = {}; }
+    withFlow(o, Number(et.v) === 2 ? 2 : 1);
     o.origem = origin(o);
     return o;
+  }
+
+  // Converte a etapa máxima (índice) em nomes, conforme a versão do quiz da visita
+  function withFlow(o, v) {
+    var names = v === 2 ? NEW_NAMES : OLD_NAMES;
+    var mx = Math.min(o.max, names.length - 1);
+    o.v = v;
+    o.flowLen = names.length;
+    o.maxName = names[mx];
+    o.reached = {};
+    o.inFlow = {};
+    names.forEach(function (n, i) { o.inFlow[n] = true; if (i <= mx) o.reached[n] = true; });
   }
 
   function origin(o) {
@@ -100,15 +119,18 @@
     return {
       visits: list.length,
       started: started.length,
-      answered: list.filter(function (o) { return o.max >= IDX.about; }).length,
-      offer: list.filter(function (o) { return o.max >= LAST; }).length,
+      answered: list.filter(function (o) { return o.reached.about; }).length,
+      offer: list.filter(function (o) { return o.reached.offer; }).length,
       checkout: list.filter(function (o) { return o.checkout; }).length,
-      avgSteps: mean(started.map(function (o) { return Math.min(o.max, LAST) + 1; })),
+      // % do quiz percorrido (comparável entre versões com número diferente de etapas)
+      avgProgress: mean(started.map(function (o) { return Math.min(1, (Math.min(o.max, o.flowLen - 1) + 1) / o.flowLen); })),
       avgTime: mean(started.map(function (o) { return o.dur; }))
     };
   }
 
-  function reach(list, i) { return list.filter(function (o) { return o.max >= i; }).length; }
+  // Quantos chegaram na etapa (entre as visitas cuja versão do quiz tem essa etapa)
+  function reach(list, name) { return list.filter(function (o) { return o.reached[name]; }).length; }
+  function baseOf(list, name) { return list.filter(function (o) { return o.inFlow[name]; }).length; }
 
   /* ───────────── Comunicação com o Apps Script ───────────── */
 
@@ -268,7 +290,7 @@
     var cards = [
       { label: "Visitas", value: num(m.visits), d: delta(m.visits, p.visits) },
       { label: "Iniciaram o quiz", value: num(m.started), sub: pct(m.started, m.visits) + " das visitas", d: delta(m.started, p.started) },
-      { label: "Média de etapas", value: m.started ? m.avgSteps.toFixed(1).replace(".", ",") + "<small>/" + (LAST + 1) + "</small>" : "—", d: delta(m.avgSteps, p.avgSteps) },
+      { label: "Avanço médio no quiz", value: m.started ? pct(m.avgProgress, 1, 0) : "—", d: delta(m.avgProgress, p.avgProgress) },
       { label: "Tempo médio", value: m.started ? dur(m.avgTime) : "—", d: delta(m.avgTime, p.avgTime) },
       { label: "Cliques no checkout", value: num(m.checkout), sub: pct(m.checkout, m.visits) + " das visitas", d: delta(m.checkout, p.checkout), hero: true }
     ];
@@ -291,7 +313,7 @@
     var stages = [
       ["Visitantes", m.visits],
       ["Iniciaram o quiz", m.started],
-      ["Responderam as " + Q.length + " perguntas", m.answered],
+      ["Responderam todas as perguntas", m.answered],
       ["Viram a oferta", m.offer],
       ["Clicaram no checkout", m.checkout]
     ];
@@ -316,8 +338,11 @@
     var worst = null;
     STEPS.forEach(function (st, k) {
       if (k === STEPS.length - 1 || st.kind === "auto") return;
-      var here = reach(state.cur, st.i);
-      var next = reach(state.cur, STEPS[k + 1].i);
+      var nextName = STEPS[k + 1].name;
+      // só visitas cuja versão do quiz tem as duas etapas
+      var pool = state.cur.filter(function (o) { return o.inFlow[st.name] && o.inFlow[nextName]; });
+      var here = reach(pool, st.name);
+      var next = reach(pool, nextName);
       if (here < 3) return;
       var rate = 1 - next / here;
       if (!worst || rate > worst.rate) worst = { st: st, rate: rate, left: here - next };
@@ -349,7 +374,7 @@
       var inB = state.cur.filter(function (o) { var t = o.inicio.getTime(); return t >= b.start && t < b.end; });
       b.visitantes = inB.length;
       b.iniciaram = inB.filter(function (o) { return o.max >= 1; }).length;
-      b.oferta = inB.filter(function (o) { return o.max >= LAST; }).length;
+      b.oferta = inB.filter(function (o) { return o.reached.offer; }).length;
       b.checkout = inB.filter(function (o) { return o.checkout; }).length;
     });
     return out;
@@ -431,7 +456,7 @@
       var g = groups[k] || (groups[k] = { name: k, visits: 0, started: 0, offer: 0, checkout: 0 });
       g.visits++;
       if (o.max >= 1) g.started++;
-      if (o.max >= LAST) g.offer++;
+      if (o.reached.offer) g.offer++;
       if (o.checkout) g.checkout++;
     });
     var list = Object.keys(groups).map(function (k) { return groups[k]; }).sort(function (a, b) { return b.visits - a.visits; });
@@ -499,16 +524,17 @@
 
   function cell(o, st) {
     var left = '<span class="pn-left">✕ saiu aqui</span>';
+    if (!o.inFlow[st.name]) return '<span class="pn-na" title="Etapa não existia na versão do quiz dessa visita">—</span>';
     if (st.kind === "answer") {
       if (o.resp[st.key]) return '<span class="pn-answer" title="' + esc(o.resp[st.key]) + '">' + esc(o.resp[st.key]) + "</span>";
-      return o.max === st.i ? left : "";
+      return o.maxName === st.name ? left : "";
     }
     if (st.kind === "offer") {
       if (o.checkout) return '<span class="pn-pill pn-pill--ok">checkout · ' + esc(o.checkout) + "</span>";
-      return o.max >= st.i ? '<span class="pn-pill">viu a oferta</span>' : "";
+      return o.reached.offer ? '<span class="pn-pill">viu a oferta</span>' : "";
     }
-    if (o.max > st.i) return '<span class="pn-pill">clicou</span>';
-    return o.max === st.i || (st.i === IDX.about && o.max === IDX.loading) ? left : "";
+    if (o.reached[st.name] && o.maxName !== st.name) return '<span class="pn-pill">clicou</span>';
+    return o.maxName === st.name || (st.name === "about" && o.maxName === "loading") ? left : "";
   }
 
   function renderResponses() {
@@ -518,10 +544,11 @@
 
     var head = "<thead><tr><th class=\"pn-sticky pn-sticky--1\">ID</th><th class=\"pn-sticky pn-sticky--2\">Data</th><th>Origem</th>" +
       TABLE_STEPS.map(function (st) {
-        var r = reach(state.cur, st.i);
-        var p = total ? r / total : 0;
+        var r = reach(state.cur, st.name);
+        var b = baseOf(state.cur, st.name);
+        var p = b ? r / b : 0;
         return '<th><div class="pn-th"><span class="pn-th__n">' + st.i + '</span><span class="pn-th__label">' + esc(st.label) + "</span>" +
-          '<span class="pn-th__pct">' + pct(r, total, 0) + "</span>" + ring(p) + "</div></th>";
+          '<span class="pn-th__pct">' + pct(r, b, 0) + "</span>" + ring(p) + "</div></th>";
       }).join("") + "</tr></thead>";
 
     if (!list.length) {
@@ -561,7 +588,7 @@
     var list = filtered();
     var head = ["id", "data", "origem", "campanha", "dispositivo", "etapa_max", "etapa", "checkout", "duracao_s"].concat(Q.map(function (q) { return q.key; }));
     var lines = [head.join(";")].concat(list.map(function (o) {
-      var st = STEPS.filter(function (s) { return s.i === Math.min(o.max, LAST); })[0];
+      var st = STEPS.filter(function (s) { return s.name === o.maxName; })[0];
       return [o.id, dateTime(o.inicio), o.origem, o.camp, o.disp, o.max, st ? st.label : "", o.checkout, o.dur]
         .concat(Q.map(function (q) { return o.resp[q.key] || ""; }))
         .map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(";");
@@ -607,19 +634,22 @@
     var sources = [["instagram", "bio", ""], ["instagram", "bio", ""], ["instagram", "stories", "mpr"], ["facebook", "cpc", "lancamento"], ["", "", ""]];
     var devices = ["Celular", "Celular", "Celular", "Celular", "Computador", "Tablet"];
     function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+    var last = NEW_NAMES.length - 1;
     for (var i = 0; i < n; i++) {
       var max = 0;
-      while (max < LAST && Math.random() < (max === 0 ? 0.78 : max === IDX.result ? 0.8 : 0.93)) max++;
+      while (max < last && Math.random() < (max === 0 ? 0.78 : NEW_NAMES[max] === "result" ? 0.8 : 0.95)) max++;
       var resp = {};
-      Q.forEach(function (q, k) { if (max > k + 1) resp[q.key] = q.options[Math.random() < 0.55 ? 0 : Math.floor(Math.random() * q.options.length)].label; });
+      Q.forEach(function (q) {
+        if (NEW_NAMES.indexOf("q:" + q.key) < max) resp[q.key] = q.options[Math.random() < 0.55 ? 0 : Math.floor(Math.random() * q.options.length)].label;
+      });
       var s = pick(sources);
       rows.push({
         id: Math.random().toString(36).slice(2, 12), inicio: new Date(now - Math.random() * span),
-        disp: pick(devices), max: max, checkout: max >= LAST && Math.random() < 0.32 ? pick(["oferta", "oferta", "oferta", "garantia"]) : "",
-        dur: 20 + max * 9 + Math.random() * 40, src: s[0], med: s[1], camp: s[2], ref: s[0] ? "" : "direto", resp: resp
+        disp: pick(devices), max: max, checkout: max >= last && Math.random() < 0.32 ? pick(["oferta", "oferta", "oferta", "garantia"]) : "",
+        dur: 20 + max * 8 + Math.random() * 40, src: s[0], med: s[1], camp: s[2], ref: s[0] ? "" : "direto", resp: resp
       });
     }
-    rows.forEach(function (o) { o.origem = origin(o); });
+    rows.forEach(function (o) { withFlow(o, 2); o.origem = origin(o); });
     return rows;
   }
 
