@@ -39,6 +39,65 @@
     try { sessionStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { /* ignore */ }
   }
 
+  /* ───────────── Jornada do visitante (alimenta o painel /painel) ─────────────
+     Anônima: um código aleatório, etapas alcançadas, respostas, botão de checkout e origem.
+     Enviada em pacote (sendBeacon) ao sair da página, ao chegar na oferta e ao clicar no checkout. */
+
+  var Journey = (function () {
+    var endpoint = (CFG.form || {}).endpoint;
+    var enabled = !!endpoint && !!navigator.sendBeacon && (CFG.painel || {}).ativo !== false;
+    var dirty = true;
+
+    function rid() {
+      var c = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = "";
+      for (var i = 0; i < 10; i++) s += c.charAt(Math.floor(Math.random() * c.length));
+      return s;
+    }
+    function device() {
+      var ua = navigator.userAgent;
+      if (/iPad|Tablet/i.test(ua)) return "Tablet";
+      return /Mobi|Android|iPhone|iPod/i.test(ua) ? "Celular" : "Computador";
+    }
+
+    if (!state.j) state.j = { id: rid(), t0: Date.now(), steps: {}, max: 0, answers: {}, checkout: "" };
+    var j = state.j;
+
+    function mark() { dirty = true; save(); }
+
+    return {
+      step: function (i) {
+        if (j.steps[i] == null) { j.steps[i] = Math.round((Date.now() - j.t0) / 1000); dirty = true; }
+        if (i > j.max) { j.max = i; dirty = true; }
+        save();
+      },
+      answer: function (key, label) { j.answers[key] = label; mark(); },
+      checkout: function (term) { j.checkout = term || "sim"; mark(); this.flush(); },
+      flush: function () {
+        if (!enabled || !dirty) return;
+        var a = VG.attribution ? VG.attribution() : {};
+        var p = new URLSearchParams();
+        p.append("action", "quiz");
+        p.append("id", j.id);
+        p.append("inicio", new Date(j.t0).toISOString());
+        p.append("dispositivo", device());
+        p.append("etapa_max", j.max);
+        p.append("etapa_nome", FLOW[j.max]);
+        p.append("concluiu", j.max >= FLOW.indexOf("offer") ? "sim" : "nao");
+        p.append("checkout", j.checkout);
+        p.append("duracao_s", Math.min(1800, Math.round((Date.now() - j.t0) / 1000)));
+        ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "referrer"].forEach(function (k) {
+          p.append(k, a[k] || "");
+        });
+        p.append("respostas", JSON.stringify(j.answers));
+        p.append("etapas", JSON.stringify(j.steps));
+        if (navigator.sendBeacon(endpoint, p)) dirty = false;
+      }
+    };
+  })();
+
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") Journey.flush(); });
+  window.addEventListener("pagehide", function () { Journey.flush(); });
+
   /* ───────────── Helpers de HTML ───────────── */
 
   function img(o, cls, eager) {
@@ -72,7 +131,7 @@
   }
 
   function checkoutCta(label, term, extraCls) {
-    return '<a class="btn btn--primary btn--pulse qz-cta ' + (extraCls || "") + '" href="' + checkoutUrl(term) + '" data-checkout>' +
+    return '<a class="btn btn--primary btn--pulse qz-cta ' + (extraCls || "") + '" href="' + checkoutUrl(term) + '" data-checkout="' + term + '">' +
       '<span class="btn__label">' + label + "</span>" + ARROW + "</a>";
   }
 
@@ -290,6 +349,7 @@
 
   function render(step, animate) {
     var name = FLOW[step];
+    Journey.step(step);
     var paint = function () {
       app.innerHTML = htmlFor(name);
       window.scrollTo(0, 0);
@@ -376,7 +436,7 @@
           b.classList.add("is-selected");
           b.setAttribute("aria-pressed", "true");
           state.answers[q.key] = +b.getAttribute("data-answer");
-          save();
+          Journey.answer(q.key, q.options[state.answers[q.key]].label);
           setTimeout(function () { busy = false; next(); }, reduceMotion ? 0 : 260);
         });
       });
@@ -470,6 +530,7 @@
       completedTracked = true;
       VG.track("quizComplete", { meta_escolhida: answerOf("meta") || "" });
     }
+    Journey.flush();
 
     $$("[data-checkout]", root).forEach(function (a) { bindCheckout(a); });
 
@@ -477,7 +538,7 @@
     var price = $("#qz-price .qz-cta", root);
     var label = D.offer.stickyLabel;
     var parcelas = (CFG.oferta || {}).parcelas;
-    sticky.firstElementChild.innerHTML = '<a class="btn btn--primary qz-sticky__btn" href="' + checkoutUrl("fixo") + '" data-checkout>' +
+    sticky.firstElementChild.innerHTML = '<a class="btn btn--primary qz-sticky__btn" href="' + checkoutUrl("fixo") + '" data-checkout="fixo">' +
       '<span class="btn__label">' + label + (parcelas ? "<small>" + parcelas + "</small>" : "") + "</span>" + ARROW + "</a>";
     bindCheckout($("[data-checkout]", sticky));
 
@@ -519,6 +580,7 @@
         return;
       }
       VG.track("checkoutClick", { meta_escolhida: answerOf("meta") || "", tempo: answerOf("tempo") || "" });
+      Journey.checkout(a.getAttribute("data-checkout"));
     });
   }
 

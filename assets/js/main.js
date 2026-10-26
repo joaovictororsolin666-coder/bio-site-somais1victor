@@ -387,7 +387,7 @@
   /* ───────────── Início ───────────── */
 
   // Usado pelo quiz (assets/js/quiz.js)
-  window.VG = { track: Tracking.track, withUtms: withUtms, toast: toast };
+  window.VG = { track: Tracking.track, withUtms: withUtms, toast: toast, attribution: Attribution.all };
 
   initLinks();
   initForm();

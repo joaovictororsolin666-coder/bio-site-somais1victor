@@ -34,6 +34,19 @@ O botão "QUERO COMEÇAR AGORA" leva ao quiz: capa → 7 perguntas → apresenta
 - **UTMs no checkout:** as do visitante vão primeiro; se faltarem, entram `utm_campaign=mpr` e `utm_content=funil_quiz` (`links.checkoutUtms`). `utm_term` mostra o botão clicado: `oferta`, `garantia` ou `fixo`.
 - Para pular o quiz e mandar direto ao checkout, troque `links.metodoPrimeiraRenda` pelo link do checkout.
 
+## Painel do funil (`/painel`)
+
+Métricas do quiz em `https://www.ovictorgomes.com.br/painel`, com duas abas:
+
+- **Performance:** visitas, início do quiz, média de etapas, tempo médio, cliques no checkout (com comparação ao período anterior), funil, tráfego por hora/dia, campanhas (UTMs) e dispositivos.
+- **Respostas:** uma linha por visitante com a resposta de cada etapa, a % de pessoas que chegou em cada etapa e onde cada um saiu; resumo das respostas por pergunta; exportação em CSV.
+
+Como funciona: o quiz envia a jornada anônima de cada visitante para a aba **Quiz** da planilha (via Apps Script). O painel lê essa aba usando a senha.
+
+- **Senha:** no Apps Script → Configurações do projeto (engrenagem) → Propriedades do script → `PAINEL_SENHA`.
+- **Visual sem dados reais:** `/painel?demo=1` mostra dados fictícios (só para conferir o layout).
+- O painel mede até o **clique no checkout**; as vendas aprovadas ficam no painel da NeonPay (cruze pelas UTMs).
+
 ## 2. Imagens
 
 Use **WebP ou AVIF** (converta grátis em squoosh.app). Salve em `assets/img/` e substitua os placeholders — o código pronto está em comentários no `index.html`:

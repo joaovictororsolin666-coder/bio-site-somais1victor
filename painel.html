@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Painel do Funil | Victor Gomes</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#080808">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/painel.css">
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/quiz-data.js" defer></script>
+  <script src="assets/js/painel.js" defer></script>
+</head>
+<body class="pn">
+
+  <!-- Login -->
+  <main class="pn-login" id="login" hidden>
+    <form class="pn-login__card" id="login-form">
+      <img src="assets/img/quiz/logo-mpr.webp" alt="" width="64" height="64">
+      <h1>Painel do Funil MPR</h1>
+      <p>Digite a senha do painel para ver as métricas do quiz.</p>
+      <label class="pn-sr" for="senha">Senha</label>
+      <input class="input" id="senha" name="senha" type="password" autocomplete="current-password" placeholder="Senha do painel" required>
+      <label class="pn-check"><input type="checkbox" id="lembrar" checked> Lembrar neste aparelho</label>
+      <p class="pn-login__error" id="login-error" role="alert" hidden></p>
+      <button class="btn btn--primary" type="submit"><span class="btn__label">ENTRAR</span></button>
+    </form>
+  </main>
+
+  <!-- Painel -->
+  <div class="pn-app" id="app" hidden>
+    <header class="pn-top">
+      <div class="pn-top__brand">
+        <img src="assets/img/quiz/logo-mpr.webp" alt="" width="36" height="36">
+        <div><strong>Funil MPR</strong><span>ovictorgomes.com.br/quiz</span></div>
+      </div>
+      <nav class="pn-tabs" role="tablist" aria-label="Seções do painel">
+        <button class="pn-tab is-active" type="button" role="tab" aria-selected="true" data-tab="performance">Performance</button>
+        <button class="pn-tab" type="button" role="tab" aria-selected="false" data-tab="respostas">Respostas</button>
+      </nav>
+      <div class="pn-top__actions">
+        <div class="pn-seg" role="group" aria-label="Período">
+          <button type="button" data-dias="1" class="is-active">24 horas</button>
+          <button type="button" data-dias="7">7 dias</button>
+          <button type="button" data-dias="30">30 dias</button>
+        </div>
+        <button class="pn-icon" type="button" id="refresh" aria-label="Atualizar dados" title="Atualizar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>
+        </button>
+        <button class="pn-icon" type="button" id="logout" aria-label="Sair do painel" title="Sair">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <p class="pn-status" id="status" role="status" hidden></p>
+
+    <!-- Performance -->
+    <section class="pn-view" id="view-performance" role="tabpanel">
+      <div class="pn-kpis" id="kpis"></div>
+
+      <div class="pn-grid">
+        <article class="pn-card pn-card--funnel">
+          <header class="pn-card__head"><h2>Desempenho do funil</h2></header>
+          <div class="pn-funnel-top" id="funnel-top"></div>
+          <div class="pn-funnel" id="funnel"></div>
+          <p class="pn-insight" id="funnel-insight"></p>
+        </article>
+
+        <article class="pn-card pn-card--traffic">
+          <header class="pn-card__head"><h2>Tráfego</h2><span class="pn-muted" id="traffic-scale"></span></header>
+          <div class="pn-legend" id="traffic-legend"></div>
+          <div class="pn-chart" id="traffic"></div>
+        </article>
+      </div>
+
+      <div class="pn-grid pn-grid--bottom">
+        <article class="pn-card">
+          <header class="pn-card__head"><h2>Campanhas e origens</h2></header>
+          <div class="pn-campaign-top" id="campaign-top"></div>
+          <div class="pn-table-wrap"><table class="pn-table" id="campaigns"></table></div>
+        </article>
+        <article class="pn-card">
+          <header class="pn-card__head"><h2>Dispositivos</h2></header>
+          <div class="pn-devices" id="devices"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Respostas -->
+    <section class="pn-view" id="view-respostas" role="tabpanel" hidden>
+      <div class="pn-toolbar">
+        <input class="input pn-search" id="search" type="search" placeholder="Buscar por ID ou origem" aria-label="Buscar visitante">
+        <span class="pn-muted" id="resp-count"></span>
+        <button class="btn btn--ghost btn--sm" type="button" id="export">Exportar CSV</button>
+      </div>
+      <div class="pn-card pn-card--flush">
+        <div class="pn-table-wrap pn-table-wrap--resp"><table class="pn-table pn-resp" id="responses"></table></div>
+        <div class="pn-more" id="more-wrap" hidden><button class="btn btn--ghost btn--sm" type="button" id="more">Mostrar mais</button></div>
+      </div>
+
+      <h2 class="pn-section-title">Resumo das respostas</h2>
+      <div class="pn-summary" id="summary"></div>
+    </section>
+
+    <div class="pn-tooltip" id="tooltip" role="status" hidden></div>
+  </div>
+</body>
+</html>
