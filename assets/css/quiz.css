@@ -126,6 +126,27 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 }
 .qz-screen { isolation: isolate; }
 
+/* ───────────── Apresentação (quem é) ───────────── */
+
+.qz-about { padding-top: 6px; }
+.qz-author { display: flex; align-items: center; gap: 14px; }
+.qz-author__ring {
+  display: block;
+  flex: none;
+  width: 72px;
+  height: 72px;
+  padding: 3px;
+  border-radius: 50%;
+  background: conic-gradient(from 210deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5, #feda75);
+}
+.qz-author__ring img { display: block; width: 100%; height: 100%; border: 3px solid var(--bg); border-radius: 50%; object-fit: cover; }
+.qz-author__name { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 19px; font-weight: 800; }
+.qz-author__handle { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
+.qz-author__badge { flex: none; width: 20px; height: 20px; fill: #3897f0; }
+.qz-author__tick { fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.qz-about__title { margin-top: 26px; font-size: clamp(28px, 8vw, 34px); text-align: left; }
+.qz-about .qz-text { margin-top: 16px; font-size: 16.5px; line-height: 1.6; text-align: left; }
+
 /* ───────────── Perguntas ───────────── */
 
 .qz-options { display: grid; gap: 10px; margin-top: 24px; }

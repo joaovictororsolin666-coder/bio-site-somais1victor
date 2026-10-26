@@ -193,10 +193,14 @@
     },
 
     about: function () {
-      var s = D.about;
-      return '<section class="qz-screen qz-center">' +
-        '<h1 class="qz-title">' + s.title + "</h1>" +
-        '<div class="qz-media qz-media--portrait">' + img(s.image, "", true) + "</div>" +
+      var s = D.about, a = s.author || {};
+      var badge = a.verified
+        ? '<svg class="qz-author__badge" viewBox="0 0 24 24" role="img" aria-label="Verificado"><path d="M12 1.5l2.4 1.8 3-.2.9 2.9 2.5 1.7-.9 2.9.9 2.9-2.5 1.7-.9 2.9-3-.2L12 20.5l-2.4-1.8-3 .2-.9-2.9-2.5-1.7.9-2.9-.9-2.9 2.5-1.7.9-2.9 3 .2z"/><path class="qz-author__tick" d="M8 12.2l2.6 2.6L16 9.4"/></svg>'
+        : "";
+      return '<section class="qz-screen qz-about">' +
+        (a.name ? '<div class="qz-author"><span class="qz-author__ring"><img src="' + a.avatar + '" width="80" height="80" alt="' + a.name + '"></span>' +
+          '<div><p class="qz-author__name">' + a.name + badge + '</p><p class="qz-author__handle">' + (a.handle || "") + "</p></div></div>" : "") +
+        '<h1 class="qz-title qz-about__title">' + s.title + "</h1>" +
         s.paragraphs.map(function (p) { return '<p class="qz-text">' + p + "</p>"; }).join("") +
         cta(s.cta) +
         "</section>";
@@ -352,7 +356,7 @@
   function preload(name) {
     if (!name) return;
     var srcs = [];
-    if (name === "about") srcs = [D.about.image.src];
+    if (name === "about") srcs = D.about.author ? [D.about.author.avatar] : [];
     else if (name === "result") srcs = [D.result.image.src, D.result.casePhoto.src].concat(D.result.casePrint ? [D.result.casePrint.src] : []);
     else if (name === "gift") srcs = [D.gift.image];
     else if (name === "bonus") srcs = D.bonus.items.map(function (b) { return b.image.src; });

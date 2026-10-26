@@ -84,12 +84,14 @@ window.QUIZ_DATA = {
   ],
 
   about: {
-    title: 'Prazer, sou Victor Gomes 👋',
-    image: { src: 'assets/img/quiz/victor.webp', w: 640, h: 800, alt: 'Victor Gomes' },
+    // Cabeçalho de autor (foto + nome + @)
+    author: { name: 'Victor Orsolin', handle: '@victor_orsolin', avatar: 'assets/img/victor.webp', verified: true },
+    title: '<span class="hl">Quem é</span> Victor Orsolin?',
     paragraphs: [
-      'Eu comecei no digital do zero e descobri como <strong>vender produtos digitais pela internet usando vídeos simples, sem precisar mostrar meu rosto.</strong>',
-      'Com essa estratégia, construí um negócio digital de <span class="hl">6 dígitos em faturamento</span> e já ajudei <strong>mais de 3.000 pessoas</strong> a conhecer esse mercado.',
-      'Agora quero te mostrar como esse método funciona e quais são os primeiros passos para você começar também.'
+      'Eu comecei no digital do <strong>absoluto zero</strong>, sem audiência, sem experiência e sem saber por onde começar.',
+      'Até que descobri uma forma de <strong>vender produtos digitais usando vídeos simples, sem precisar aparecer e sem investir em anúncios.</strong>',
+      'Foi assim que construí um negócio digital de <span class="hl">6 dígitos em faturamento</span> e já ajudei <strong>mais de 3.000 pessoas</strong> a conhecer esse mercado.',
+      'Hoje, meu objetivo é mostrar que <strong>você também pode dar os primeiros passos no digital</strong>, mesmo começando do zero.'
     ],
     cta: 'QUERO CONHECER O MÉTODO'
   },
