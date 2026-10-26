@@ -277,12 +277,14 @@
       return '<section class="qz-screen qz-center">' +
         '<h1 class="qz-title">' + s.title + "</h1>" +
         '<p class="qz-sub">' + s.text + "</p>" +
+        '<div class="qz-bonus-grid">' +
         s.items.map(function (b) {
           return '<article class="qz-bonus">' + img(b.image, "qz-bonus__img") +
             '<div class="qz-bonus__body"><span class="qz-pill">' + b.tag + "</span>" +
             '<h2 class="qz-h2">' + b.title + "</h2><p>" + b.text + "</p>" +
             '<span class="qz-included">✓ INCLUSO</span></div></article>';
         }).join("") +
+        "</div>" +
         '<p class="qz-warning">' + s.warning + "</p>" +
         cta(s.cta) +
         "</section>";
