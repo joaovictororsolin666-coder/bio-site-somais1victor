@@ -312,10 +312,15 @@
         }).join('<div class="qz-pillar-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15M5 12l7 7 7-7"/></svg></div>') + "</div>" +
 
         '<h2 class="qz-h2 qz-center qz-gap">' + s.proofTitle + "</h2>" +
-        '<div class="qz-carousel" tabindex="0" aria-label="Resultados de alunos">' + s.proofs.map(function (p, i) {
-          return img({ src: p.src, w: p.w, h: p.h, alt: "Resultado de aluno " + (i + 1) });
-        }).join("") + "</div>" +
-        '<p class="qz-note qz-swipe">' + s.proofHint + "</p>" +
+        // Provas em loop automático (a lista vai duas vezes; a segunda é só visual)
+        '<div class="qz-marquee qz-marquee--proof" aria-label="Resultados de alunos"><div class="qz-marquee__track">' +
+        s.proofs.map(function (p, i) {
+          return '<img class="qz-proof-card" src="' + p.src + '" width="' + p.w + '" height="' + p.h + '" alt="Resultado de aluno ' + (i + 1) + '" decoding="async">';
+        }).join("") +
+        s.proofs.map(function (p) {
+          return '<img class="qz-proof-card" src="' + p.src + '" width="' + p.w + '" height="' + p.h + '" alt="" aria-hidden="true" decoding="async">';
+        }).join("") +
+        "</div></div>" +
 
         '<div class="qz-stack" id="qz-price">' +
         '<h2 class="qz-h2 qz-center">' + s.stackTitle + "</h2>" +

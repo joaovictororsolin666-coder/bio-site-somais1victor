@@ -342,32 +342,22 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-pillar h2 { margin: 2px 0 0; font-size: 14px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; }
 .qz-pillar p { margin: 6px 0 0; color: var(--muted); font-size: 14.5px; }
 
-.qz-carousel {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  margin: 16px -16px 0;
-  padding: 4px 16px 10px;
-  scroll-snap-type: x mandatory;
-  scroll-padding: 0 16px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-.qz-carousel::-webkit-scrollbar { display: none; }
-.qz-carousel img {
-  flex: 0 0 68%;
-  max-width: 280px;
+/* Provas sociais em loop (usa .qz-marquee, definido no bloco dos módulos) */
+.qz-marquee--proof { margin: 16px -16px 0; }
+.qz-marquee--proof .qz-marquee__track { animation-duration: 48s; }
+.qz-proof-card {
+  flex: none;
+  width: 200px;
   height: auto;
+  margin-right: 12px;
   aspect-ratio: 9 / 15;
   border: 1px solid var(--line-2);
   border-radius: 14px;
   background: #111;
   object-fit: cover;
   object-position: top;
-  scroll-snap-align: start;
+  box-shadow: 0 12px 28px -14px rgba(57, 229, 140, .35);
 }
-.qz-swipe { animation: swipe 1.8s ease-in-out infinite; }
-@keyframes swipe { 50% { transform: translateX(6px); } }
 
 .qz-stack {
   margin-top: 30px;

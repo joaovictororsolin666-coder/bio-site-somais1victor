@@ -161,7 +161,6 @@ window.QUIZ_DATA = {
       { emoji: '🤖', title: 'Estruture suas vendas', text: 'Ative nosso Sistema de Vendas para atrair compradores e fazer vendas todos os dias.' }
     ],
     proofTitle: 'Veja os resultados de quem decidiu colocar o método em prática! 🚀',
-    proofHint: 'Arraste para o lado 👉',
     proofs: [
       { src: 'assets/img/quiz/resultado-a.webp', w: 540, h: 957 },
       { src: 'assets/img/quiz/resultado-b.webp', w: 540, h: 776 },
