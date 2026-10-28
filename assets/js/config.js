@@ -8,14 +8,14 @@ window.SITE_CONFIG = {
     // Botão do Método Primeira Renda → quiz (funil). Para pular o quiz, coloque aqui o link do checkout.
     metodoPrimeiraRenda: "quiz",
 
-    // Checkout do MPR (botões da oferta no fim do quiz) — NeonPay
-    checkoutMPR: "https://checkout.neonpay.com.br/checkout/cmv6sesvu022k01of5d632afj?offer=VNOV5FS",
-    // Para voltar à Kiwify: "https://pay.kiwify.com.br/X9MavXp" (utm_content "funil_quiz_kiwify", parcelas "12x de R$ 6,93")
+    // Checkout do MPR (botões da oferta no fim do quiz) — Kiwify
+    checkoutMPR: "https://pay.kiwify.com.br/X9MavXp",
+    // Para voltar à NeonPay: "https://checkout.neonpay.com.br/checkout/cmv6sesvu022k01of5d632afj?offer=VNOV5FS" (utm_content "funil_quiz_neonpay", parcelas "12x de R$ 6,85")
 
     // UTMs fixas no link do checkout para identificar vendas vindas do quiz.
     // As UTMs do visitante (anúncio, stories etc.) têm prioridade; estas só preenchem o que faltar.
     // utm_term recebe o botão clicado: oferta ou garantia. "src" identifica o quiz nos relatórios de vendas.
-    checkoutUtms: { utm_campaign: "mpr", utm_content: "funil_quiz_neonpay", src: "quiz_mpr" },
+    checkoutUtms: { utm_campaign: "mpr", utm_content: "funil_quiz_kiwify", src: "quiz_mpr" },
 
     // Repassa as UTMs do visitante para o link do funil (mantém a origem rastreável)
     repassarUtms: true,
@@ -28,7 +28,7 @@ window.SITE_CONFIG = {
   oferta: {
     precoDe: "R$ 297", // preço cheio, aparece riscado acima do preço à vista
     precoVista: "R$ 67",
-    parcelas: "12x de R$ 6,85" // NeonPay (na Kiwify era 12x de R$ 6,93)
+    parcelas: "12x de R$ 6,93" // Kiwify (na NeonPay era 12x de R$ 6,85)
   },
 
   /* ── Formulário de aplicação da mentoria ── */
