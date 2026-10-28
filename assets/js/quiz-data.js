@@ -5,7 +5,7 @@
 window.QUIZ_DATA = {
 
   intro: {
-    title: 'Como fazer seus primeiros <span class="hl">R$5.000/mês</span> vendendo produtos digitais com vídeos simples, sem precisar aparecer!',
+    title: 'Como faturar até <span class="hl">R$300 por dia</span> vendendo produtos digitais com vídeos simples, sem precisar aparecer!',
     tag: 'Mesmo que você seja totalmente iniciante',
     image: { src: 'assets/img/quiz/capa-v2.webp', w: 800, h: 450, alt: 'Victor Gomes com notificações de vendas aprovadas' },
     text: 'Não perca mais tempo apenas <mark>"rolando a tela"</mark> e vendo a vida dos outros. Chegou a hora de transformar <strong>visualizações em dinheiro no seu bolso</strong> com a fórmula que realmente funciona.',
@@ -225,7 +225,7 @@ window.QUIZ_DATA = {
   offer: {
     banner: { src: 'assets/img/quiz/banner-oferta.webp', w: 800, h: 336, alt: 'Método Primeira Renda' },
     eyebrow: 'MPR · Método Primeira Renda',
-    title: 'Aprenda a fazer seus primeiros <span class="hl">R$5.000/mês</span> vendendo produtos digitais com vídeos simples, sem precisar aparecer!',
+    title: 'Aprenda a faturar até <span class="hl">R$300 por dia</span> vendendo produtos digitais com vídeos simples, sem precisar aparecer!',
     subtitle: 'Mesmo que você esteja começando do absoluto zero.',
     pillars: [
       { emoji: '📱', title: 'Comece do zero usando apenas o celular', text: 'Aprenda a vender produtos digitais, mesmo sem experiência, seguidores ou precisar aparecer.' },
