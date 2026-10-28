@@ -282,9 +282,15 @@
       if (ob && s.objection && s.objection[ob]) fit.push(s.objection[ob]);
       if (optId("idade") === "30+" && s.over30) fit.push(s.over30);
       if (s.fitBase) fit.push(s.fitBase);
+      // Título: meta escolhida + final pela experiência
+      var mq = Q.filter(function (x) { return x.key === "meta"; })[0], mi = state.answers.meta;
+      var goal = mq && mi != null && mq.options[mi] ? mq.options[mi].goal : null;
+      var title = goal
+        ? s.title.replace("{meta}", goal).replace("{fim}", (s.titleEnd || {})[ex] || s.titleEnd.zero)
+        : s.titleFallback;
       return '<section class="qz-screen qz-center qz-result">' +
         '<p class="qz-badge"><span aria-hidden="true">✔</span> ' + s.badge + "</p>" +
-        '<h1 class="qz-title">' + s.title + "</h1>" +
+        '<h1 class="qz-title">' + title + "</h1>" +
         (s.subtitle ? '<p class="qz-sub">' + s.subtitle + "</p>" : "") +
         (rows.length ? '<div class="qz-diag"><h2 class="qz-diag__title">' + s.diagTitle + "</h2>" + rows.map(function (r) {
           return '<div class="qz-diag__row"><span>' + r[0] + "</span><strong>" + r[1] + "</strong></div>";

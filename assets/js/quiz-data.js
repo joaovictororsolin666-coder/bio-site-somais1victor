@@ -88,12 +88,12 @@ window.QUIZ_DATA = {
     },
     {
       key: 'meta',
-      title: 'Quanto você gostaria de faturar por mês com seu negócio digital?',
+      title: 'Quanto você gostaria de faturar por dia com seu negócio digital?',
       subtitle: 'Escolha a meta que mudaria a sua rotina 👇',
       options: [
-        { emoji: '💸', label: 'De R$1.000 a R$3.000 por mês', short: 'R$1 mil a R$3 mil/mês' },
-        { emoji: '🔥', label: 'De R$3.000 a R$5.000 por mês', short: 'R$3 mil a R$5 mil/mês' },
-        { emoji: '🚀', label: 'Mais de R$5.000 por mês', short: '+R$5 mil/mês' }
+        { emoji: '💸', label: 'Até R$100 por dia', short: 'Até R$100/dia', goal: 'até R$100 por dia' },
+        { emoji: '🔥', label: 'De R$100 a R$200 por dia', short: 'R$100 a R$200/dia', goal: 'R$100 a R$200 por dia' },
+        { emoji: '🚀', label: 'De R$200 a R$300 por dia', short: 'R$200 a R$300/dia', goal: 'R$200 a R$300 por dia' }
       ]
     },
     {
@@ -155,7 +155,14 @@ window.QUIZ_DATA = {
   result: {
     // Tela de resultado em formato de diagnóstico: respostas → bloqueio → por que combina → prova → botão
     badge: 'Diagnóstico pronto!',
-    title: 'Seu perfil é <span class="hl">compatível</span> com o Método Primeira Renda',
+    // Título pela meta escolhida ({meta}) + final pela experiência (id da opção)
+    title: 'Sua meta de <span class="hl">{meta}</span> é possível, {fim}',
+    titleEnd: {
+      zero: 'mas só com o caminho certo',
+      tentou: 'mas não do jeito que você vem tentando',
+      vende: 'mas não do jeito que você vem fazendo'
+    },
+    titleFallback: 'O que te separa da sua primeira venda <span class="hl">não é o que você imagina</span>',
     subtitle: 'Analisei suas respostas. Veja o que elas mostram 👇',
     diagTitle: '📋 Seu diagnóstico',
     diagRows: [
