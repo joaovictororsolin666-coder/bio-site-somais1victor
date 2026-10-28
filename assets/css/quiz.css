@@ -345,6 +345,41 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-pill { display: inline-block; padding: 3px 8px; border-radius: 999px; background: var(--green); color: var(--green-ink); font-size: 10.5px; font-weight: 800; letter-spacing: .08em; }
 .qz-included { display: inline-block; margin-top: auto; padding: 4px 8px; border: 1px solid rgba(57, 229, 140, .5); border-radius: 8px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .06em; }
 .qz-bonus__body p + .qz-included { margin-top: 10px; }
+
+/* Efeitos premium: entrada em sequência, borda com luz girando, brilho passando na capa */
+@property --qz-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+.qz-bonus {
+  position: relative;
+  border-color: transparent;
+  background:
+    linear-gradient(180deg, #0f1612, #0c0e0d) padding-box,
+    conic-gradient(from var(--qz-angle), rgba(57, 229, 140, .25), rgba(57, 229, 140, .25) 55%, #39e58c 75%, #d6fbe7 80%, #39e58c 85%, rgba(57, 229, 140, .25)) border-box;
+  box-shadow: 0 10px 30px -12px rgba(57, 229, 140, .35);
+  animation: qz-bonus-in .6s cubic-bezier(.2, .8, .2, 1) backwards, qz-bonus-spin 4s linear infinite, qz-bonus-glow 3s ease-in-out infinite;
+}
+.qz-bonus:nth-child(2) { animation-delay: .15s, -2s, -1.5s; }
+.qz-bonus::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  aspect-ratio: 1 / 1.6;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, .28) 50%, transparent 80%);
+  transform: translateX(-120%) skewX(-12deg);
+  pointer-events: none;
+  animation: qz-bonus-shine 4.5s ease-in-out 1s infinite;
+}
+.qz-bonus:nth-child(2)::after { animation-delay: 1.6s; }
+.qz-included { background: rgba(57, 229, 140, .08); }
+
+@keyframes qz-bonus-in { from { opacity: 0; transform: translateY(18px) scale(.96); } }
+@keyframes qz-bonus-spin { to { --qz-angle: 360deg; } }
+@keyframes qz-bonus-glow { 50% { box-shadow: 0 12px 36px -10px rgba(57, 229, 140, .55); } }
+@keyframes qz-bonus-shine { 0%, 55% { transform: translateX(-120%) skewX(-12deg); } 85%, 100% { transform: translateX(260%) skewX(-12deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .qz-bonus, .qz-bonus::after { animation: none; }
+}
 .qz-warning { margin: 20px 0 0; color: var(--muted); font-style: italic; }
 
 /* ───────────── Oferta ───────────── */
