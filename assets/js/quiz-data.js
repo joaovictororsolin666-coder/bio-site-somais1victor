@@ -195,7 +195,7 @@ window.QUIZ_DATA = {
   },
 
   bonus: {
-    title: '🎁 2 bônus inclusos na compra do método',
+    title: '🎁 Você desbloqueou 2 bônus junto com o método',
     text: 'Além do treinamento, você terá acesso a ferramentas práticas para facilitar seus primeiros passos.',
     items: [
       {
@@ -212,7 +212,7 @@ window.QUIZ_DATA = {
       }
     ],
     warning: '(Não desperdice essa oportunidade, hein 🤨)',
-    cta: 'VER O PACOTE E O VALOR'
+    cta: 'QUERO GARANTIR MEUS BÔNUS'
   },
 
   offer: {
