@@ -190,7 +190,7 @@ window.QUIZ_DATA = {
   },
 
   bonus: {
-    title: '🎁 Seus 2 bônus estão liberados!',
+    title: '🎁 2 bônus inclusos na compra do método',
     text: 'Além do treinamento, você terá acesso a ferramentas práticas para facilitar seus primeiros passos.',
     items: [
       {
@@ -207,7 +207,7 @@ window.QUIZ_DATA = {
       }
     ],
     warning: '(Não desperdice essa oportunidade, hein 🤨)',
-    cta: 'QUERO VER MEU PACOTE COMPLETO'
+    cta: 'VER O PACOTE E O VALOR'
   },
 
   offer: {
@@ -253,7 +253,10 @@ window.QUIZ_DATA = {
         { src: 'assets/img/quiz/modulo-10.webp', title: 'Entre para a comunidade' }
       ]
     },
-    cta: 'SIM! QUERO SER O MEU PRÓPRIO CHEFE',
+    // {preco} vira o preço à vista do config.js (oferta.precoVista)
+    cta: 'SIM! QUERO COMPRAR POR {preco}',
+    // Deixa claro que é uma compra (muita gente achava que era grátis)
+    payNote: 'Você vai para o pagamento seguro (Pix ou cartão). O acesso é liberado após a confirmação do pagamento.',
     trust: '🔒 Pagamento 100% seguro · 🔓 Acesso imediato',
     // Linha logo abaixo do preço, pela objeção escolhida no quiz
     objectionNotes: {
@@ -262,14 +265,20 @@ window.QUIZ_DATA = {
       tempo: '⏳ Comece pelo celular, no seu ritmo',
       tentou: '🔁 Estratégias prontas para aplicar, sem tentativa e erro'
     },
-    minorNote: 'Você marcou que tem menos de 18 anos: peça para um responsável maior de idade fazer a compra.',
+    // Quem marca "menos de 18" não vê o botão de compra: vê este bloco e envia o link a um responsável
+    minor: {
+      title: '🔞 A compra precisa ser feita por um maior de 18 anos',
+      text: 'Você marcou que tem menos de 18. Se quiser começar, mostre o método para seu pai, mãe ou responsável.',
+      cta: 'ENVIAR PARA MEU RESPONSÁVEL',
+      message: 'Olha esse método para vender produtos digitais com vídeos simples, sem aparecer. Quero começar, pode dar uma olhada? '
+    },
     guarantee: {
       image: { src: 'assets/img/quiz/garantia.webp', w: 480, h: 320, alt: 'Selo de garantia de 7 dias' },
       title: 'Garantia incondicional de 7 dias',
       text: 'Você terá <strong>7 dias inteiros</strong> para acessar o Método Primeira Renda, assistir às aulas, conhecer as estratégias e colocar o passo a passo em prática.',
       list: ['Acesse o conteúdo imediatamente', 'Teste o método durante 7 dias', 'Se não gostar, peça seu dinheiro de volta'],
       footer: 'Sem complicação e sem burocracia!',
-      cta: 'QUERO GARANTIR MEU ACESSO SEM RISCO'
+      cta: 'COMPRAR COM GARANTIA DE 7 DIAS'
     },
     faq: [
       { q: 'Funciona mesmo para quem está começando do zero?', a: '<strong>Sim! 🚀</strong> O Método Primeira Renda foi desenvolvido para iniciantes. Você vai aprender o passo a passo para criar sua estrutura, produzir conteúdos e começar a vender produtos digitais, mesmo sem experiência.' },

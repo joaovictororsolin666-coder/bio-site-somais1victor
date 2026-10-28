@@ -160,8 +160,16 @@
     var notes = [];
     var ob = optId("objecao");
     if (ob && s.objectionNotes && s.objectionNotes[ob]) notes.push('<p class="qz-price__note">' + s.objectionNotes[ob] + "</p>");
-    if (optId("idade") === "menor" && s.minorNote) notes.push('<p class="qz-price__note qz-price__note--warn">' + s.minorNote + "</p>");
     return notes.join("");
+  }
+
+  // Menor de 18: no lugar do botão de compra, um convite para enviar o link a um responsável
+  function minorBlock(m) {
+    var link = location.origin + location.pathname + "?utm_source=whatsapp&utm_medium=responsavel";
+    return '<div class="qz-minor"><p class="qz-minor__title">' + m.title + "</p>" +
+      '<p class="qz-minor__text">' + m.text + "</p>" +
+      '<a class="btn btn--ghost qz-minor__btn" href="https://wa.me/?text=' + encodeURIComponent(m.message + link) + '" target="_blank" rel="noopener">' +
+      '<span class="btn__label">' + m.cta + "</span>" + ARROW + "</a></div>";
   }
 
   // id da opção escolhida (ex.: objecao → "medo"; idade → "30+")
@@ -337,6 +345,8 @@
     offer: function () {
       var s = D.offer;
       var price = CFG.oferta || {};
+      var isMinor = optId("idade") === "menor" && !!s.minor;
+      var ctaLabel = s.cta.replace("{preco}", price.precoVista || "").replace(/\s+POR\s*$/, "");
       // Preço à vista em destaque (verde, grande) e o parcelado embaixo
       var vista = (price.precoVista || "").replace(/^R\$\s*/, "");
       var priceHtml = price.precoVista ?
@@ -376,8 +386,10 @@
             "<div><strong>" + it.title + "</strong>" + (it.text ? "<span>" + it.text + "</span>" : "") + "</div></li>";
         }).join("") + "</ul>" +
         priceHtml +
-        checkoutCta(s.cta, "oferta", "qz-cta--main") +
-        '<p class="qz-trust">' + s.trust + "</p>" +
+        (isMinor ? minorBlock(s.minor) :
+          checkoutCta(ctaLabel, "oferta", "qz-cta--main") +
+          (s.payNote ? '<p class="qz-paynote">' + s.payNote + "</p>" : "") +
+          '<p class="qz-trust">' + s.trust + "</p>") +
         "</div>" +
 
         modulesHtml(s.modules) +
@@ -387,7 +399,7 @@
         '<p class="qz-text">' + s.guarantee.text + "</p>" +
         '<ul class="qz-guarantee__list">' + s.guarantee.list.map(function (t) { return "<li>✅ " + t + "</li>"; }).join("") + "</ul>" +
         '<p class="qz-guarantee__footer">' + s.guarantee.footer + "</p>" +
-        checkoutCta(s.guarantee.cta, "garantia") +
+        (isMinor ? "" : checkoutCta(s.guarantee.cta, "garantia")) +
         "</div>" +
 
         '<h2 class="qz-h2 qz-center qz-gap">Dúvidas frequentes</h2>' +

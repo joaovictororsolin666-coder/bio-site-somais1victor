@@ -476,6 +476,14 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
   .qz-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
 }
 
+.qz-paynote { margin: 12px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; text-align: center; }
+
+/* Menor de 18: bloco no lugar do botão de compra */
+.qz-minor { margin-top: 20px; padding: 16px; border: 1px solid rgba(250, 204, 21, .35); border-radius: 16px; background: rgba(250, 204, 21, .06); text-align: center; }
+.qz-minor__title { margin: 0; color: #fde68a; font-size: 15.5px; font-weight: 800; }
+.qz-minor__text { margin: 8px 0 0; color: #d4d4d4; font-size: 14px; line-height: 1.45; }
+.qz-minor__btn { margin-top: 14px; }
+
 .qz-trust { margin: 12px 0 0; color: var(--dim); font-size: 12.5px; text-align: center; }
 
 .qz-guarantee { margin-top: 30px; padding: 22px 18px; border: 1px solid var(--line); border-radius: 22px; background: #101010; text-align: center; }
