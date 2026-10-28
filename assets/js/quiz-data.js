@@ -165,7 +165,7 @@ window.QUIZ_DATA = {
       { key: 'objecao', label: 'Maior obstáculo' }
     ],
     alertTitle: 'O que está te impedindo de começar não é falta de esforço...',
-    alertText: '❌ É não saber por onde começar e quais estratégias realmente aplicar!',
+    alertText: '❌ É não ter um passo a passo e não saber quais estratégias realmente aplicar!',
     fitTitle: '✅ Por que o método combina com você',
     // Pela resposta de "experiencia" (id da opção)
     fit: {
