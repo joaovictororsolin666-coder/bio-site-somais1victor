@@ -227,6 +227,15 @@ window.QUIZ_DATA = {
     eyebrow: 'MPR · Método Primeira Renda',
     title: 'Aprenda a faturar até <span class="hl">R$300 por dia</span> vendendo produtos digitais com vídeos simples, sem precisar aparecer!',
     subtitle: 'Mesmo que você esteja começando do absoluto zero.',
+    // Resumo das respostas logo abaixo do título (continua a conversa do quiz)
+    plan: {
+      title: '📋 Seu plano personalizado',
+      rows: [
+        { key: 'experiencia', label: 'Ponto de partida' },
+        { key: 'tempo', label: 'Tempo por dia' },
+        { key: 'meta', label: 'Sua meta' }
+      ]
+    },
     pillars: [
       { emoji: '📱', title: 'Comece do zero usando apenas o celular', text: 'Aprenda a vender produtos digitais, mesmo sem experiência, seguidores ou precisar aparecer.' },
       { emoji: '🧩', title: 'Use estratégias prontas', text: 'Acesse conteúdos e estratégias prontas para adaptar e colocar em prática.' },

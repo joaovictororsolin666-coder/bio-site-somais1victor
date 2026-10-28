@@ -26,6 +26,7 @@ window.SITE_CONFIG = {
 
   /* ── Preço exibido na oferta do quiz (confira com o checkout ao mudar o preço) ── */
   oferta: {
+    precoDe: "R$ 297", // preço cheio, aparece riscado acima do preço à vista
     precoVista: "R$ 67",
     parcelas: "12x de R$ 6,93" // Kiwify (na NeonPay era 12x de R$ 6,85)
   },

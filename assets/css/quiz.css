@@ -443,6 +443,10 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-price__label { margin: 0; color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .qz-price__main { margin: 6px 0 0; color: var(--green); font-size: clamp(56px, 17vw, 72px); font-weight: 800; line-height: 1; letter-spacing: -.03em; text-shadow: 0 0 28px rgba(57, 229, 140, .45); font-variant-numeric: tabular-nums; }
 .qz-price__main small { margin-right: 4px; color: var(--green); font-size: .42em; font-weight: 800; letter-spacing: 0; vertical-align: .9em; }
+.qz-price__from { margin: 10px 0 0; color: var(--muted); font-size: 16px; font-weight: 600; }
+.qz-price__from s { color: #f87171; text-decoration-thickness: 2px; }
+.qz-price__off { display: inline-block; margin-left: 4px; padding: 2px 7px; border-radius: 6px; background: #ef4444; color: #fff; font-size: 12px; font-weight: 800; letter-spacing: .04em; vertical-align: 2px; }
+.qz-plan { margin-top: 18px; text-align: left; }
 .qz-price__alt { margin: 8px 0 0; color: var(--muted); font-size: 16px; }
 .qz-price__alt strong { color: var(--text); }
 .qz-price__note { margin: 12px auto 0; padding: 8px 12px; max-width: 340px; border-radius: 10px; background: var(--green-soft); color: #d6fbe7; font-size: 13.5px; font-weight: 700; }

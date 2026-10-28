@@ -371,19 +371,31 @@
       var ctaLabel = s.cta.replace("{preco}", price.precoVista || "").replace(/\s+POR\s*$/, "");
       // Preço à vista em destaque (verde, grande) e o parcelado embaixo
       var vista = (price.precoVista || "").replace(/^R\$\s*/, "");
+      // Preço cheio riscado + % de desconto, quando configurado
+      var toNum = function (v) { return parseFloat(String(v || "").replace(/[^\d,]/g, "").replace(",", ".")); };
+      var off = price.precoDe ? Math.round((1 - toNum(price.precoVista) / toNum(price.precoDe)) * 100) : 0;
       var priceHtml = price.precoVista ?
         '<div class="qz-price">' +
         '<p class="qz-price__label">Acesso completo + todos os bônus</p>' +
+        (price.precoDe ? '<p class="qz-price__from">De <s>' + price.precoDe + "</s> por apenas" +
+          (off > 0 ? ' <span class="qz-price__off">' + off + "% OFF</span>" : "") + "</p>" : "") +
         '<p class="qz-price__main"><small>R$</small>' + vista + "</p>" +
         (price.parcelas ? '<p class="qz-price__alt">ou <strong>' + price.parcelas + "</strong></p>" : "") +
         priceNotes(s) +
         "</div>" : "";
 
+      // "Seu plano": as respostas do quiz em linhas (mesmo visual do diagnóstico)
+      var planRows = s.plan ? s.plan.rows.map(function (r) { return [r.label, answerOf(r.key)]; })
+        .filter(function (r) { return r[1]; }) : [];
+      var planHtml = planRows.length ? '<div class="qz-diag qz-plan"><h2 class="qz-diag__title">' + s.plan.title + "</h2>" +
+        planRows.map(function (r) { return '<div class="qz-diag__row"><span>' + r[0] + "</span><strong>" + r[1] + "</strong></div>"; }).join("") +
+        "</div>" : "";
       return '<section class="qz-screen">' +
         '<div class="qz-media qz-media--flush">' + img(s.banner, "", true) + "</div>" +
         '<p class="qz-eyebrow">' + s.eyebrow + "</p>" +
         '<h1 class="qz-title">' + s.title + "</h1>" +
         '<p class="qz-sub">' + s.subtitle + "</p>" +
+        planHtml +
 
         '<div class="qz-pillars">' + s.pillars.map(function (p) {
           return '<div class="qz-pillar"><span class="qz-pillar__icon" aria-hidden="true">' + p.emoji + "</span>" +
