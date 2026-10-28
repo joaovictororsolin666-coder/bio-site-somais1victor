@@ -133,7 +133,7 @@ a { color: inherit; }
 }
 .hl { color: var(--green); }
 
-.hero__sub { max-width: 34ch; margin: 12px 0 0; color: var(--muted); font-size: 15.5px; }
+.hero__sub { max-width: 34ch; margin: 18px 0 0; color: var(--muted); font-size: 15.5px; }
 
 /* ───────────── Cards ───────────── */
 
