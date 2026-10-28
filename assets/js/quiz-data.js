@@ -106,7 +106,20 @@ window.QUIZ_DATA = {
         { emoji: '😟', label: 'Medo de investir e não dar certo', id: 'medo', short: 'Medo de investir' },
         { emoji: '⏳', label: 'Tenho pouco tempo no dia', id: 'tempo', short: 'Pouco tempo' },
         { emoji: '🔁', label: 'Já tentei outras coisas que não funcionaram', id: 'tentou', short: 'Já tentou antes' }
-      ]
+      ],
+      // Prova social logo depois da dificuldade: tela própria ("prf" + índice)
+      proof: {
+        badge: '👀 Veja esse caso real',
+        title: 'Muita gente começa <span class="hl">exatamente assim</span>',
+        caseText: 'A Poliana entrou perdida, achando que nunca ia vender nada e em <mark>12 dias faturou mais de R$2.000,00</mark> usando o nosso <strong>Sistema de Vendas.</strong>',
+        casePhoto: { src: 'assets/img/quiz/poliana.webp', w: 400, h: 534, alt: 'Poliana, aluna do MPR' },
+        caseName: 'Poliana · Aluna MPR',
+        audio: { src: 'assets/img/quiz/depoimento.mp3', duration: '0:18' },
+        audioHint: '🔊 Toque para ouvir o depoimento dela',
+        casePrint: { src: 'assets/img/quiz/resultado-a.webp', w: 540, h: 957, alt: 'Print da conversa com a Poliana mostrando o resultado dela' },
+        proof: 'Esse é apenas um dos milhares de resultados de quem coloca o método em prática! 🔥',
+        cta: 'IR PARA A ÚLTIMA PERGUNTA'
+      }
     },
     {
       key: 'disposicao',
@@ -161,21 +174,13 @@ window.QUIZ_DATA = {
       vende: '📈 Você vai <strong>estruturar suas vendas</strong> para vender todos os dias.'
     },
     fitBase: '📱 Tudo pelo <strong>celular</strong>, com vídeos simples e <strong>sem precisar aparecer</strong>.',
-    caseTitle: 'Como o caso da Poliana 👇',
-    caseText: 'Entrou perdida, achando que nunca ia vender nada e em <mark>12 dias faturou mais de R$2.000,00</mark> usando o nosso <strong>Sistema de Vendas.</strong>',
-    casePhoto: { src: 'assets/img/quiz/poliana.webp', w: 400, h: 534, alt: 'Poliana, aluna do MPR' },
-    caseName: 'Poliana · Aluna MPR',
-    audio: { src: 'assets/img/quiz/depoimento.mp3', duration: '0:18' },
-    audioHint: '🔊 Toque para ouvir o depoimento dela',
-    casePrint: { src: 'assets/img/quiz/resultado-a.webp', w: 540, h: 957, alt: 'Print da conversa com a Poliana mostrando o resultado dela' },
-    proof: 'Esse é apenas um dos milhares de resultados de quem coloca o método em prática! 🔥',
     cta: 'QUERO APRENDER ESSE MÉTODO',
     // Recado personalizado pela resposta da pergunta "objecao" (id da opção)
     objection: {
       comeco: '🧭 Não sabe por onde começar? O método é um <strong>passo a passo do zero</strong>, aula por aula.',
       medo: '🛡️ Medo de investir? Você tem <strong>7 dias de garantia</strong>: se não gostar, recebe 100% de volta.',
       tempo: '⏳ Pouco tempo? Dá para começar <strong>no seu ritmo</strong>, nos intervalos do dia.',
-      tentou: '🔁 Já tentou outras coisas? Aqui você aplica <strong>estratégias prontas</strong>. Veja o caso da Poliana abaixo.'
+      tentou: '🔁 Já tentou outras coisas? Aqui você aplica <strong>estratégias prontas</strong>, como a Poliana.'
     },
     // Recado para quem tem mais de 30 anos
     over30: '🤝 <strong>Não precisa entender de tecnologia:</strong> você segue o passo a passo, aula por aula.'

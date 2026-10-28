@@ -20,11 +20,16 @@
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var Q = D.questions;
-  // Perguntas com "insight" ganham uma tela de virada logo depois ("ins" + índice)
+  // Perguntas com "insight" ganham uma tela de virada logo depois ("ins" + índice);
+  // com "proof", uma tela de prova social ("prf" + índice)
   var FLOW = ["intro"];
-  Q.forEach(function (q, i) { FLOW.push("q" + i); if (q.insight) FLOW.push("ins" + i); });
+  Q.forEach(function (q, i) {
+    FLOW.push("q" + i);
+    if (q.insight) FLOW.push("ins" + i);
+    if (q.proof) FLOW.push("prf" + i);
+  });
   FLOW = FLOW.concat(["about", "loading", "result", "gift", "bonus", "offer"]);
-  var FLOW_VERSION = 2; // painel usa para ler etapas antigas e novas
+  var FLOW_VERSION = 3; // painel usa para ler etapas antigas e novas
   var TRANSIENT = { loading: true };
   var NO_BACK = { intro: true, loading: true };
 
@@ -287,8 +292,19 @@
         '<div class="qz-alert"><p class="qz-alert__title">⚠️ ' + s.alertTitle + "</p><p>" + s.alertText + "</p></div>" +
         (fit.length ? '<div class="qz-fit"><h2 class="qz-fit__title">' + s.fitTitle + "</h2><ul>" +
           fit.map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul></div>" : "") +
+        cta(s.cta) +
+        "</section>";
+    },
+
+    // Prova social logo depois de uma pergunta de dificuldade
+    proof: function (i) {
+      var q = Q[i], s = q.proof, chosen = state.answers[q.key];
+      var picked = chosen != null && q.options[chosen] ? q.options[chosen].label : "";
+      return '<section class="qz-screen qz-center qz-insight qz-proofscreen">' +
+        (picked ? '<p class="qz-insight__you">Você respondeu: <strong>' + picked + "</strong></p>" : "") +
+        '<p class="qz-insight__badge">' + s.badge + "</p>" +
+        '<h1 class="qz-title">' + s.title + "</h1>" +
         '<div class="qz-case">' +
-        '<h2 class="qz-h2">' + s.caseTitle + "</h2>" +
         '<p class="qz-text">' + s.caseText + "</p>" +
         '<div class="qz-audio">' +
         img(s.casePhoto, "qz-audio__avatar") +
@@ -413,6 +429,7 @@
   function htmlFor(name) {
     if (name.charAt(0) === "q" && name !== "q") return screens.question(+name.slice(1));
     if (name.indexOf("ins") === 0) return screens.insight(+name.slice(3));
+    if (name.indexOf("prf") === 0) return screens.proof(+name.slice(3));
     return screens[name]();
   }
 
@@ -422,7 +439,7 @@
     if (!name) return;
     var srcs = [];
     if (name === "about") srcs = D.about.author ? [D.about.author.avatar] : [];
-    else if (name === "result") srcs = [D.result.casePhoto.src].concat(D.result.casePrint ? [D.result.casePrint.src] : []);
+    else if (name.indexOf("prf") === 0) { var p = Q[+name.slice(3)].proof; srcs = [p.casePhoto.src].concat(p.casePrint ? [p.casePrint.src] : []); }
     else if (name === "gift") srcs = [D.gift.image];
     else if (name === "bonus") srcs = D.bonus.items.map(function (b) { return b.image.src; });
     else if (name === "offer") srcs = [D.offer.banner.src];
@@ -530,7 +547,7 @@
     }
 
     if (name === "loading") runLoading(root);
-    if (name === "result") bindAudio(root);
+    if (name.indexOf("prf") === 0) bindAudio(root);
     if (name === "gift") bindGift(root);
     if (name === "offer") bindOffer(root);
   }
