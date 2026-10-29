@@ -12,10 +12,13 @@
   var FONT = '"Manrope", system-ui, sans-serif';
   var STORE = "vg_acelerador";
 
+  // forma: "padrao" (texto solto), "cartao" (cartão branco sobre degradê) ou "post" (visual de post de rede social)
   var ESTILOS = {
-    escuro: { nome: "Escuro", bg: ["#0d0d0d", "#050505"], titulo: "#ffffff", texto: "#bdbdbd", destaque: "#39e58c", tinta: "#03150b", linha: "rgba(255,255,255,.12)" },
-    claro: { nome: "Claro", bg: ["#f7f4ee", "#ece6db"], titulo: "#141414", texto: "#4a4a4a", destaque: "#e4572e", tinta: "#ffffff", linha: "rgba(0,0,0,.1)" },
-    amarelo: { nome: "Impacto", bg: ["#ffd84d", "#ffc81f"], titulo: "#111111", texto: "#2b2b2b", destaque: "#111111", tinta: "#ffd84d", linha: "rgba(0,0,0,.14)" }
+    escuro: { nome: "Escuro", forma: "padrao", bg: ["#0d0d0d", "#050505"], titulo: "#ffffff", texto: "#bdbdbd", destaque: "#39e58c", tinta: "#03150b", linha: "rgba(255,255,255,.12)" },
+    claro: { nome: "Claro", forma: "padrao", bg: ["#f7f4ee", "#ece6db"], titulo: "#141414", texto: "#4a4a4a", destaque: "#e4572e", tinta: "#ffffff", linha: "rgba(0,0,0,.1)" },
+    amarelo: { nome: "Impacto", forma: "padrao", bg: ["#ffd84d", "#ffc81f"], titulo: "#111111", texto: "#2b2b2b", destaque: "#111111", tinta: "#ffd84d", linha: "rgba(0,0,0,.14)" },
+    cartao: { nome: "Cartão", forma: "cartao", bg: ["#7c3aed", "#db2777"], cartao: "#ffffff", topo: "#ffffff", titulo: "#1a1033", texto: "#4b4560", destaque: "#7c3aed", tinta: "#ffffff", linha: "rgba(26,16,51,.1)" },
+    post: { nome: "Post", forma: "post", bg: ["#ffffff", "#f2f5f8"], titulo: "#0f1419", texto: "#3d4852", destaque: "#1d9bf0", tinta: "#ffffff", linha: "rgba(15,20,25,.1)" }
   };
 
   var NICHOS = window.ACELERADOR_DATA || [];
@@ -71,17 +74,47 @@
 
   /* ───────────── Slide ───────────── */
 
+  // Centraliza um bloco de altura `alt` entre `topo` e `base`
+  function centro(alt, topo, base) { return Math.max(topo, topo + (base - topo - alt) / 2 - 20); }
+
+  function pilula(ctx, est, x, y, maxW) {
+    var label = "Comente: " + state.palavra.toUpperCase();
+    ctx.font = "800 48px " + FONT;
+    var bw = Math.min(maxW, ctx.measureText(label).width + 96);
+    roundRect(ctx, x, y, bw, 112, 56); ctx.fillStyle = est.destaque; ctx.fill();
+    ctx.fillStyle = est.tinta; ctx.textBaseline = "middle"; ctx.fillText(label, x + 48, y + 57);
+    ctx.textBaseline = "top";
+  }
+
+  function progresso(ctx, est, x, y, w, i, total) {
+    ctx.fillStyle = est.linha; ctx.fillRect(x, y, w, 8);
+    ctx.fillStyle = est.destaque; ctx.fillRect(x, y, w * (i + 1) / total, 8);
+  }
+
   function render(canvas, slide, i, total, est) {
-    var ctx = canvas.getContext("2d"), maxW = W - PAD * 2;
+    var ctx = canvas.getContext("2d");
     canvas.width = W; canvas.height = H;
 
-    var g = ctx.createLinearGradient(0, 0, 0, H);
+    var g = est.forma === "cartao" ? ctx.createLinearGradient(0, 0, W, H) : ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, est.bg[0]); g.addColorStop(1, est.bg[1]);
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
+    if (est.forma === "post") return renderPost(ctx, slide, i, total, est);
+
+    var card = est.forma === "cartao";
+    var pad = card ? 136 : PAD, maxW = W - pad * 2;
+    var topo = card ? 230 : 170, base = card ? H - 240 : H - 110;
+
+    if (card) {
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,.25)"; ctx.shadowBlur = 60; ctx.shadowOffsetY = 24;
+      roundRect(ctx, 64, 150, W - 128, H - 270, 48); ctx.fillStyle = est.cartao; ctx.fill();
+      ctx.restore();
+    }
+
     // Topo: @ e numeração
     ctx.font = "700 34px " + FONT; ctx.textBaseline = "top";
-    ctx.fillStyle = est.texto;
+    ctx.fillStyle = est.topo || est.texto;
     if (state.perfil) ctx.fillText(state.perfil, PAD, 72);
     var num = (i + 1) + "/" + total;
     ctx.fillText(num, W - PAD - ctx.measureText(num).width, 72);
@@ -89,40 +122,66 @@
     var capa = i === 0, final = i === total - 1 && total > 1;
 
     if (capa) {
-      ctx.fillStyle = est.destaque; ctx.fillRect(PAD, 360, 120, 12);
-      var t = fit(ctx, slide.titulo, 800, 112, 64, maxW, 520, 1.08);
-      var y = draw(ctx, t, PAD, 420, 800, est.titulo);
+      var t = fit(ctx, slide.titulo, 800, card ? 100 : 112, 60, maxW, card ? 460 : 520, 1.08);
       var s = fit(ctx, slide.texto, 600, 46, 32, maxW, 220, 1.3);
-      draw(ctx, s, PAD, y + 40, 600, est.texto);
+      var y = centro(60 + altura(t) + 40 + altura(s), topo, base - 80);
+      ctx.fillStyle = est.destaque; ctx.fillRect(pad, y, 120, 12);
+      y = draw(ctx, t, pad, y + 60, 800, est.titulo);
+      draw(ctx, s, pad, y + 40, 600, est.texto);
       ctx.font = "800 38px " + FONT; ctx.fillStyle = est.destaque;
-      ctx.fillText("Arrasta pro lado  →", PAD, H - 150);
+      ctx.fillText("Arrasta pro lado  →", pad, base - 40);
     } else if (final) {
-      var tf = fit(ctx, slide.titulo, 800, 104, 56, maxW, 380, 1.1);
+      var tf = fit(ctx, slide.titulo, 800, card ? 92 : 104, 56, maxW, 380, 1.1);
       var sf = fit(ctx, slide.texto, 600, 52, 32, maxW, 380, 1.35);
-      var alt = altura(tf) + 40 + altura(sf) + (state.palavra ? 172 : 0);
-      var yf = draw(ctx, tf, PAD, Math.max(180, (H - alt) / 2 - 30), 800, est.titulo);
-      yf = draw(ctx, sf, PAD, yf + 40, 600, est.texto);
-      if (state.palavra) {
-        var label = "Comente: " + state.palavra.toUpperCase();
-        ctx.font = "800 48px " + FONT;
-        var bw = Math.min(maxW, ctx.measureText(label).width + 96);
-        roundRect(ctx, PAD, yf + 60, bw, 112, 56); ctx.fillStyle = est.destaque; ctx.fill();
-        ctx.fillStyle = est.tinta; ctx.textBaseline = "middle"; ctx.fillText(label, PAD + 48, yf + 117);
-      }
+      var yf = centro(altura(tf) + 40 + altura(sf) + (state.palavra ? 172 : 0), topo, base);
+      yf = draw(ctx, tf, pad, yf, 800, est.titulo);
+      yf = draw(ctx, sf, pad, yf + 40, 600, est.texto);
+      if (state.palavra) pilula(ctx, est, pad, yf + 60, maxW);
     } else {
       // Número, título e texto centralizados na altura do slide
-      var tm = fit(ctx, slide.titulo, 800, 88, 52, maxW, 330, 1.12);
-      var sm = fit(ctx, slide.texto, 600, 54, 34, maxW, 520, 1.4);
-      var ym = Math.max(170, (H - (190 + altura(tm) + 40 + altura(sm))) / 2 - 20);
+      var tm = fit(ctx, slide.titulo, 800, card ? 80 : 88, 50, maxW, 330, 1.12);
+      var sm = fit(ctx, slide.texto, 600, card ? 50 : 54, 34, maxW, card ? 440 : 520, 1.4);
+      var ym = centro(190 + altura(tm) + 40 + altura(sm), topo, base);
       ctx.font = "800 150px " + FONT; ctx.fillStyle = est.destaque; ctx.textBaseline = "top";
-      ctx.fillText(String(i).padStart(2, "0"), PAD - 6, ym);
-      ym = draw(ctx, tm, PAD, ym + 190, 800, est.titulo);
-      draw(ctx, sm, PAD, ym + 40, 600, est.texto);
+      ctx.fillText(String(i).padStart(2, "0"), pad - 6, ym);
+      ym = draw(ctx, tm, pad, ym + 190, 800, est.titulo);
+      draw(ctx, sm, pad, ym + 40, 600, est.texto);
     }
 
-    // Barra de progresso no rodapé
-    ctx.fillStyle = est.linha; ctx.fillRect(PAD, H - 72, maxW, 8);
-    ctx.fillStyle = est.destaque; ctx.fillRect(PAD, H - 72, maxW * (i + 1) / total, 8);
+    progresso(ctx, est, pad, card ? H - 190 : H - 72, maxW, i, total);
+  }
+
+  // Visual de post de rede social: foto redonda, nome e @ em cima do texto
+  function renderPost(ctx, slide, i, total, est) {
+    var maxW = W - PAD * 2, handle = state.perfil || "@seuperfil";
+    var nome = handle.replace(/^@/, "").replace(/[._]+/g, " ");
+    nome = nome.charAt(0).toUpperCase() + nome.slice(1);
+
+    ctx.font = "700 34px " + FONT; ctx.textBaseline = "top"; ctx.fillStyle = est.texto;
+    var num = (i + 1) + "/" + total;
+    ctx.fillText(num, W - PAD - ctx.measureText(num).width, 72);
+
+    var capa = i === 0, final = i === total - 1 && total > 1;
+    var titulo = capa || final ? slide.titulo : i + ". " + slide.titulo;
+    var t = fit(ctx, titulo, 800, capa ? 84 : 72, 48, maxW, capa ? 480 : 360, 1.15);
+    var s = fit(ctx, slide.texto, 500, capa ? 48 : 52, 32, maxW, 460, 1.4);
+    var alt = 112 + 56 + altura(t) + 36 + altura(s) + (final && state.palavra ? 172 : 0);
+    var y = centro(alt, 150, H - (capa ? 220 : 140));
+
+    // Cabeçalho
+    ctx.beginPath(); ctx.arc(PAD + 56, y + 56, 56, 0, Math.PI * 2); ctx.fillStyle = est.destaque; ctx.fill();
+    ctx.font = "800 54px " + FONT; ctx.fillStyle = est.tinta; ctx.textBaseline = "middle"; ctx.textAlign = "center";
+    ctx.fillText(nome.charAt(0) || "?", PAD + 56, y + 58);
+    ctx.textAlign = "left"; ctx.textBaseline = "top";
+    ctx.font = "800 44px " + FONT; ctx.fillStyle = est.titulo; ctx.fillText(nome, PAD + 140, y + 8);
+    ctx.font = "500 36px " + FONT; ctx.fillStyle = est.texto; ctx.fillText(handle, PAD + 140, y + 64);
+
+    y = draw(ctx, t, PAD, y + 168, 800, est.titulo);
+    y = draw(ctx, s, PAD, y + 36, 500, est.texto);
+    if (final && state.palavra) pilula(ctx, est, PAD, y + 60, maxW);
+    if (capa) { ctx.font = "800 38px " + FONT; ctx.fillStyle = est.destaque; ctx.fillText("Arrasta pro lado  →", PAD, H - 150); }
+
+    progresso(ctx, est, PAD, H - 72, maxW, i, total);
   }
 
   /* ───────────── Estilos (mini prévia) ───────────── */

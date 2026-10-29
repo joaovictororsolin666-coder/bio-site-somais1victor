@@ -1,7 +1,7 @@
 /* ==========================================================================
    Acelerador MPR — biblioteca de carrosséis prontos
    Cada carrossel: [capa, subtítulo da capa, [[título, texto] × 5]]
-   Com 5 slides usa os 3 primeiros pontos; com 7 usa os 5.
+   Com 5 slides usa os 3 primeiros pontos; com 7 usa os 5. 16 nichos × 10 carrosséis.
    ========================================================================== */
 
 window.ACELERADOR_DATA = [
@@ -663,6 +663,402 @@ window.ACELERADOR_DATA = [
         ["Tempo de brincadeira", "Interação faz bem para os dois."],
         ["Momentos de descanso", "Cachorros dormem bastante."],
         ["Carinho todo dia", "Fortalece o vínculo."]]]
+    ]
+  },
+  {
+    id: "beleza", nome: "Beleza e autocuidado",
+    tags: "#autocuidado #beleza #skincare #cuidadoscomapele #bemestar",
+    itens: [
+      ["5 hábitos de quem tem a pele bonita", "Nenhum deles é caro.", [
+        ["Protetor solar todo dia", "Mesmo nublado e mesmo dentro de casa."],
+        ["Tirar a maquiagem antes de dormir", "A pele precisa respirar à noite."],
+        ["Beber água", "A hidratação começa por dentro."],
+        ["Trocar a fronha com frequência", "Ela acumula oleosidade e sujeira."],
+        ["Não espremer espinhas", "Pode deixar marcas difíceis de tirar."]]],
+      ["Rotina de skincare para iniciantes", "Só 3 passos.", [
+        ["Limpar", "Um sabonete próprio para o rosto, de manhã e à noite."],
+        ["Hidratar", "Até pele oleosa precisa de hidratante."],
+        ["Proteger", "Protetor solar todas as manhãs."],
+        ["Comece simples", "Produtos demais podem irritar a pele."],
+        ["Tenha paciência", "Os resultados aparecem com algumas semanas de constância."]]],
+      ["Erros comuns no cuidado com o cabelo", "Que você pode estar cometendo.", [
+        ["Água muito quente", "Resseca os fios e o couro cabeludo."],
+        ["Prender molhado", "Os fios ficam mais frágeis e quebram."],
+        ["Chapinha sem protetor", "O calor direto danifica o cabelo."],
+        ["Pular o corte", "Pontas duplas sobem pelo fio."],
+        ["Esfregar com a toalha", "Aperte com cuidado em vez de esfregar."]]],
+      ["Autocuidado não é luxo", "É necessidade.", [
+        ["Descansar", "Dormir bem muda o humor e a aparência."],
+        ["Dizer não", "Proteger seu tempo também é cuidado."],
+        ["Movimentar o corpo", "Do jeito que for possível para você."],
+        ["Desconectar", "Um tempo sem tela por dia."],
+        ["Fazer algo só por você", "Um hobby, um banho demorado, um livro."]]],
+      ["Maquiagem natural em 5 passos", "Para o dia a dia.", [
+        ["Pele preparada", "Hidratante e protetor antes de tudo."],
+        ["Pouca base", "Só onde precisa, bem espalhada."],
+        ["Corretivo pontual", "Olheiras e pequenas manchas."],
+        ["Máscara de cílios", "Abre o olhar na hora."],
+        ["Lábios e bochechas", "Um tom suave que combine com você."]]],
+      ["Ritual de autocuidado de domingo", "Para começar a semana renovada.", [
+        ["Máscara facial", "Escolha uma para o seu tipo de pele."],
+        ["Hidratação no cabelo", "Deixe agir enquanto relaxa."],
+        ["Unhas", "Lixar e hidratar as cutículas já faz diferença."],
+        ["Esfoliação no corpo", "Deixa a pele macia."],
+        ["Uma pausa só sua", "Música, chá e silêncio."]]],
+      ["Mitos sobre a pele", "Que muita gente ainda acredita.", [
+        ["\"Pele oleosa não precisa de hidratante\"", "Precisa sim. Escolha um mais leve."],
+        ["\"Protetor só na praia\"", "O sol age todos os dias."],
+        ["\"Quanto mais lavar, melhor\"", "Lavar demais resseca e pode aumentar a oleosidade."],
+        ["\"Produto caro é sempre melhor\"", "Muitos produtos acessíveis funcionam muito bem."],
+        ["\"Espremer faz a espinha sumir\"", "Na verdade pode inflamar e manchar."]]],
+      ["Como montar um kit de beleza básico", "Sem gastar muito.", [
+        ["Sabonete facial", "A base de tudo."],
+        ["Hidratante", "Para o seu tipo de pele."],
+        ["Protetor solar", "O item mais importante."],
+        ["Máscara de cílios", "Versátil para qualquer ocasião."],
+        ["Um batom coringa", "Que combine com tudo."]]],
+      ["Sinais de que você precisa de uma pausa", "Seu corpo avisa.", [
+        ["Pele opaca", "Cansaço também aparece no rosto."],
+        ["Olheiras marcadas", "Falta de descanso."],
+        ["Irritação constante", "Sinal de sobrecarga."],
+        ["Queda de cabelo", "Estresse pode ser um dos motivos."],
+        ["Cuide-se", "Pausa é parte da rotina, não prêmio."]]],
+      ["Autoestima: pequenos passos", "Para se sentir melhor com você.", [
+        ["Pare de se comparar", "Filtros e ângulos não mostram a realidade."],
+        ["Fale bem de você", "Inclusive em pensamento."],
+        ["Vista o que te faz bem", "Conforto e estilo juntos."],
+        ["Celebre suas conquistas", "As grandes e as pequenas."],
+        ["Cerque-se de quem te valoriza", "Ambiente faz diferença."]]]
+    ]
+  },
+  {
+    id: "estudos", nome: "Estudos e concursos",
+    tags: "#estudos #concursos #concurseiros #dicasdeestudo #foconosestudos",
+    itens: [
+      ["5 técnicas de estudo que funcionam", "Simples de aplicar hoje.", [
+        ["Revisão espaçada", "Revise o conteúdo depois de 1, 7 e 30 dias."],
+        ["Questões desde o início", "Fazer exercício fixa mais que só ler."],
+        ["Explique em voz alta", "Se você consegue explicar, você entendeu."],
+        ["Resumo com suas palavras", "Copiar o livro não ajuda a memorizar."],
+        ["Pausas programadas", "O cérebro precisa de descanso para absorver."]]],
+      ["Como montar um cronograma de estudos", "Que você consegue cumprir.", [
+        ["Seja realista", "Quantas horas você tem de verdade por dia?"],
+        ["Divida por matéria", "Alterne as difíceis com as mais leves."],
+        ["Inclua revisões", "Estudar sem revisar é esquecer depois."],
+        ["Deixe um dia livre", "Para recuperar o atraso ou descansar."],
+        ["Ajuste toda semana", "O cronograma serve a você, não o contrário."]]],
+      ["Erros que atrasam a aprovação", "Evite estes.", [
+        ["Estudar sem edital", "Você perde tempo com o que não cai."],
+        ["Só ler e grifar", "Pouca prática, pouca fixação."],
+        ["Pular as revisões", "O conteúdo some da memória."],
+        ["Trocar de material toda hora", "Escolha um e vá até o fim."],
+        ["Não cuidar da saúde", "Sono e alimentação também estudam com você."]]],
+      ["Como manter o foco estudando em casa", "Mesmo com distrações.", [
+        ["Um lugar fixo", "O cérebro associa aquele espaço ao estudo."],
+        ["Celular em outro cômodo", "Longe dos olhos, longe da tentação."],
+        ["Blocos de tempo", "25 a 50 minutos de foco total."],
+        ["Metas por sessão", "Saber o que precisa terminar."],
+        ["Avise quem mora com você", "Combine os horários de estudo."]]],
+      ["Mapas mentais: como fazer", "Para memorizar mais rápido.", [
+        ["Tema no centro", "A ideia principal no meio da folha."],
+        ["Ramos principais", "Os tópicos mais importantes ao redor."],
+        ["Palavras-chave", "Nada de frases longas."],
+        ["Cores e desenhos", "Ajudam o cérebro a lembrar."],
+        ["Revise olhando o mapa", "E depois tente refazer de memória."]]],
+      ["O que fazer na véspera da prova", "Para chegar tranquilo.", [
+        ["Não estude conteúdo novo", "Revise só os pontos principais."],
+        ["Separe tudo antes", "Documento, caneta e o caminho do local."],
+        ["Durma cedo", "Descanso vale mais que uma hora a mais de estudo."],
+        ["Coma leve", "Nada de experimentar comida nova."],
+        ["Confie na preparação", "Você fez o que precisava."]]],
+      ["Como resolver mais questões em menos tempo", "Estratégia de prova.", [
+        ["Leia o enunciado primeiro", "Saiba o que está sendo pedido."],
+        ["Comece pelas fáceis", "Garante pontos e dá confiança."],
+        ["Marque e volte", "Não trave em uma questão difícil."],
+        ["Controle o tempo", "Defina quanto tempo por questão."],
+        ["Revise as marcações", "Erros bobos custam pontos."]]],
+      ["Para quem estuda há muito tempo", "Não desista agora.", [
+        ["Cada dia conta", "Mesmo os dias que parecem improdutivos."],
+        ["Reprovação ensina", "Mostra exatamente onde melhorar."],
+        ["Lembre do seu motivo", "Por que você começou?"],
+        ["Compare você com você", "Veja o quanto já evoluiu."],
+        ["Constância leva longe", "Quem não para chega mais perto a cada dia."]]],
+      ["Ferramentas gratuitas para estudar", "Que facilitam a rotina.", [
+        ["Aplicativos de flashcards", "Revisão espaçada automática."],
+        ["Timer de foco", "Para aplicar a técnica Pomodoro."],
+        ["Planilha de horas", "Para medir o quanto você estuda."],
+        ["Vídeos de revisão", "Bons para os dias de pouca energia."],
+        ["IA para tirar dúvidas", "Peça explicações com outras palavras."]]],
+      ["Estudar trabalhando: é possível", "Com organização.", [
+        ["Use os tempos mortos", "Ônibus e fila viram revisão."],
+        ["Acorde mais cedo", "Uma hora de manhã rende muito."],
+        ["Fins de semana estratégicos", "Para as matérias mais pesadas."],
+        ["Qualidade acima de quantidade", "Uma hora focada vale mais que três distraídas."],
+        ["Respeite seus limites", "Descanso também faz parte."]]]
+    ]
+  },
+  {
+    id: "tecnologia", nome: "Tecnologia e IA",
+    tags: "#inteligenciaartificial #tecnologia #ia #produtividade #ferramentasdigitais",
+    itens: [
+      ["5 usos da IA que economizam horas", "Que pouca gente aproveita.", [
+        ["Resumir textos longos", "Cole o texto e peça os pontos principais."],
+        ["Escrever e-mails", "Diga o objetivo e o tom que você quer."],
+        ["Planejar a semana", "Liste suas tarefas e peça uma organização."],
+        ["Criar roteiros", "Para vídeos, apresentações ou posts."],
+        ["Explicar assuntos difíceis", "Peça para explicar como se fosse para uma criança."]]],
+      ["Como escrever um bom prompt", "A IA responde melhor assim.", [
+        ["Dê contexto", "Quem você é e para que precisa."],
+        ["Seja específico", "Tamanho, formato e tom da resposta."],
+        ["Dê exemplos", "Mostre o estilo que você espera."],
+        ["Peça em etapas", "Tarefas grandes funcionam melhor divididas."],
+        ["Revise e ajuste", "A primeira resposta raramente é a final."]]],
+      ["Recursos do celular que você precisa conhecer", "Para ganhar tempo.", [
+        ["Captura de tela longa", "Para salvar uma conversa inteira."],
+        ["Ditado por voz", "Escreva falando."],
+        ["Copiar texto de imagens", "Muitos celulares reconhecem texto em fotos."],
+        ["Modo foco", "Silencia o que distrai."],
+        ["Atalhos de texto", "Escreva frases longas com poucas letras."]]],
+      ["Proteja suas contas", "Dicas de segurança digital.", [
+        ["Verificação em duas etapas", "Ative em todas as contas importantes."],
+        ["Senhas diferentes", "Um gerenciador de senhas ajuda."],
+        ["Desconfie de links", "Principalmente os que pedem urgência."],
+        ["Atualize o celular", "Atualizações corrigem falhas de segurança."],
+        ["Cuidado com Wi-Fi público", "Evite acessar o banco nessas redes."]]],
+      ["Ferramentas gratuitas para criar conteúdo", "Sem precisar pagar nada.", [
+        ["Editor de vídeo no celular", "Muitos têm modelos prontos."],
+        ["Editor de imagens online", "Modelos para posts e capas."],
+        ["IA de texto", "Para roteiros e legendas."],
+        ["Voz por IA", "Narração sem gravar a própria voz."],
+        ["Bancos de vídeos gratuitos", "Imagens de fundo para os seus vídeos."]]],
+      ["A IA vai roubar seu emprego?", "Uma visão realista.", [
+        ["Tarefas vão mudar", "Muitas atividades repetitivas serão automatizadas."],
+        ["Novas funções vão surgir", "Como em toda mudança de tecnologia."],
+        ["Quem usa IA se destaca", "Faz mais em menos tempo."],
+        ["Habilidades humanas valem mais", "Criatividade, empatia e decisão."],
+        ["O melhor caminho", "Aprender a usar a IA a seu favor."]]],
+      ["Organize sua vida digital", "Em uma tarde.", [
+        ["Limpe a galeria", "Apague prints e fotos repetidas."],
+        ["Organize as pastas", "Uma estrutura simples para os arquivos."],
+        ["Faça backup", "Na nuvem ou em um HD."],
+        ["Desinstale apps que não usa", "Libera espaço e bateria."],
+        ["Saia de grupos parados", "Menos notificações, mais foco."]]],
+      ["Golpes digitais mais comuns", "Saiba reconhecer.", [
+        ["Falso parente pedindo dinheiro", "Sempre confirme por ligação."],
+        ["Link de entrega falso", "Confira o código direto no site oficial."],
+        ["Promoção boa demais", "Desconfie de preços muito abaixo do normal."],
+        ["Falsa central do banco", "O banco não pede senha por telefone."],
+        ["Perfil clonado", "Avise seus contatos se acontecer com você."]]],
+      ["Como a IA pode te ajudar a aprender", "Um professor disponível a qualquer hora.", [
+        ["Peça explicações simples", "Sem palavras difíceis."],
+        ["Peça exemplos", "Fica mais fácil de entender."],
+        ["Crie exercícios", "A IA monta perguntas para você praticar."],
+        ["Corrija seus textos", "E entenda os erros."],
+        ["Confira as informações", "A IA também erra. Use fontes confiáveis."]]],
+      ["Tecnologias que mudaram o dia a dia", "E você nem percebeu.", [
+        ["Pagamento por aproximação", "Celular e relógio viraram carteira."],
+        ["Pix", "Transferência na hora, qualquer dia."],
+        ["Assistentes de voz", "Para lembretes e perguntas rápidas."],
+        ["Mapas em tempo real", "Trânsito e rotas na palma da mão."],
+        ["Tradução instantânea", "Pela câmera ou pela voz."]]]
+    ]
+  },
+  {
+    id: "viagens", nome: "Viagens",
+    tags: "#viagem #dicasdeviagem #viajarbarato #turismo #mochilao",
+    itens: [
+      ["5 dicas para viajar gastando pouco", "Sem abrir mão de aproveitar.", [
+        ["Viaje fora da temporada", "Preços menores e menos filas."],
+        ["Compare passagens", "Datas flexíveis fazem muita diferença."],
+        ["Hospedagem com cozinha", "Economiza nas refeições."],
+        ["Passeios gratuitos", "Parques, praias e caminhadas pela cidade."],
+        ["Coma onde os moradores comem", "Mais barato e mais autêntico."]]],
+      ["O que levar na mala de mão", "Checklist essencial.", [
+        ["Documentos", "Sempre com você, nunca na mala despachada."],
+        ["Remédios de uso contínuo", "Em quantidade para a viagem toda."],
+        ["Carregador e fone", "Itens que fazem falta logo de cara."],
+        ["Uma troca de roupa", "Caso a mala atrase."],
+        ["Lanche e garrafa vazia", "Encha depois da inspeção."]]],
+      ["Erros comuns de quem viaja", "E como evitar.", [
+        ["Roteiro apertado demais", "Deixe espaço para descansar."],
+        ["Não pesquisar o clima", "A mala certa depende dele."],
+        ["Trocar dinheiro no aeroporto", "Costuma ter a pior cotação."],
+        ["Esquecer o seguro viagem", "Principalmente em viagens internacionais."],
+        ["Levar coisas demais", "Mala leve é mala feliz."]]],
+      ["Como montar um roteiro de viagem", "Passo a passo.", [
+        ["Defina o orçamento", "Ele decide o resto."],
+        ["Liste o que quer ver", "E marque no mapa."],
+        ["Agrupe por região", "Menos tempo em deslocamento."],
+        ["Um passeio grande por dia", "O resto é bônus."],
+        ["Reserve o essencial", "Hospedagem e atrações concorridas."]]],
+      ["Viajar sozinho: vale a pena?", "O que ninguém te conta.", [
+        ["Liberdade total", "Você decide tudo no seu ritmo."],
+        ["Autoconhecimento", "Você descobre do que gosta de verdade."],
+        ["Novas amizades", "Fica mais fácil conhecer gente nova."],
+        ["Exige atenção", "Compartilhe seu roteiro com alguém de confiança."],
+        ["Comece perto", "Uma viagem curta antes da grande aventura."]]],
+      ["Como arrumar a mala sem esquecer nada", "Método simples.", [
+        ["Faça uma lista", "Revise antes de fechar."],
+        ["Monte looks", "Peças que combinam entre si."],
+        ["Enrole as roupas", "Ocupa menos espaço."],
+        ["Use organizadores", "Fica fácil achar tudo."],
+        ["Deixe espaço para a volta", "Sempre aparece uma lembrancinha."]]],
+      ["Passeios gratuitos em qualquer cidade", "Para economizar sem perder nada.", [
+        ["Centro histórico", "Arquitetura e história a céu aberto."],
+        ["Parques", "Natureza e piquenique."],
+        ["Mirantes", "As melhores vistas costumam ser de graça."],
+        ["Feiras locais", "Cultura, comida e artesanato."],
+        ["Museus com entrada gratuita", "Muitos têm dias sem cobrança."]]],
+      ["Como economizar em hospedagem", "Dicas práticas.", [
+        ["Compare plataformas", "O mesmo quarto pode ter preços diferentes."],
+        ["Fique um pouco longe do centro", "Perto do transporte público."],
+        ["Viaje em grupo", "Divida um apartamento."],
+        ["Leia as avaliações recentes", "Evitam surpresas."],
+        ["Cancelamento grátis", "Reserve cedo e mude se achar melhor."]]],
+      ["Documentos para viajar", "Não saia de casa sem conferir.", [
+        ["Documento com foto válido", "Confira a validade antes."],
+        ["Passaporte", "Confira se o destino exige."],
+        ["Vacinas exigidas", "Alguns destinos pedem comprovante."],
+        ["Reservas salvas", "Para mostrar quando pedirem."],
+        ["Cópias digitais", "Guarde fotos dos documentos na nuvem."]]],
+      ["Viagem de fim de semana", "Como aproveitar ao máximo.", [
+        ["Escolha um destino próximo", "Menos tempo na estrada."],
+        ["Saia cedo", "O primeiro dia rende mais."],
+        ["Mala pequena", "Só o essencial."],
+        ["Um roteiro leve", "Dois ou três programas principais."],
+        ["Desconecte", "Aproveite de verdade o descanso."]]]
+    ]
+  },
+  {
+    id: "treino", nome: "Treino em casa",
+    tags: "#treinoemcasa #exercicios #fitness #vidaativa #saude",
+    itens: [
+      ["5 exercícios para fazer em casa", "Sem nenhum equipamento.", [
+        ["Agachamento", "Fortalece pernas e glúteos."],
+        ["Flexão", "Com os joelhos no chão se for iniciante."],
+        ["Prancha", "Trabalha o abdômen e a postura."],
+        ["Afundo", "Equilíbrio e força nas pernas."],
+        ["Polichinelo", "Aquece e acelera o coração."]]],
+      ["Como começar a treinar do zero", "Sem se machucar e sem desistir.", [
+        ["Comece leve", "10 a 15 minutos já são um bom começo."],
+        ["Aprenda a postura", "Execução certa vale mais que repetição."],
+        ["Respeite a recuperação", "Dor forte é sinal para parar."],
+        ["Tenha horário fixo", "O hábito nasce da repetição."],
+        ["Procure orientação", "Um profissional ajusta o treino para você."]]],
+      ["Treino de 15 minutos para dias corridos", "Melhor que nada sempre.", [
+        ["Aquecimento", "2 minutos de polichinelo ou marcha no lugar."],
+        ["Bloco de pernas", "Agachamento e afundo."],
+        ["Bloco de braços", "Flexão e tríceps na cadeira."],
+        ["Bloco de abdômen", "Prancha e abdominal."],
+        ["Alongamento final", "2 minutos para relaxar."]]],
+      ["Erros comuns de quem treina em casa", "E como corrigir.", [
+        ["Pular o aquecimento", "Aumenta o risco de lesão."],
+        ["Treinar sem plano", "Faça um roteiro para a semana."],
+        ["Fazer rápido demais", "Movimentos controlados funcionam melhor."],
+        ["Esquecer a respiração", "Solte o ar no esforço."],
+        ["Desistir cedo", "Resultado vem com semanas de constância."]]],
+      ["Benefícios de se exercitar", "Que vão além da estética.", [
+        ["Mais disposição", "Movimento gera energia."],
+        ["Melhor humor", "O corpo libera substâncias de bem-estar."],
+        ["Sono mais profundo", "Quem se exercita costuma dormir melhor."],
+        ["Mais foco", "A mente também se beneficia."],
+        ["Autoestima", "Cada treino feito é uma conquista."]]],
+      ["Alongamentos para quem trabalha sentado", "Faça a cada hora.", [
+        ["Pescoço", "Incline a cabeça para os lados devagar."],
+        ["Ombros", "Gire para trás algumas vezes."],
+        ["Costas", "Entrelace as mãos e estique os braços para frente."],
+        ["Punhos", "Alongue para cima e para baixo."],
+        ["Pernas", "Levante e caminhe um pouco."]]],
+      ["Como montar um cantinho de treino", "Sem gastar muito.", [
+        ["Um tapete", "Conforto para os exercícios no chão."],
+        ["Garrafas de água como peso", "Funcionam no começo."],
+        ["Uma cadeira firme", "Para tríceps e apoio."],
+        ["Elástico de exercício", "Barato e versátil."],
+        ["Espaço livre", "Só precisa de dois metros."]]],
+      ["Motivação para treinar", "Nos dias sem vontade.", [
+        ["Comece com 5 minutos", "Depois que começa, fica mais fácil continuar."],
+        ["Coloque a roupa de treino", "Já é meio caminho andado."],
+        ["Música animada", "Muda a energia na hora."],
+        ["Marque no calendário", "Ver a sequência motiva."],
+        ["Lembre do seu porquê", "Saúde, disposição, autoestima."]]],
+      ["Abdômen: o que realmente funciona", "Sem mitos.", [
+        ["Prancha", "Trabalha toda a região central."],
+        ["Abdominal bicicleta", "Ativa as laterais."],
+        ["Elevação de pernas", "Foco na parte de baixo."],
+        ["Alimentação conta muito", "Treino sozinho não faz milagre."],
+        ["Constância", "Resultados aparecem com o tempo."]]],
+      ["Treino em casa para iniciantes", "Plano da primeira semana.", [
+        ["Segunda: pernas", "Agachamento e afundo."],
+        ["Terça: caminhada", "20 minutos em ritmo leve."],
+        ["Quarta: braços e abdômen", "Flexão e prancha."],
+        ["Quinta: descanso ativo", "Alongamento."],
+        ["Sexta: corpo todo", "Um pouco de cada exercício."]]]
+    ]
+  },
+  {
+    id: "casa", nome: "Casa e organização",
+    tags: "#organizacao #casaorganizada #dicasdecasa #limpeza #lar",
+    itens: [
+      ["5 hábitos de quem tem a casa sempre organizada", "Simples de copiar.", [
+        ["Arruma a cama ao acordar", "Leva um minuto e muda o quarto."],
+        ["Guarda logo depois de usar", "Evita o acúmulo."],
+        ["Lava a louça na hora", "A pia nunca vira montanha."],
+        ["Faz uma arrumação rápida à noite", "10 minutos antes de dormir."],
+        ["Tem menos coisas", "Menos itens, menos bagunça."]]],
+      ["Como organizar o guarda-roupa", "Passo a passo.", [
+        ["Tire tudo para fora", "Para ver o que você realmente tem."],
+        ["Separe o que não usa", "Doe o que ficou parado há um ano."],
+        ["Agrupe por categoria", "Calças, blusas, vestidos."],
+        ["Use cabides iguais", "Fica mais bonito e economiza espaço."],
+        ["Dobra vertical nas gavetas", "Você vê tudo de uma vez."]]],
+      ["Limpeza rápida para quem não tem tempo", "Rotina de 15 minutos.", [
+        ["Comece pelo banheiro", "Pia e vaso em poucos minutos."],
+        ["Cozinha", "Bancada e fogão limpos já mudam tudo."],
+        ["Recolha o que está fora do lugar", "Uma cesta ajuda."],
+        ["Aspire as áreas de passagem", "Onde a sujeira mais aparece."],
+        ["Troque as toalhas", "Sensação de casa limpa na hora."]]],
+      ["Limpeza com o que você tem em casa", "Barato e eficiente.", [
+        ["Vinagre", "Ajuda a tirar manchas de água e gordura leve."],
+        ["Bicarbonato", "Bom para remover odores."],
+        ["Limão", "Deixa um cheiro fresco."],
+        ["Pano de microfibra", "Limpa sem deixar fiapos."],
+        ["Cuidado com misturas", "Nunca misture produtos de limpeza."]]],
+      ["Organize a cozinha em uma tarde", "E facilite seu dia a dia.", [
+        ["Esvazie os armários", "E limpe as prateleiras."],
+        ["Descarte o vencido", "Confira as datas."],
+        ["Potes transparentes", "Você vê o que tem e o que falta."],
+        ["O que usa mais, mais perto", "Itens do dia a dia na altura das mãos."],
+        ["Etiquete", "Todo mundo sabe onde guardar."]]],
+      ["Destralhar sem sofrer", "Comece por aqui.", [
+        ["Uma gaveta por dia", "Pequenas vitórias motivam."],
+        ["Pergunte se usou no último ano", "Se não, provavelmente não vai usar."],
+        ["Doe enquanto ainda é útil", "Alguém pode precisar."],
+        ["Fotografe o que tem valor afetivo", "A lembrança fica, o espaço libera."],
+        ["Evite repor", "Pense antes de comprar algo novo."]]],
+      ["Cronograma de limpeza semanal", "Um pouco por dia.", [
+        ["Segunda: banheiros", "Limpeza completa."],
+        ["Terça: cozinha", "Geladeira e armários."],
+        ["Quarta: quartos", "Troca de roupa de cama."],
+        ["Quinta: sala", "Móveis e chão."],
+        ["Sexta: roupas", "Lavar e passar."]]],
+      ["Casa pequena: como ganhar espaço", "Truques que funcionam.", [
+        ["Móveis com função dupla", "Cama baú e mesa dobrável."],
+        ["Use as paredes", "Prateleiras e ganchos."],
+        ["Espelhos", "Dão sensação de amplitude."],
+        ["Cores claras", "Deixam o ambiente mais leve."],
+        ["Menos objetos à vista", "Superfícies livres parecem maiores."]]],
+      ["Como deixar a casa cheirosa", "Sem gastar muito.", [
+        ["Abra as janelas", "Ventilação é o primeiro passo."],
+        ["Lave os panos com frequência", "Eles acumulam cheiro."],
+        ["Bicarbonato no lixo", "Diminui o odor."],
+        ["Ervas e cascas de fruta", "Fervidas em água perfumam o ambiente."],
+        ["Lençóis limpos", "O quarto inteiro muda."]]],
+      ["Organização com crianças em casa", "É possível.", [
+        ["Caixas por tipo de brinquedo", "Fica fácil guardar."],
+        ["Tudo na altura delas", "Assim elas conseguem ajudar."],
+        ["Arrumação em família", "10 minutos todo mundo junto."],
+        ["Rodízio de brinquedos", "Guarde alguns e troque depois."],
+        ["Elogie a ajuda", "Incentiva a repetir."]]]
     ]
   }
 ];
