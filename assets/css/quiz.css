@@ -467,6 +467,7 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 /* Carrossel de arrastar dos módulos (capa + tópicos), cards dos lados girados para trás */
 .qz-mods { position: relative; margin: 18px -16px 0; }
 .qz-mods__track {
+  isolation: isolate;
   display: flex;
   padding: 10px calc(50% - min(33vw, 170px) + 14px) 14px;
   overflow-x: auto;
