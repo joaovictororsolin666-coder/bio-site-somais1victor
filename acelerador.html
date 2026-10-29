@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Acelerador MPR | Carrosséis prontos</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#080808">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/acelerador.css">
+  <script src="assets/js/acelerador.js" defer></script>
+</head>
+<body class="ac">
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <main class="ac-app">
+    <header class="ac-head">
+      <img src="assets/img/quiz/logo-mpr.webp" alt="" width="44" height="44">
+      <div>
+        <p class="ac-kicker">Acelerador MPR</p>
+        <h1>Carrossel pronto em 1 clique</h1>
+      </div>
+    </header>
+    <p class="ac-lead">Digite seu nicho e receba o carrossel pronto em imagem. É só baixar e postar, sem aparecer.</p>
+
+    <form class="form ac-form" id="form" novalidate>
+      <div class="field">
+        <label class="field__label" for="nicho">Qual o nicho do seu perfil?</label>
+        <input class="input" id="nicho" name="nicho" maxlength="120" placeholder="Ex.: renda extra pela internet" required>
+        <p class="field__error" id="nicho-erro"></p>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="tema">Tema do carrossel <span class="field__hint">(opcional)</span></label>
+        <input class="input" id="tema" name="tema" maxlength="200" placeholder="Deixe vazio que a IA escolhe o melhor">
+      </div>
+
+      <div class="ac-row">
+        <div class="field">
+          <label class="field__label" for="objetivo">Objetivo</label>
+          <select class="input" id="objetivo" name="objetivo">
+            <option value="seguidores">Seguidores</option>
+            <option value="vender">Vender</option>
+            <option value="engajamento">Comentários</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field__label" for="slides">Slides</label>
+          <select class="input" id="slides" name="slides">
+            <option value="5">5</option>
+            <option value="7" selected>7</option>
+            <option value="9">9</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="ac-row">
+        <div class="field">
+          <label class="field__label" for="perfil">Seu @</label>
+          <input class="input" id="perfil" name="perfil" maxlength="30" placeholder="@seuperfil" autocapitalize="none" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="field__label" for="palavra">Palavra p/ comentar</label>
+          <input class="input" id="palavra" name="palavra" maxlength="30" placeholder="Ex.: EU QUERO">
+        </div>
+      </div>
+
+      <fieldset class="field">
+        <legend class="field__label">Estilo</legend>
+        <div class="ac-styles" id="estilos"></div>
+      </fieldset>
+
+      <button class="btn btn--primary" type="submit" id="gerar"><span class="btn__label">GERAR CARROSSEL</span></button>
+      <p class="ac-status" id="status" role="status" aria-live="polite"></p>
+    </form>
+
+    <section class="ac-result" id="resultado" hidden>
+      <div class="ac-result__top">
+        <h2>Seu carrossel</h2>
+        <button class="btn btn--ghost btn--sm" type="button" id="refazer">Gerar outro</button>
+      </div>
+      <p class="ac-hint">Toque em um slide para editar o texto.</p>
+      <div class="ac-slides" id="slides-lista"></div>
+
+      <div class="ac-actions">
+        <button class="btn btn--primary" type="button" id="compartilhar" hidden><span class="btn__label">SALVAR / ENVIAR PRO INSTAGRAM</span></button>
+        <button class="btn btn--ghost" type="button" id="baixar"><span class="btn__label">BAIXAR IMAGENS</span></button>
+      </div>
+
+      <div class="field ac-caption">
+        <label class="field__label" for="legenda">Legenda pronta</label>
+        <textarea class="input" id="legenda" rows="7"></textarea>
+        <button class="btn btn--ghost btn--sm" type="button" id="copiar">Copiar legenda</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="ac-edit" id="editor">
+    <form method="dialog" class="ac-edit__card">
+      <h3 id="editor-titulo">Editar slide</h3>
+      <label class="field__label" for="ed-titulo">Título</label>
+      <textarea class="input" id="ed-titulo" rows="2"></textarea>
+      <label class="field__label" for="ed-texto">Texto</label>
+      <textarea class="input" id="ed-texto" rows="5"></textarea>
+      <div class="ac-edit__actions">
+        <button class="btn btn--ghost btn--sm" value="cancelar">Cancelar</button>
+        <button class="btn btn--primary btn--sm" value="salvar">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
