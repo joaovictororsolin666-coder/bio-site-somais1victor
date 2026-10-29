@@ -27,12 +27,24 @@
         <h1>Carrossel pronto em 1 clique</h1>
       </div>
     </header>
-    <p class="ac-lead">Escolha seu nicho e receba o carrossel pronto em imagem. É só baixar e postar, sem aparecer.</p>
+    <p class="ac-lead">Escolha um nicho ou cole seu próprio texto e receba o carrossel pronto em imagem. É só baixar e postar, sem aparecer.</p>
 
     <form class="form ac-form" id="form" novalidate>
-      <div class="field">
+      <div class="ac-modos" role="group" aria-label="Como montar o carrossel">
+        <button class="ac-modo" type="button" data-modo="modelo" aria-pressed="true">Modelos prontos</button>
+        <button class="ac-modo" type="button" data-modo="texto" aria-pressed="false">Colar meu texto</button>
+      </div>
+
+      <div class="field" data-so="modelo">
         <label class="field__label" for="nicho">Qual o nicho do seu perfil?</label>
         <select class="input" id="nicho" name="nicho"></select>
+      </div>
+
+      <div class="field" data-so="texto" hidden>
+        <label class="field__label" for="texto">Cole seu texto</label>
+        <textarea class="input ac-texto" id="texto" name="texto" rows="9" placeholder="5 erros que travam seu perfil&#10;&#10;1. Postar sem constância&#10;O algoritmo entrega mais pra quem aparece toda semana.&#10;&#10;2. Não ter um nicho claro&#10;Quem chega no perfil precisa entender em 3 segundos do que se trata."></textarea>
+        <p class="ac-hint">A primeira parte vira a capa. Separe as outras com uma linha em branco ou numere (1., 2., 3.) que cada uma vira um slide.</p>
+        <p class="ac-erro" id="texto-erro" role="alert" hidden></p>
       </div>
 
       <div class="ac-row">
@@ -44,7 +56,7 @@
             <option value="engajamento">Comentários</option>
           </select>
         </div>
-        <div class="field">
+        <div class="field" data-so="modelo">
           <label class="field__label" for="slides">Slides</label>
           <select class="input" id="slides" name="slides">
             <option value="5">5</option>
@@ -90,7 +102,7 @@
     <section class="ac-result" id="resultado" hidden>
       <div class="ac-result__top">
         <h2>Seu carrossel</h2>
-        <button class="btn btn--ghost btn--sm" type="button" id="refazer">Gerar outro ↻</button>
+        <button class="btn btn--ghost btn--sm" type="button" id="refazer" data-so="modelo">Gerar outro ↻</button>
       </div>
       <p class="ac-hint">Toque em um slide para editar o texto.</p>
       <div class="ac-slides" id="slides-lista"></div>

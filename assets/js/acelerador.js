@@ -22,7 +22,7 @@
   };
 
   var NICHOS = window.ACELERADOR_DATA || [];
-  var state = { estilo: "escuro", slides: [], perfil: "", palavra: "", nome: "", foto: null, editando: -1 };
+  var state = { modo: "modelo", estilo: "escuro", slides: [], perfil: "", palavra: "", nome: "", foto: null, editando: -1 };
 
   var store = {
     get: function () { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } },
@@ -272,13 +272,114 @@
   function montar(nicho, objetivo, total, palavra) {
     var c = sortear(nicho), ch = CHAMADAS[objetivo] || CHAMADAS.seguidores;
     var pontos = c[2].slice(0, total - 2).map(function (p) { return { titulo: p[0], texto: p[1] }; });
-    var fim = palavra
-      ? { titulo: "Quer o material completo?", texto: "Comenta a palavra abaixo que eu te mando." }
-      : { titulo: ch.titulo, texto: ch.texto };
+    var fim = fimPadrao(objetivo, palavra);
     var chamada = palavra ? "Comenta " + palavra.toUpperCase() + " que eu te mando o material completo." : ch.legenda;
     return {
       slides: [{ titulo: c[0], texto: c[1] }].concat(pontos, [fim]),
       legenda: c[0] + " 👇\n\n" + c[1] + "\n\n" + chamada + "\n\n" + nicho.tags
+    };
+  }
+
+  function fimPadrao(objetivo, palavra) {
+    var ch = CHAMADAS[objetivo] || CHAMADAS.seguidores;
+    return palavra
+      ? { titulo: "Quer o material completo?", texto: "Comenta a palavra abaixo que eu te mando." }
+      : { titulo: ch.titulo, texto: ch.texto };
+  }
+
+  /* ───────────── Colar meu texto ───────────── */
+
+  var MAX_SLIDES = 20, LONGO = 300;
+  var LISTA = /^\s*(?:\d{1,2}\s*[.)ºª°:-]|[-•*▪►✅✔👉🔹🔸➡️]+)\s*/;
+  var CTA = /coment|me segue|siga|salv[ae]|compartilh|link na bio|link da bio|chama no direct|manda pra/i;
+
+  function frases(t) {
+    return (t.match(/[^.!?…]+[.!?…]+["”')]*|[^.!?…]+$/g) || []).map(function (f) { return f.trim(); }).filter(Boolean);
+  }
+
+  // Tira marcações que vêm de outros apps: "Slide 2:", **negrito**, # títulos
+  function limpar(t) {
+    return t.replace(/\r/g, "")
+      .replace(/\*\*|__|^#+\s*/gm, "")
+      .replace(/^\s*(?:slide|página|pagina|card)\s*\d+\s*[:.)–-]?\s*/gim, "")
+      .trim();
+  }
+
+  // Divide em partes: linha em branco separa; item numerado ou com marcador também abre uma parte nova.
+  // Sem linha em branco nem lista, cada linha é uma parte.
+  function partes(t) {
+    var out = [], linhas = t.split("\n");
+    var lista = linhas.filter(function (l) { return LISTA.test(l); }).length >= 2;
+    var blocos = /\n\s*\n/.test(t) ? t.split(/\n\s*\n/) : lista ? [t] : linhas;
+    blocos.forEach(function (b) {
+      var atual = [];
+      b.split("\n").forEach(function (l) {
+        if (LISTA.test(l) && atual.length) { out.push(atual.join("\n")); atual = []; }
+        if (l.trim()) atual.push(l.trim());
+      });
+      if (atual.length) out.push(atual.join("\n"));
+    });
+    return out;
+  }
+
+  // Uma parte vira { titulo, texto }: 1ª linha (ou 1ª frase) é o título, o resto é o texto
+  function slideDe(p) {
+    var s = dividir(p.replace(LISTA, ""));
+    s.titulo = s.titulo.replace(/\.$/, "");
+    return s;
+  }
+
+  function dividir(p) {
+    var linhas = p.split("\n");
+    if (linhas.length > 1) return { titulo: linhas[0].replace(/[:–-]\s*$/, ""), texto: linhas.slice(1).join(" ") };
+    var dois = p.match(/^(.{8,90}?)(?::|\s[–-])\s+(.+)$/);
+    if (dois) return { titulo: dois[1], texto: dois[2] };
+    var fs = frases(p);
+    if (fs.length > 1 && fs[0].length <= 110) return { titulo: fs[0], texto: fs.slice(1).join(" ") };
+    return { titulo: p, texto: "" };
+  }
+
+  // Parte longa demais para um slide é quebrada em grupos de frases
+  function quebrar(p) {
+    if (p.length <= LONGO) return [p];
+    var grupos = [], atual = "";
+    frases(p.replace(/\n/g, " ")).forEach(function (f) {
+      if (atual && (atual + " " + f).length > LONGO * .8) { grupos.push(atual); atual = f; }
+      else atual = atual ? atual + " " + f : f;
+    });
+    if (atual) grupos.push(atual);
+    return grupos;
+  }
+
+  function organizar(texto, objetivo, palavra) {
+    var t = limpar(texto), ps = partes(t);
+    // Texto corrido num bloco só: separa por frases, 2 por slide
+    if (ps.length < 3) {
+      var fs = frases(t.replace(/\n/g, " ")), grupos = [fs.shift()];
+      for (var k = 0; k < fs.length; k += 2) grupos.push(fs.slice(k, k + 2).join(" "));
+      ps = grupos.filter(Boolean);
+    }
+    if (!ps.length) return null;
+
+    // Chamada final colada no último item da lista ("5. ... \n Salva esse post") vira parte própria
+    var ult = ps[ps.length - 1], ls = ult.split("\n");
+    if (LISTA.test(ult) && ls.length > 1 && CTA.test(ls[ls.length - 1])) ps.splice(-1, 1, ls.slice(0, -1).join("\n"), ls.pop());
+
+    var capa = slideDe(ps.shift());
+    // Título sozinho na capa: o parágrafo curto logo abaixo vira o subtítulo
+    if (!capa.texto && ps.length > 2 && !LISTA.test(ps[0]) && ps[0].length <= 160) capa.texto = ps.shift().replace(/\n/g, " ");
+    ult = ps[ps.length - 1];
+    var ultimo = ult && !LISTA.test(ult) && CTA.test(ult) ? slideDe(ps.pop()) : null;
+    var meio = [];
+    ps.forEach(function (p) { quebrar(p).forEach(function (q) { meio.push(slideDe(q)); }); });
+    var fim = ultimo || fimPadrao(objetivo, palavra);
+
+    meio = meio.slice(0, MAX_SLIDES - 2);
+    var ch = CHAMADAS[objetivo] || CHAMADAS.seguidores;
+    var chamada = palavra ? "Comenta " + palavra.toUpperCase() + " que eu te mando o material completo." : ch.legenda;
+    return {
+      slides: [capa].concat(meio, [fim]),
+      legenda: capa.titulo + " 👇" + (capa.texto ? "\n\n" + capa.texto : "") + "\n\n" + chamada
     };
   }
 
@@ -299,14 +400,18 @@
   }
 
   function gerar() {
-    var f = $("#form"), nicho = NICHOS[f.nicho.selectedIndex];
+    var f = $("#form"), nicho = NICHOS[f.nicho.selectedIndex], erro = $("#texto-erro");
     lerCampos();
 
     var salvo = store.get();
     salvo.perfil = state.perfil; salvo.nome = state.nome; salvo.estilo = state.estilo; salvo.nicho = nicho.id;
     store.set(salvo);
 
-    var r = montar(nicho, f.objetivo.value, +f.slides.value, state.palavra);
+    var r = state.modo === "texto"
+      ? organizar(f.texto.value, f.objetivo.value, state.palavra)
+      : montar(nicho, f.objetivo.value, +f.slides.value, state.palavra);
+    erro.hidden = !!r;
+    if (!r) { erro.textContent = "Cole o texto do carrossel antes de gerar."; f.texto.focus(); return Promise.reject(); }
     state.slides = r.slides;
     $("#legenda").value = r.legenda;
     return document.fonts.load("800 80px Manrope").then(renderSlides, renderSlides);
@@ -317,7 +422,7 @@
     gerar().then(function () {
       $("#resultado").hidden = false;
       $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    }, function () {});
   }
 
   /* ───────────── Editor ───────────── */
@@ -413,6 +518,16 @@
     img.src = src;
   }
 
+  /* ───────────── Modo: modelos prontos × colar meu texto ───────────── */
+
+  function trocarModo(modo) {
+    state.modo = modo;
+    document.querySelectorAll(".ac-modo").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.modo === modo)); });
+    document.querySelectorAll("[data-so]").forEach(function (el) { el.hidden = el.dataset.so !== modo; });
+    $("#texto-erro").hidden = true;
+    var salvo = store.get(); salvo.modo = modo; store.set(salvo);
+  }
+
   /* ───────────── Início ───────────── */
 
   function init() {
@@ -420,8 +535,15 @@
     if (ESTILOS[salvo.estilo]) state.estilo = salvo.estilo;
     if (salvo.perfil) $("#perfil").value = salvo.perfil;
     if (salvo.nome) $("#nome").value = salvo.nome;
+    if (salvo.texto) $("#texto").value = salvo.texto;
     lerCampos();
     usarFoto(salvo.foto || "");
+    trocarModo(salvo.modo === "texto" ? "texto" : "modelo");
+    document.querySelectorAll(".ac-modo").forEach(function (b) {
+      b.addEventListener("click", function () { trocarModo(b.dataset.modo); });
+    });
+    // Guarda o rascunho colado para não perder se a página recarregar
+    $("#texto").addEventListener("input", function (e) { var s = store.get(); s.texto = e.target.value; store.set(s); });
 
     ["#perfil", "#nome", "#palavra"].forEach(function (s) { $(s).addEventListener("input", atualizar); });
     $("#foto").addEventListener("change", function (e) { carregarFoto(e.target.files[0]); e.target.value = ""; });

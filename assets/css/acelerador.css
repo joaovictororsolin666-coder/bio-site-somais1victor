@@ -13,6 +13,15 @@
 .ac-form { gap: 16px; }
 .ac-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .ac-row .field__label { font-size: 13px; }
+.ac-row:has(> [hidden]) { grid-template-columns: 1fr; }
+
+/* Modelos prontos × Colar meu texto */
+.ac-modos { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid var(--line-2); border-radius: var(--r-md); background: var(--surface-2); }
+.ac-modo { padding: 11px 8px; border: 0; border-radius: 12px; background: none; color: var(--muted); font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; transition: background .2s, color .2s; }
+.ac-modo[aria-pressed="true"] { background: var(--green); color: var(--green-ink); }
+textarea.ac-texto { min-height: 220px; }
+.ac-texto + .ac-hint { margin-top: 2px; }
+.ac-erro { margin: 0; color: #ff6b6b; font-size: 13px; font-weight: 700; }
 
 .ac-styles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .ac-style { position: relative; display: grid; gap: 6px; padding: 8px; border: 1px solid var(--line-2); border-radius: var(--r-sm); background: var(--surface-2); color: var(--muted); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: border-color .2s, color .2s; }
