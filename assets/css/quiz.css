@@ -451,18 +451,10 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-price__alt strong { color: var(--text); }
 .qz-price__note { margin: 12px auto 0; padding: 8px 12px; max-width: 340px; border-radius: 10px; background: var(--green-soft); color: #d6fbe7; font-size: 13.5px; font-weight: 700; }
 .qz-price__note--warn { background: rgba(250, 204, 21, .08); color: #fde68a; font-weight: 600; }
-/* Bloco dos módulos */
-.qz-modules {
-  margin-top: 30px;
-  padding: 22px 0 8px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 210, 90, .22);
-  border-radius: 22px;
-  background: radial-gradient(90% 70% at 50% 0%, rgba(255, 196, 60, .1), transparent 70%), #101010;
-  text-align: center;
-}
-.qz-modules__title { margin: 0; padding: 0 18px; font-size: 19px; font-weight: 800; line-height: 1.3; }
-.qz-modules__sub { margin: 4px 0 0; padding: 0 18px; color: var(--muted); font-size: 13.5px; }
+/* Bloco dos módulos: sem caixa, carrossel de ponta a ponta em perspectiva */
+.qz-modules { margin-top: 34px; text-align: center; }
+.qz-modules__title { margin: 0; font-size: 26px; font-weight: 900; line-height: 1.15; letter-spacing: .01em; text-transform: uppercase; }
+.qz-modules__sub { margin: 8px 0 0; color: var(--muted); font-size: 13.5px; letter-spacing: .06em; text-transform: uppercase; }
 .qz-marquee {
   overflow: hidden;
   margin: 16px 0 0;
@@ -472,12 +464,11 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-marquee__track { display: flex; width: max-content; padding: 8px 0 14px; animation: qz-marquee 38s linear infinite; }
 .qz-marquee:hover .qz-marquee__track,
 .qz-marquee:active .qz-marquee__track { animation-play-state: paused; }
-/* Carrossel de arrastar dos módulos (capa + tópicos) */
-.qz-mods { position: relative; margin: 16px 0 0; }
+/* Carrossel de arrastar dos módulos (capa + tópicos), cards dos lados girados para trás */
+.qz-mods { position: relative; margin: 18px -16px 0; }
 .qz-mods__track {
   display: flex;
-  gap: 12px;
-  padding: 6px 13% 10px;
+  padding: 10px calc(50% - min(33vw, 170px) + 14px) 14px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -486,19 +477,23 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-mods__track::-webkit-scrollbar { display: none; }
 .qz-module {
   position: relative;
+  z-index: 1;
   flex: none;
-  width: 74%;
+  width: min(66vw, 340px);
+  margin: 0 -14px;
   padding: 12px 12px 16px;
-  border: 1px solid rgba(255, 210, 90, .22);
+  border: 1px solid rgba(255, 255, 255, .08);
   border-radius: 16px;
-  background: #161616;
+  background: #15181c;
   text-align: left;
   scroll-snap-align: center;
-  opacity: .5;
-  transform: scale(.93);
-  transition: transform .35s var(--ease), opacity .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease);
+  opacity: .55;
+  transform: perspective(900px) scale(.86);
+  transition: transform .4s var(--ease), opacity .4s var(--ease), border-color .4s var(--ease), box-shadow .4s var(--ease);
 }
-.qz-module.is-on { opacity: 1; transform: none; border-color: rgba(255, 210, 90, .45); box-shadow: 0 14px 30px -16px rgba(255, 196, 60, .6); }
+.qz-module.is-left { z-index: 2; transform: perspective(900px) rotateY(22deg) scale(.86); transform-origin: right center; }
+.qz-module.is-right { z-index: 2; transform: perspective(900px) rotateY(-22deg) scale(.86); transform-origin: left center; }
+.qz-module.is-on { z-index: 3; opacity: 1; transform: perspective(900px); border-color: rgba(255, 210, 90, .4); box-shadow: 0 22px 40px -18px rgba(0, 0, 0, .9), 0 14px 30px -18px rgba(255, 196, 60, .5); }
 .qz-module img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; border-radius: 10px; object-fit: cover; }
 .qz-module__n {
   display: inline-block;
@@ -522,7 +517,7 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-mods__nav {
   position: absolute;
   top: 38%;
-  z-index: 1;
+  z-index: 5;
   width: 34px;
   height: 34px;
   border: 1px solid rgba(255, 210, 90, .4);

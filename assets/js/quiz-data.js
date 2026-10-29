@@ -260,8 +260,8 @@ window.QUIZ_DATA = {
     ],
     // Carrossel de arrastar: módulos em destaque com tópicos + card final com os demais (antes da garantia)
     modules: {
-      title: '📚 O que você vai aprender no método',
-      subtitle: 'Arraste para o lado para ver os módulos',
+      title: 'O que vou <span class="hl">aprender?</span>',
+      subtitle: 'Módulos do treinamento',
       items: [
         { n: 1, src: 'assets/img/quiz/modulo-01.webp', title: 'Comece aqui', topics: ['Como o método funciona do início ao fim', 'O que configurar antes de começar', 'Seu plano para os primeiros 7 dias'] },
         { n: 5, src: 'assets/img/quiz/modulo-05.webp', title: 'Primeira venda', topics: ['Como vender diariamente', 'Como vender no automático', 'O que fazer quando a primeira venda cair'] },

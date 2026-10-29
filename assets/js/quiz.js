@@ -190,19 +190,23 @@
     $$(".qz-mods__nav", box).forEach(function (b) {
       b.addEventListener("click", function () { go(current() + Number(b.getAttribute("data-dir"))); });
     });
+    // Card do meio em destaque; os vizinhos ficam girados para trás (is-left / is-right)
+    var mark = function (i) {
+      dots.forEach(function (d, k) { d.classList.toggle("is-on", k === i); });
+      cards.forEach(function (c, k) {
+        c.classList.toggle("is-on", k === i);
+        c.classList.toggle("is-left", k < i);
+        c.classList.toggle("is-right", k > i);
+      });
+      box.classList.toggle("is-start", i === 0);
+      box.classList.toggle("is-end", i === cards.length - 1);
+    };
     var raf;
     track.addEventListener("scroll", function () {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(function () {
-        var i = current();
-        dots.forEach(function (d, k) { d.classList.toggle("is-on", k === i); });
-        cards.forEach(function (c, k) { c.classList.toggle("is-on", k === i); });
-        box.classList.toggle("is-start", i === 0);
-        box.classList.toggle("is-end", i === cards.length - 1);
-      });
+      raf = requestAnimationFrame(function () { mark(current()); });
     }, { passive: true });
-    cards[0].classList.add("is-on");
-    box.classList.add("is-start");
+    mark(0);
   }
 
   // Linhas abaixo do preço conforme as respostas (objeção; aviso para menor de idade)
