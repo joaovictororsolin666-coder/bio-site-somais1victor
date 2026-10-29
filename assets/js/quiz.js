@@ -190,23 +190,29 @@
     $$(".qz-mods__nav", box).forEach(function (b) {
       b.addEventListener("click", function () { go(current() + Number(b.getAttribute("data-dir"))); });
     });
-    // Card do meio em destaque; os vizinhos ficam girados para trás (is-left / is-right)
-    var mark = function (i) {
-      dots.forEach(function (d, k) { d.classList.toggle("is-on", k === i); });
-      cards.forEach(function (c, k) {
-        c.classList.toggle("is-on", k === i);
-        c.classList.toggle("is-left", k < i);
-        c.classList.toggle("is-right", k > i);
+    // Perspectiva contínua: cada card gira, encolhe e apaga conforme a distância do centro,
+    // calculado a cada quadro da rolagem (sem transição CSS, então acompanha o dedo sem saltos)
+    var paint = function () {
+      var mid = track.scrollLeft + track.clientWidth / 2, step = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : 1;
+      cards.forEach(function (c) {
+        var p = (c.offsetLeft + c.offsetWidth / 2 - mid) / step, a = Math.min(Math.abs(p), 1);
+        var dir = p < 0 ? -1 : 1;
+        c.style.transform = "perspective(900px) rotateY(" + (-22 * a * dir).toFixed(2) + "deg) scale(" + (1 - .14 * a).toFixed(3) + ")";
+        c.style.opacity = (1 - .45 * a).toFixed(3);
+        c.style.zIndex = String(10 - Math.round(Math.min(Math.abs(p), 4) * 2));
       });
+      var i = current();
+      dots.forEach(function (d, k) { d.classList.toggle("is-on", k === i); });
+      cards.forEach(function (c, k) { c.classList.toggle("is-on", k === i); });
       box.classList.toggle("is-start", i === 0);
       box.classList.toggle("is-end", i === cards.length - 1);
     };
     var raf;
     track.addEventListener("scroll", function () {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(function () { mark(current()); });
+      raf = requestAnimationFrame(paint);
     }, { passive: true });
-    mark(0);
+    paint();
   }
 
   // Linhas abaixo do preço conforme as respostas (objeção; aviso para menor de idade)
