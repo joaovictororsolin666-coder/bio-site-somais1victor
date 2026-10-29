@@ -161,12 +161,14 @@
         "</article>");
     }
     var dots = cards.map(function (_, i) { return '<i' + (i ? "" : ' class="is-on"') + "></i>"; }).join("");
+    // Loop: a lista vai três vezes (cópias escondidas do leitor de tela) e a rolagem fica sempre na do meio
+    var clone = function (h) { return h.replace("<article ", '<article aria-hidden="true" '); };
     return '<div class="qz-modules" data-modules>' +
       '<p class="qz-modules__title">' + m.title + "</p>" +
       (m.subtitle ? '<p class="qz-modules__sub">' + m.subtitle + "</p>" : "") +
       '<div class="qz-mods">' +
       '<button type="button" class="qz-mods__nav qz-mods__nav--prev" data-dir="-1" aria-label="Módulo anterior">‹</button>' +
-      '<div class="qz-mods__track">' + cards.join("") + "</div>" +
+      '<div class="qz-mods__track">' + cards.map(clone).join("") + cards.join("") + cards.map(clone).join("") + "</div>" +
       '<button type="button" class="qz-mods__nav qz-mods__nav--next" data-dir="1" aria-label="Próximo módulo">›</button>' +
       "</div>" +
       '<div class="qz-mods__dots" aria-hidden="true">' + dots + "</div></div>";
@@ -176,6 +178,7 @@
     var box = $("[data-modules]", root);
     if (!box) return;
     var track = $(".qz-mods__track", box), cards = $$(".qz-module", track), dots = $$(".qz-mods__dots i", box);
+    var n = dots.length;
     var current = function () {
       var mid = track.scrollLeft + track.clientWidth / 2, best = 0;
       cards.forEach(function (c, i) {
@@ -183,9 +186,15 @@
       });
       return best;
     };
+    var leftOf = function (c) { return c.offsetLeft - (track.clientWidth - c.offsetWidth) / 2; };
     var go = function (i) {
-      var c = cards[Math.max(0, Math.min(cards.length - 1, i))];
-      track.scrollTo({ left: c.offsetLeft - (track.clientWidth - c.offsetWidth) / 2, behavior: "smooth" });
+      track.scrollTo({ left: leftOf(cards[Math.max(0, Math.min(cards.length - 1, i))]), behavior: "smooth" });
+    };
+    // Quando a rolagem para numa cópia, pula sem animação para o mesmo card na lista do meio
+    var recenter = function () {
+      var i = current(), shift = cards[n].offsetLeft - cards[0].offsetLeft;
+      if (i < n) track.scrollLeft += shift;
+      else if (i >= 2 * n) track.scrollLeft -= shift;
     };
     $$(".qz-mods__nav", box).forEach(function (b) {
       b.addEventListener("click", function () { go(current() + Number(b.getAttribute("data-dir"))); });
@@ -202,16 +211,18 @@
         c.style.zIndex = String(10 - Math.round(Math.min(Math.abs(p), 4) * 2));
       });
       var i = current();
-      dots.forEach(function (d, k) { d.classList.toggle("is-on", k === i); });
+      dots.forEach(function (d, k) { d.classList.toggle("is-on", k === i % n); });
       cards.forEach(function (c, k) { c.classList.toggle("is-on", k === i); });
-      box.classList.toggle("is-start", i === 0);
-      box.classList.toggle("is-end", i === cards.length - 1);
     };
-    var raf;
+    var raf, idle;
     track.addEventListener("scroll", function () {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(paint);
+      clearTimeout(idle);
+      idle = setTimeout(recenter, 160);
     }, { passive: true });
+    // Abre com o primeiro módulo (Comece aqui) no meio, já com vizinhos dos dois lados
+    track.scrollLeft = leftOf(cards[n]);
     paint();
   }
 

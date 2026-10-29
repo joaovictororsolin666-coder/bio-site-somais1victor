@@ -529,8 +529,6 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 }
 .qz-mods__nav--prev { left: 6px; }
 .qz-mods__nav--next { right: 6px; }
-.is-start .qz-mods__nav--prev,
-.is-end .qz-mods__nav--next { opacity: 0; pointer-events: none; }
 .qz-mods__dots { display: flex; justify-content: center; gap: 6px; padding: 6px 0 10px; }
 .qz-mods__dots i { width: 6px; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, .22); transition: width .3s var(--ease), background .3s var(--ease); }
 .qz-mods__dots i.is-on { width: 18px; background: #ffd666; }
