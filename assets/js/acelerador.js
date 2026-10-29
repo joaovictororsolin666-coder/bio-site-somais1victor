@@ -22,7 +22,7 @@
   };
 
   var NICHOS = window.ACELERADOR_DATA || [];
-  var state = { estilo: "escuro", slides: [], perfil: "", palavra: "", editando: -1 };
+  var state = { estilo: "escuro", slides: [], perfil: "", palavra: "", nome: "", foto: null, editando: -1 };
 
   var store = {
     get: function () { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } },
@@ -152,10 +152,26 @@
   }
 
   // Visual de post de rede social: foto redonda, nome e @ em cima do texto
+  // Selo de verificado: círculo ondulado com um check branco
+  function selo(ctx, cx, cy, r, cor) {
+    ctx.fillStyle = cor;
+    ctx.beginPath(); ctx.arc(cx, cy, r * .84, 0, Math.PI * 2); ctx.fill();
+    for (var k = 0; k < 8; k++) {
+      var a = k * Math.PI / 4;
+      ctx.beginPath(); ctx.arc(cx + Math.cos(a) * r * .5, cy + Math.sin(a) * r * .5, r * .5, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.strokeStyle = "#ffffff"; ctx.lineWidth = r * .22; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.beginPath(); ctx.moveTo(cx - r * .42, cy + r * .02); ctx.lineTo(cx - r * .1, cy + r * .34); ctx.lineTo(cx + r * .46, cy - r * .3); ctx.stroke();
+  }
+
+  function nomePadrao(handle) {
+    var n = handle.replace(/^@/, "").replace(/[._]+/g, " ");
+    return n.charAt(0).toUpperCase() + n.slice(1);
+  }
+
   function renderPost(ctx, slide, i, total, est) {
     var maxW = W - PAD * 2, handle = state.perfil || "@seuperfil";
-    var nome = handle.replace(/^@/, "").replace(/[._]+/g, " ");
-    nome = nome.charAt(0).toUpperCase() + nome.slice(1);
+    var nome = state.nome || nomePadrao(handle);
 
     ctx.font = "700 34px " + FONT; ctx.textBaseline = "top"; ctx.fillStyle = est.texto;
     var num = (i + 1) + "/" + total;
@@ -168,12 +184,23 @@
     var alt = 112 + 56 + altura(t) + 36 + altura(s) + (final && state.palavra ? 172 : 0);
     var y = centro(alt, 150, H - (capa ? 220 : 140));
 
-    // Cabeçalho
-    ctx.beginPath(); ctx.arc(PAD + 56, y + 56, 56, 0, Math.PI * 2); ctx.fillStyle = est.destaque; ctx.fill();
-    ctx.font = "800 54px " + FONT; ctx.fillStyle = est.tinta; ctx.textBaseline = "middle"; ctx.textAlign = "center";
-    ctx.fillText(nome.charAt(0) || "?", PAD + 56, y + 58);
-    ctx.textAlign = "left"; ctx.textBaseline = "top";
-    ctx.font = "800 44px " + FONT; ctx.fillStyle = est.titulo; ctx.fillText(nome, PAD + 140, y + 8);
+    // Cabeçalho: foto (ou inicial), nome com selo e @
+    if (state.foto) {
+      ctx.save();
+      ctx.beginPath(); ctx.arc(PAD + 56, y + 56, 56, 0, Math.PI * 2); ctx.clip();
+      ctx.drawImage(state.foto, PAD, y, 112, 112);
+      ctx.restore();
+    } else {
+      ctx.beginPath(); ctx.arc(PAD + 56, y + 56, 56, 0, Math.PI * 2); ctx.fillStyle = est.destaque; ctx.fill();
+      ctx.font = "800 54px " + FONT; ctx.fillStyle = est.tinta; ctx.textBaseline = "middle"; ctx.textAlign = "center";
+      ctx.fillText(nome.charAt(0) || "?", PAD + 56, y + 58);
+      ctx.textAlign = "left";
+    }
+    ctx.textBaseline = "top";
+    var tam = 44, livre = maxW - 140 - 60;
+    for (; tam > 30; tam -= 2) { ctx.font = "800 " + tam + "px " + FONT; if (ctx.measureText(nome).width <= livre) break; }
+    ctx.fillStyle = est.titulo; ctx.fillText(nome, PAD + 140, y + 8);
+    selo(ctx, PAD + 140 + ctx.measureText(nome).width + 30, y + 8 + tam * .55, 20, est.destaque);
     ctx.font = "500 36px " + FONT; ctx.fillStyle = est.texto; ctx.fillText(handle, PAD + 140, y + 64);
 
     y = draw(ctx, t, PAD, y + 168, 800, est.titulo);
@@ -203,6 +230,7 @@
       });
       box.appendChild(b);
     });
+    $("#post-extra").hidden = ESTILOS[state.estilo].forma !== "post";
   }
 
   function renderSlides() {
@@ -254,14 +282,28 @@
     };
   }
 
-  function gerar() {
-    var f = $("#form"), nicho = NICHOS[f.nicho.selectedIndex];
-    var perfil = f.perfil.value.trim().replace(/^@?/, "@");
+  function lerCampos() {
+    var f = $("#form"), perfil = f.perfil.value.trim().replace(/^@?/, "@");
     state.perfil = perfil === "@" ? "" : perfil;
     state.palavra = f.palavra.value.trim();
+    state.nome = f.nome.value.trim();
+  }
+
+  // @, nome e palavra atualizam os slides já gerados enquanto a pessoa digita
+  function atualizar() {
+    lerCampos();
+    if (state.slides.length) renderSlides();
+    var salvo = store.get();
+    salvo.perfil = state.perfil; salvo.nome = state.nome;
+    store.set(salvo);
+  }
+
+  function gerar() {
+    var f = $("#form"), nicho = NICHOS[f.nicho.selectedIndex];
+    lerCampos();
 
     var salvo = store.get();
-    salvo.perfil = state.perfil; salvo.estilo = state.estilo; salvo.nicho = nicho.id;
+    salvo.perfil = state.perfil; salvo.nome = state.nome; salvo.estilo = state.estilo; salvo.nicho = nicho.id;
     store.set(salvo);
 
     var r = montar(nicho, f.objetivo.value, +f.slides.value, state.palavra);
@@ -335,12 +377,58 @@
     else { t.select(); document.execCommand("copy"); done(); }
   }
 
+  /* ───────────── Foto de perfil (estilo Post) ───────────── */
+
+  function mostrarFoto(url) {
+    var prev = $("#foto-prev");
+    prev.style.backgroundImage = url ? "url(" + url + ")" : "";
+    prev.textContent = url ? "" : "?";
+    $("#foto-remover").hidden = !url;
+  }
+
+  function usarFoto(url) {
+    if (!url) { state.foto = null; mostrarFoto(""); if (state.slides.length) renderSlides(); renderEstilos(); return; }
+    var img = new Image();
+    img.onload = function () {
+      state.foto = img; mostrarFoto(url);
+      if (state.slides.length) renderSlides();
+      renderEstilos();
+    };
+    img.src = url;
+  }
+
+  // Recorta no centro e reduz para 240×240, assim cabe no armazenamento do aparelho
+  function carregarFoto(file) {
+    if (!file || !/^image\//.test(file.type)) return;
+    var src = URL.createObjectURL(file), img = new Image();
+    img.onload = function () {
+      var lado = Math.min(img.width, img.height), c = document.createElement("canvas");
+      c.width = c.height = 240;
+      c.getContext("2d").drawImage(img, (img.width - lado) / 2, (img.height - lado) / 2, lado, lado, 0, 0, 240, 240);
+      URL.revokeObjectURL(src);
+      var url = c.toDataURL("image/jpeg", .88), salvo = store.get();
+      salvo.foto = url; store.set(salvo);
+      usarFoto(url);
+    };
+    img.src = src;
+  }
+
   /* ───────────── Início ───────────── */
 
   function init() {
     var salvo = store.get();
     if (ESTILOS[salvo.estilo]) state.estilo = salvo.estilo;
     if (salvo.perfil) $("#perfil").value = salvo.perfil;
+    if (salvo.nome) $("#nome").value = salvo.nome;
+    lerCampos();
+    usarFoto(salvo.foto || "");
+
+    ["#perfil", "#nome", "#palavra"].forEach(function (s) { $(s).addEventListener("input", atualizar); });
+    $("#foto").addEventListener("change", function (e) { carregarFoto(e.target.files[0]); e.target.value = ""; });
+    $("#foto-remover").addEventListener("click", function () {
+      var salvo = store.get(); delete salvo.foto; store.set(salvo);
+      usarFoto("");
+    });
 
     var sel = $("#nicho");
     NICHOS.forEach(function (n) {

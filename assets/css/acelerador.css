@@ -19,6 +19,16 @@
 .ac-style canvas { width: 100%; height: auto; border-radius: 8px; }
 .ac-style[aria-pressed="true"] { border-color: var(--green); color: var(--text); box-shadow: 0 0 0 3px rgba(57, 229, 140, .12); }
 
+/* Extras do estilo Post: foto e nome */
+.ac-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.ac-post { display: grid; gap: 14px; padding: 14px; border: 1px solid var(--line-2); border-radius: var(--r-md); background: rgba(255, 255, 255, .025); }
+.ac-post__foto { display: flex; align-items: center; gap: 14px; }
+.ac-post__avatar { flex: none; width: 64px; height: 64px; border-radius: 50%; background: #1d9bf0 center / cover no-repeat; display: grid; place-items: center; color: #fff; font-size: 26px; font-weight: 800; }
+.ac-post__acoes { display: grid; justify-items: start; gap: 6px; }
+.ac-post__acoes .btn { cursor: pointer; }
+.ac-sr:focus-visible + .btn { outline: 2px solid var(--green); outline-offset: 3px; }
+.ac-link { padding: 0; border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+
 .ac-result { margin-top: 34px; }
 .ac-result__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .ac-result__top h2 { margin: 0; font-size: 20px; font-weight: 800; }
