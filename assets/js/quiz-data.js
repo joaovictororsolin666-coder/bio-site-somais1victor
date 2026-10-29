@@ -258,21 +258,20 @@ window.QUIZ_DATA = {
       { title: 'Bônus extra · Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp' },
       { title: 'Bônus extra · Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp' }
     ],
-    // Carrossel automático com as capas dos módulos (bloco próprio, antes da garantia)
+    // Carrossel de arrastar: módulos em destaque com tópicos + card final com os demais (antes da garantia)
     modules: {
-      title: '📚 O que você recebe ao entrar no método',
+      title: '📚 O que você vai aprender no método',
+      subtitle: 'Arraste para o lado para ver os módulos',
       items: [
-        { src: 'assets/img/quiz/modulo-01.webp', title: 'Comece aqui' },
-        { src: 'assets/img/quiz/modulo-02.webp', title: 'Produtos digitais' },
-        { src: 'assets/img/quiz/modulo-03.webp', title: 'Crie o seu produto' },
-        { src: 'assets/img/quiz/modulo-04.webp', title: 'Edição viral' },
-        { src: 'assets/img/quiz/modulo-05.webp', title: 'Primeira venda' },
-        { src: 'assets/img/quiz/modulo-06.webp', title: 'Decifrando o algoritmo' },
-        { src: 'assets/img/quiz/modulo-07.webp', title: 'Automatizando suas vendas' },
-        { src: 'assets/img/quiz/modulo-08.webp', title: 'Escalando com tráfego pago' },
-        { src: 'assets/img/quiz/modulo-09.webp', title: 'Produtos validados' },
-        { src: 'assets/img/quiz/modulo-10.webp', title: 'Entre para a comunidade' }
-      ]
+        { n: 4, src: 'assets/img/quiz/modulo-04.webp', title: 'Edição viral', topics: ['Vídeos simples que prendem a atenção', 'Como gravar sem precisar aparecer', 'Os apps e cortes que fazem o vídeo viralizar'] },
+        { n: 5, src: 'assets/img/quiz/modulo-05.webp', title: 'Primeira venda', topics: ['O caminho do vídeo até o Pix', 'Como levar quem assiste até o link de compra', 'O que fazer quando a primeira venda cair'] },
+        { n: 9, src: 'assets/img/quiz/modulo-09.webp', title: 'Produtos validados', topics: ['Lista de produtos que já estão vendendo', 'Como achar um produto campeão', 'Os nichos que mais vendem agora'] },
+        { n: 6, src: 'assets/img/quiz/modulo-06.webp', title: 'Decifrando o algoritmo', topics: ['O que faz o Instagram entregar seu vídeo', 'Melhores horários e frequência de postagem', 'Por que alguns vídeos não saem do lugar'] }
+      ],
+      more: {
+        title: '+ 5 módulos completos',
+        items: ['Comece aqui', 'Produtos digitais', 'Crie o seu produto', 'Automatizando suas vendas', 'Entre para a comunidade']
+      }
     },
     // {preco} vira o preço à vista do config.js (oferta.precoVista)
     cta: 'SIM! QUERO COMPRAR POR {preco}',

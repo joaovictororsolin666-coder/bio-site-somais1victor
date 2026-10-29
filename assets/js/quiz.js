@@ -143,21 +143,66 @@
       '<span class="btn__label">' + label + "</span>" + ARROW + "</a>";
   }
 
-  // Carrossel infinito das capas dos módulos: a lista vai duas vezes e a faixa desliza meia largura
+  // Carrossel de arrastar dos módulos: capa + tópicos em cada card, e um card final com os demais
   function modulesHtml(m) {
     if (!m || !m.items || !m.items.length) return "";
-    var card = function (it, i, clone) {
-      return '<figure class="qz-module"' + (clone ? ' aria-hidden="true"' : "") + '>' +
-        '<img src="' + it.src + '" width="320" height="400" alt="' + (clone ? "" : "Módulo " + (i + 1) + ": " + it.title) + '" decoding="async">' +
-        '<span class="qz-module__n">' + ("0" + (i + 1)).slice(-2) + "</span></figure>";
-    };
-    return '<div class="qz-modules">' +
+    var cards = m.items.map(function (it) {
+      return '<article class="qz-module">' +
+        '<img src="' + it.src + '" width="320" height="400" alt="Módulo ' + it.n + ": " + it.title + '" loading="lazy" decoding="async">' +
+        '<span class="qz-module__n">MÓDULO ' + it.n + "</span>" +
+        '<h3 class="qz-module__title">' + it.title + "</h3>" +
+        '<ul class="qz-module__list">' + it.topics.map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul>" +
+        "</article>";
+    });
+    if (m.more) {
+      cards.push('<article class="qz-module qz-module--more">' +
+        '<h3 class="qz-module__title">' + m.more.title + "</h3>" +
+        '<ul class="qz-module__list">' + m.more.items.map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul>" +
+        "</article>");
+    }
+    var dots = cards.map(function (_, i) { return '<i' + (i ? "" : ' class="is-on"') + "></i>"; }).join("");
+    return '<div class="qz-modules" data-modules>' +
       '<p class="qz-modules__title">' + m.title + "</p>" +
       (m.subtitle ? '<p class="qz-modules__sub">' + m.subtitle + "</p>" : "") +
-      '<div class="qz-marquee"><div class="qz-marquee__track">' +
-      m.items.map(function (it, i) { return card(it, i, false); }).join("") +
-      m.items.map(function (it, i) { return card(it, i, true); }).join("") +
-      "</div></div></div>";
+      '<div class="qz-mods">' +
+      '<button type="button" class="qz-mods__nav qz-mods__nav--prev" data-dir="-1" aria-label="Módulo anterior">‹</button>' +
+      '<div class="qz-mods__track">' + cards.join("") + "</div>" +
+      '<button type="button" class="qz-mods__nav qz-mods__nav--next" data-dir="1" aria-label="Próximo módulo">›</button>' +
+      "</div>" +
+      '<div class="qz-mods__dots" aria-hidden="true">' + dots + "</div></div>";
+  }
+
+  function bindModules(root) {
+    var box = $("[data-modules]", root);
+    if (!box) return;
+    var track = $(".qz-mods__track", box), cards = $$(".qz-module", track), dots = $$(".qz-mods__dots i", box);
+    var current = function () {
+      var mid = track.scrollLeft + track.clientWidth / 2, best = 0;
+      cards.forEach(function (c, i) {
+        if (Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid) < Math.abs(cards[best].offsetLeft + cards[best].offsetWidth / 2 - mid)) best = i;
+      });
+      return best;
+    };
+    var go = function (i) {
+      var c = cards[Math.max(0, Math.min(cards.length - 1, i))];
+      track.scrollTo({ left: c.offsetLeft - (track.clientWidth - c.offsetWidth) / 2, behavior: "smooth" });
+    };
+    $$(".qz-mods__nav", box).forEach(function (b) {
+      b.addEventListener("click", function () { go(current() + Number(b.getAttribute("data-dir"))); });
+    });
+    var raf;
+    track.addEventListener("scroll", function () {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(function () {
+        var i = current();
+        dots.forEach(function (d, k) { d.classList.toggle("is-on", k === i); });
+        cards.forEach(function (c, k) { c.classList.toggle("is-on", k === i); });
+        box.classList.toggle("is-start", i === 0);
+        box.classList.toggle("is-end", i === cards.length - 1);
+      });
+    }, { passive: true });
+    cards[0].classList.add("is-on");
+    box.classList.add("is-start");
   }
 
   // Linhas abaixo do preço conforme as respostas (objeção; aviso para menor de idade)
@@ -653,6 +698,7 @@
       VG.track("quizComplete", { meta_escolhida: answerOf("meta") || "" });
     }
     Journey.flush();
+    bindModules(root);
 
     $$("[data-checkout]", root).forEach(function (a) { bindCheckout(a); });
   }
