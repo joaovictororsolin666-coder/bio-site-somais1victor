@@ -19,10 +19,6 @@
 .ac-style canvas { width: 100%; height: auto; border-radius: 8px; }
 .ac-style[aria-pressed="true"] { border-color: var(--green); color: var(--text); box-shadow: 0 0 0 3px rgba(57, 229, 140, .12); }
 
-.ac-status { margin: 0; min-height: 1.4em; color: var(--muted); font-size: 13.5px; text-align: center; }
-.ac-status.is-error { color: #fca5a5; }
-.btn[aria-busy="true"] { opacity: .7; pointer-events: none; }
-
 .ac-result { margin-top: 34px; }
 .ac-result__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .ac-result__top h2 { margin: 0; font-size: 20px; font-weight: 800; }

@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/acelerador.css">
+  <script src="assets/js/acelerador-data.js" defer></script>
   <script src="assets/js/acelerador.js" defer></script>
 </head>
 <body class="ac">
@@ -26,18 +27,12 @@
         <h1>Carrossel pronto em 1 clique</h1>
       </div>
     </header>
-    <p class="ac-lead">Digite seu nicho e receba o carrossel pronto em imagem. É só baixar e postar, sem aparecer.</p>
+    <p class="ac-lead">Escolha seu nicho e receba o carrossel pronto em imagem. É só baixar e postar, sem aparecer.</p>
 
     <form class="form ac-form" id="form" novalidate>
       <div class="field">
         <label class="field__label" for="nicho">Qual o nicho do seu perfil?</label>
-        <input class="input" id="nicho" name="nicho" maxlength="120" placeholder="Ex.: renda extra pela internet" required>
-        <p class="field__error" id="nicho-erro"></p>
-      </div>
-
-      <div class="field">
-        <label class="field__label" for="tema">Tema do carrossel <span class="field__hint">(opcional)</span></label>
-        <input class="input" id="tema" name="tema" maxlength="200" placeholder="Deixe vazio que a IA escolhe o melhor">
+        <select class="input" id="nicho" name="nicho"></select>
       </div>
 
       <div class="ac-row">
@@ -54,7 +49,6 @@
           <select class="input" id="slides" name="slides">
             <option value="5">5</option>
             <option value="7" selected>7</option>
-            <option value="9">9</option>
           </select>
         </div>
       </div>
@@ -75,14 +69,12 @@
         <div class="ac-styles" id="estilos"></div>
       </fieldset>
 
-      <button class="btn btn--primary" type="submit" id="gerar"><span class="btn__label">GERAR CARROSSEL</span></button>
-      <p class="ac-status" id="status" role="status" aria-live="polite"></p>
-    </form>
+      <button class="btn btn--primary" type="submit" id="gerar"><span class="btn__label">GERAR CARROSSEL</span></button>    </form>
 
     <section class="ac-result" id="resultado" hidden>
       <div class="ac-result__top">
         <h2>Seu carrossel</h2>
-        <button class="btn btn--ghost btn--sm" type="button" id="refazer">Gerar outro</button>
+        <button class="btn btn--ghost btn--sm" type="button" id="refazer">Gerar outro ↻</button>
       </div>
       <p class="ac-hint">Toque em um slide para editar o texto.</p>
       <div class="ac-slides" id="slides-lista"></div>

@@ -1,7 +1,7 @@
 /* ==========================================================================
    Acelerador MPR — gera carrosséis prontos em imagem (1080×1350)
-   A IA escreve o texto em /api/carrossel; os slides são desenhados no canvas.
-   /acelerador?demo=1 usa um texto de exemplo (sem IA) só para conferir o visual.
+   O texto vem da biblioteca em acelerador-data.js (sem IA, sem custo);
+   os slides são desenhados no canvas.
    ========================================================================== */
 
 (function () {
@@ -18,8 +18,8 @@
     amarelo: { nome: "Impacto", bg: ["#ffd84d", "#ffc81f"], titulo: "#111111", texto: "#2b2b2b", destaque: "#111111", tinta: "#ffd84d", linha: "rgba(0,0,0,.14)" }
   };
 
+  var NICHOS = window.ACELERADOR_DATA || [];
   var state = { estilo: "escuro", slides: [], perfil: "", palavra: "", editando: -1 };
-  var demo = /[?&]demo=1/.test(location.search);
 
   var store = {
     get: function () { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } },
@@ -161,73 +161,62 @@
     });
   }
 
-  /* ───────────── Geração ───────────── */
 
-  function exemplo(d) {
-    var nicho = d.nicho || "renda extra";
-    var base = [
-      { titulo: "5 erros que travam quem está começando em " + nicho, texto: "O terceiro quase todo mundo comete sem perceber." },
-      { titulo: "Querer fazer tudo ao mesmo tempo", texto: "Escolha um único caminho e vá até o fim. Foco vende mais que volume." },
-      { titulo: "Postar sem um objetivo", texto: "Todo post precisa levar a pessoa a um próximo passo: seguir, comentar ou clicar no link." },
-      { titulo: "Esperar estar pronto", texto: "Ninguém começa pronto. Quem posta todos os dias aprende mais rápido do que quem planeja." },
-      { titulo: "Ignorar o que já funciona", texto: "Olhe os vídeos que mais performaram no seu nicho e modele o formato, não o conteúdo." },
-      { titulo: "Desistir antes dos 30 dias", texto: "Os primeiros resultados quase sempre aparecem depois de um mês de constância." },
-      { titulo: "Quer o passo a passo completo?", texto: d.palavra ? "Comenta a palavra abaixo que eu te mando." : "Salva esse post e me segue para ver o próximo." }
-    ];
-    var total = +d.slides || 7, meio = base.slice(1, -1).slice(0, total - 2);
-    return { slides: [base[0]].concat(meio, [base[base.length - 1]]), legenda: "Qual desses erros você já cometeu? 👇\n\n" + (d.palavra ? "Comenta " + d.palavra.toUpperCase() + " que eu te mando o passo a passo." : "Salva pra não esquecer.") + "\n\n#rendaextra #produtodigital #marketingdigital #empreendedorismo #negociosonline", demo: true };
-  }
+  /* ───────────── Geração (biblioteca) ───────────── */
 
-  function gerar(d) {
-    if (demo) return Promise.resolve(exemplo(d));
-    return fetch("/api/carrossel", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d) })
-      .then(function (r) {
-        if (r.status === 404 || r.status === 405) return exemplo(d); // servidor local sem a função
-        return r.json().then(function (j) { if (!r.ok) throw j; return j; });
-      });
-  }
-
-  var ERROS = {
-    nicho: "Digite o nicho do seu perfil.",
-    codigo: "Seu acesso não foi liberado. Fale com o suporte.",
-    limite: "Muita gente gerando agora. Tente de novo em 1 minuto.",
-    recusado: "Não consegui gerar esse tema. Tente outro tema."
+  var CHAMADAS = {
+    seguidores: { titulo: "Gostou? Me segue", texto: "Todo dia tem conteúdo novo por aqui. Salva esse post para consultar depois.", legenda: "Salva para não esquecer e me segue para ver os próximos." },
+    vender: { titulo: "Quer ir além?", texto: "O passo a passo completo está no link da minha bio.", legenda: "O passo a passo completo está no link da bio." },
+    engajamento: { titulo: "E você?", texto: "Me conta nos comentários qual desses você mais precisava ouvir.", legenda: "Me conta nos comentários qual desses você mais precisava ouvir." }
   };
 
-  function status(msg, erro) {
-    var el = $("#status");
-    el.textContent = msg || "";
-    el.classList.toggle("is-error", !!erro);
+  // Sorteia um carrossel do nicho que ainda não saiu neste aparelho
+  function sortear(nicho) {
+    var salvo = store.get(), usados = (salvo.usados = salvo.usados || {});
+    var vistos = usados[nicho.id] || [];
+    var livres = nicho.itens.map(function (_, i) { return i; }).filter(function (i) { return vistos.indexOf(i) < 0; });
+    if (!livres.length) { vistos = []; livres = nicho.itens.map(function (_, i) { return i; }); }
+    var i = livres[Math.floor(Math.random() * livres.length)];
+    usados[nicho.id] = vistos.concat(i);
+    store.set(salvo);
+    return nicho.itens[i];
+  }
+
+  function montar(nicho, objetivo, total, palavra) {
+    var c = sortear(nicho), ch = CHAMADAS[objetivo] || CHAMADAS.seguidores;
+    var pontos = c[2].slice(0, total - 2).map(function (p) { return { titulo: p[0], texto: p[1] }; });
+    var fim = palavra
+      ? { titulo: "Quer o material completo?", texto: "Comenta a palavra abaixo que eu te mando." }
+      : { titulo: ch.titulo, texto: ch.texto };
+    var chamada = palavra ? "Comenta " + palavra.toUpperCase() + " que eu te mando o material completo." : ch.legenda;
+    return {
+      slides: [{ titulo: c[0], texto: c[1] }].concat(pontos, [fim]),
+      legenda: c[0] + " 👇\n\n" + c[1] + "\n\n" + chamada + "\n\n" + nicho.tags
+    };
+  }
+
+  function gerar() {
+    var f = $("#form"), nicho = NICHOS[f.nicho.selectedIndex];
+    var perfil = f.perfil.value.trim().replace(/^@?/, "@");
+    state.perfil = perfil === "@" ? "" : perfil;
+    state.palavra = f.palavra.value.trim();
+
+    var salvo = store.get();
+    salvo.perfil = state.perfil; salvo.estilo = state.estilo; salvo.nicho = nicho.id;
+    store.set(salvo);
+
+    var r = montar(nicho, f.objetivo.value, +f.slides.value, state.palavra);
+    state.slides = r.slides;
+    $("#legenda").value = r.legenda;
+    return document.fonts.load("800 80px Manrope").then(renderSlides, renderSlides);
   }
 
   function onSubmit(e) {
     e.preventDefault();
-    var f = e.target, nicho = f.nicho.value.trim();
-    $("#nicho-erro").textContent = nicho ? "" : ERROS.nicho;
-    f.nicho.setAttribute("aria-invalid", String(!nicho));
-    if (!nicho) { f.nicho.focus(); return; }
-
-    var perfil = f.perfil.value.trim().replace(/^@?/, "@");
-    state.perfil = perfil === "@" ? "" : perfil;
-    state.palavra = f.palavra.value.trim();
-    store.set({ perfil: state.perfil, estilo: state.estilo });
-
-    var btn = $("#gerar");
-    btn.setAttribute("aria-busy", "true");
-    status("Criando seu carrossel… leva uns 15 segundos.");
-
-    var dados = { nicho: nicho, tema: f.tema.value.trim(), objetivo: f.objetivo.value, slides: f.slides.value, palavra: state.palavra, codigo: store.get().codigo };
-    document.fonts.load("800 80px Manrope").then(function () { return gerar(dados); })
-      .then(function (r) {
-        state.slides = r.slides;
-        $("#legenda").value = r.legenda || "";
-        renderSlides();
-        $("#resultado").hidden = false;
-        status(r.demo ? "Modo demonstração: texto de exemplo, sem IA." : "");
-        $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
-      })
-      .catch(function (err) { status((err && ERROS[err.erro]) || "Não deu certo agora. Tente de novo.", true); })
-      .then(function () { btn.removeAttribute("aria-busy"); });
+    gerar().then(function () {
+      $("#resultado").hidden = false;
+      $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   /* ───────────── Editor ───────────── */
@@ -294,13 +283,16 @@
     if (ESTILOS[salvo.estilo]) state.estilo = salvo.estilo;
     if (salvo.perfil) $("#perfil").value = salvo.perfil;
 
-    // ?codigo=XXXX no link de acesso libera a ferramenta neste aparelho
-    var m = location.search.match(/[?&]codigo=([^&]+)/);
-    if (m) { salvo.codigo = decodeURIComponent(m[1]); store.set(salvo); }
+    var sel = $("#nicho");
+    NICHOS.forEach(function (n) {
+      var o = document.createElement("option");
+      o.value = n.id; o.textContent = n.nome; o.selected = n.id === salvo.nicho;
+      sel.appendChild(o);
+    });
 
     document.fonts.load("800 80px Manrope").then(renderEstilos, renderEstilos);
     $("#form").addEventListener("submit", onSubmit);
-    $("#refazer").addEventListener("click", function () { $("#form").scrollIntoView({ behavior: "smooth" }); $("#tema").focus({ preventScroll: true }); });
+    $("#refazer").addEventListener("click", gerar);
     $("#editor").addEventListener("close", fecharEditor);
     $("#baixar").addEventListener("click", baixar);
     $("#copiar").addEventListener("click", copiar);
