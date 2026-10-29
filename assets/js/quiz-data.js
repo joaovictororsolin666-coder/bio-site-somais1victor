@@ -266,7 +266,7 @@ window.QUIZ_DATA = {
         { n: 1, src: 'assets/img/quiz/modulo-01.webp', title: 'Comece aqui', topics: ['Como o método funciona do início ao fim', 'O que configurar antes de começar', 'Seu plano para os primeiros 7 dias'] },
         { n: 5, src: 'assets/img/quiz/modulo-05.webp', title: 'Primeira venda', topics: ['Como vender diariamente', 'Como vender no automático', 'O que fazer quando a primeira venda cair'] },
         { n: 9, src: 'assets/img/quiz/modulo-09.webp', title: 'Produtos validados', topics: ['Lista de produtos que já estão vendendo', 'Como achar um produto campeão', 'Os nichos que mais vendem agora'] },
-        { n: 6, src: 'assets/img/quiz/modulo-06.webp', title: 'Decifrando o algoritmo', topics: ['O que faz o Instagram entregar seu vídeo', 'Melhores horários e frequência de postagem', 'Por que alguns vídeos não saem do lugar'] }
+        { n: 6, src: 'assets/img/quiz/modulo-06.webp', title: 'Decifrando o algoritmo', topics: ['Como viralizar com conteúdo simples, sem aparecer', 'Melhores horários e frequência de postagem', 'Por que alguns vídeos não saem do lugar'] }
       ],
       more: {
         title: '+ 5 módulos completos',
