@@ -2,7 +2,7 @@
  * Resposta automática nos comentários do Instagram (sem DM).
  * Arquivo extra no MESMO projeto do Apps Script da planilha (Arquivo → + → Script).
  *
- * A cada 5 minutos olha os comentários novos dos posts recentes e, quando o comentário
+ * A cada minuto olha os comentários novos dos posts recentes e, quando o comentário
  * tem uma das palavras-chave ("quero"...), responde publicamente apontando para o link da bio.
  * Usa a API oficial do Instagram — grátis, sem ManyChat. Aceita os dois tipos de token:
  *  - login unificado / Facebook (token de usuário do sistema, não expira) → graph.facebook.com
@@ -19,10 +19,11 @@ const IG = {
   // Responde em comentários com qualquer um destes trechos (sem acento, minúsculas)
   palavras: ['quero', 'passo a passo', 'link', 'como faz', 'me manda', 'manda pra mim'],
   ignorar: ['nao quero', 'n quero'],
+  minutos: 1,              // intervalo do gatilho (o Apps Script aceita 1, 5, 10, 15 ou 30)
   postsRecentes: 12,       // olha os últimos N posts/reels
   // Posts antigos que ainda recebem comentários (código do link: instagram.com/p/CODIGO/)
   postsFixos: ['DdJo0VaRsIc'],
-  maxPorRodada: 6,         // respostas por rodada (a cada 5 min)
+  maxPorRodada: 6,         // respostas por rodada
   maxPorDia: 150,          // trava diária
   paginasPorPost: 4,       // até 4 × 50 comentários mais novos por post
   aba: 'Respostas IG',
@@ -35,7 +36,7 @@ const IG = {
   ]
 };
 
-/* ───────────── Rodada (gatilho a cada 5 min) ───────────── */
+/* ───────────── Rodada (gatilho a cada IG.minutos) ───────────── */
 
 function responderComentarios() {
   const props = PropertiesService.getScriptProperties();
@@ -60,17 +61,23 @@ function igRodada_(props, token) {
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(1000)) return; // rodada anterior ainda em andamento
 
+  // Contagem de comentários de cada post na última rodada: só abre os posts em que ela mudou
+  const contagens = JSON.parse(props.getProperty('IG_CONTAGENS') || '{}');
   try {
     const eu = igConta_(token);
     token = eu.token || token; // token da Página, quando houver
+    const posts = igPosts_(token).filter(function (m) { return contagens[m.id] !== m.comments_count; });
+    if (!posts.length) return; // nada novo: a rodada fica em 1 ou 2 chamadas
+
     const log = igLog_();
     const feitos = igFeitos_(log);
     let hoje = feitos.hoje, enviadas = 0;
 
-    for (const m of igPosts_(token)) {
+    for (const m of posts) {
       if (enviadas >= IG.maxPorRodada || hoje >= IG.maxPorDia) break;
+      let completo = true;
       for (const c of igComentarios_(m.id, desde, token)) {
-        if (enviadas >= IG.maxPorRodada || hoje >= IG.maxPorDia) break;
+        if (enviadas >= IG.maxPorRodada || hoje >= IG.maxPorDia) { completo = false; break; }
         const quem = (c.from && c.from.username) || c.username || '';
         if (!quem || quem === eu.username) continue;                 // comentário meu
         if (feitos.ids[c.id] || feitos.pessoas[m.id + '|' + quem]) continue; // já respondido
@@ -90,8 +97,10 @@ function igRodada_(props, token) {
         if (status !== 'ok') return; // erro (limite, permissão…): para e tenta na próxima rodada
         Utilities.sleep(3000 + Math.random() * 5000); // pausa humana entre respostas
       }
+      if (completo) contagens[m.id] = m.comments_count; // post com sobra fica para a próxima rodada
     }
   } finally {
+    props.setProperty('IG_CONTAGENS', JSON.stringify(contagens));
     lock.releaseLock();
   }
 }
@@ -125,7 +134,7 @@ function ligarComentarios() {
   props.setProperty('IG_DESDE', String(Date.now()));
   props.setProperty('IG_TOKEN_EM', String(Date.now()));
   props.setProperty('IG_ATIVO', '1');
-  ScriptApp.newTrigger('responderComentarios').timeBased().everyMinutes(5).create();
+  ScriptApp.newTrigger('responderComentarios').timeBased().everyMinutes(IG.minutos).create();
   ScriptApp.newTrigger('renovarTokenInstagram').timeBased().everyDays(1).create();
   igLog_();
   Logger.log('Ligado. Respondendo comentários feitos a partir de agora.');
@@ -226,7 +235,7 @@ function igResumo_(props) {
     conta: conta.username || '',
     ultimaRodada: Number(props.getProperty('IG_ULTIMA')) || null,
     erro: props.getProperty('IG_ERRO') || '',
-    config: { palavras: IG.palavras, ignorar: IG.ignorar, respostas: IG.respostas, postsFixos: IG.postsFixos, maxPorRodada: IG.maxPorRodada, maxPorDia: IG.maxPorDia, postsRecentes: IG.postsRecentes },
+    config: { palavras: IG.palavras, ignorar: IG.ignorar, respostas: IG.respostas, postsFixos: IG.postsFixos, maxPorRodada: IG.maxPorRodada, maxPorDia: IG.maxPorDia, postsRecentes: IG.postsRecentes, minutos: IG.minutos },
     stats: { total: total, hoje: hojeOk, semana: semanaOk, erros: erros, porDia: porDia },
     ultimas: ultimas
   };
@@ -279,7 +288,7 @@ function igPosts_(token) {
   const props = PropertiesService.getScriptProperties();
   const cache = JSON.parse(props.getProperty('IG_FIXOS') || '{}');
   const eu = igConta_(token);
-  let r = igGet_('/' + eu.id + '/media', { fields: 'id,permalink', limit: IG.postsRecentes }, token);
+  let r = igGet_('/' + eu.id + '/media', { fields: 'id,permalink,comments_count', limit: IG.postsRecentes }, token);
   const posts = (r.data || []).slice();
   const faltam = IG.postsFixos.filter(function (code) { return !cache[code]; });
   // procura os fixos que ainda não têm id (até ~300 posts para trás)
@@ -293,10 +302,14 @@ function igPosts_(token) {
     r = igGet_('/' + eu.id + '/media', { fields: 'id,permalink', limit: 50, after: r.paging.cursors.after }, token);
   }
   props.setProperty('IG_FIXOS', JSON.stringify(cache));
-  IG.postsFixos.forEach(function (code) {
-    const f = cache[code];
-    if (f && !posts.some(function (m) { return m.id === f.id; })) posts.push(f);
+  const fixos = IG.postsFixos.map(function (code) { return cache[code]; }).filter(function (f) {
+    return f && !posts.some(function (m) { return m.id === f.id; });
   });
+  if (fixos.length) {
+    // Contagem dos fixos numa chamada só
+    const n = igGet_('/', { ids: fixos.map(function (f) { return f.id; }).join(','), fields: 'comments_count' }, token);
+    fixos.forEach(function (f) { posts.push({ id: f.id, permalink: f.permalink, comments_count: n[f.id] && n[f.id].comments_count }); });
+  }
   return posts;
 }
 

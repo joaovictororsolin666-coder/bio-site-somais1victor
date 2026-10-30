@@ -31,6 +31,7 @@
     if (d.toDateString() === new Date(hoje - 86400000).toDateString()) return "Ontem " + hora;
     return pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + " " + hora;
   }
+  function cada(min) { min = min || 5; return min === 1 ? "minuto" : min + " minutos"; }
   function haQuanto(ms) {
     var min = Math.round((Date.now() - ms) / 60000);
     if (min < 1) return "agora há pouco";
@@ -115,7 +116,7 @@
 
     $("#det-rodada").textContent = !d.gatilho ? "Os gatilhos não estão instalados."
       : !ativo ? "Pausada: nenhum comentário está sendo respondido."
-      : d.ultimaRodada ? "Última verificação " + haQuanto(d.ultimaRodada) + " · verifica a cada 5 minutos" : "Aguardando a primeira verificação (a cada 5 minutos)";
+      : d.ultimaRodada ? "Última verificação " + haQuanto(d.ultimaRodada) + " · verifica a cada " + cada(d.config.minutos) : "Aguardando a primeira verificação (a cada " + cada(d.config.minutos) + ")";
     $("#det-erro").textContent = d.erro ? "Último erro: " + d.erro : "";
     $("#det-erro").hidden = !d.erro;
 
@@ -141,6 +142,7 @@
     $("#fluxo-posts").textContent = c.postsRecentes;
     $("#fluxo-respostas").textContent = c.respostas.length;
     $("#fluxo-rodada").textContent = c.maxPorRodada;
+    $("#fluxo-cada").textContent = cada(c.minutos);
     $("#fluxo-dia").textContent = c.maxPorDia;
   }
 
@@ -319,11 +321,11 @@
       for (var i = 0; i < 14; i++) { var dt = new Date(); dt.setDate(dt.getDate() - i); porDia[diaKey(dt)] = Math.round(Math.random() * 30) + (i < 3 ? 12 : 0); }
       for (var k = 0; k < 12; k++) ultimas.push({ data: new Date(Date.now() - k * 23 * 60000).toISOString(), post: "https://www.instagram.com/reel/DdJo0VaRsIc/", usuario: nomes[k % nomes.length], comentario: k % 3 ? "Eu quero!!" : "quero o passo a passo 🙏", resposta: "Não consegui te mandar no direct 😕 mas o passo a passo está no link da minha bio, é só acessar por lá! 🔗", status: k === 4 ? "erro: limite de respostas atingido" : "ok" });
       demoDados = { ok: true, ativo: true, gatilho: true, conta: "somais1victor", ultimaRodada: Date.now() - 2 * 60000, erro: "",
-        config: { palavras: ["quero", "passo a passo", "link", "como faz", "me manda"], ignorar: ["nao quero"], respostas: ["Não consegui te mandar no direct 😕 mas o passo a passo está no link da minha bio, é só acessar por lá! 🔗", "Te chamei no direct mas não foi 😕 Tá tudo no link da minha bio, corre lá! 👆"], postsFixos: ["DdJo0VaRsIc"], maxPorRodada: 6, maxPorDia: 150, postsRecentes: 12 },
+        config: { palavras: ["quero", "passo a passo", "link", "como faz", "me manda"], ignorar: ["nao quero"], respostas: ["Não consegui te mandar no direct 😕 mas o passo a passo está no link da minha bio, é só acessar por lá! 🔗", "Te chamei no direct mas não foi 😕 Tá tudo no link da minha bio, corre lá! 👆"], postsFixos: ["DdJo0VaRsIc"], maxPorRodada: 6, maxPorDia: 150, postsRecentes: 12, minutos: 1 },
         stats: { total: 1284, hoje: porDia[diaKey(new Date())], semana: 196, erros: 1, porDia: porDia }, ultimas: ultimas };
     }
     if (params.action === "vicchat_ativar") demoDados.ativo = params.ativo === "1";
-    if (params.action === "vicchat_config") { var c = JSON.parse(params.config); c.postsRecentes = 12; demoDados.config = c; }
+    if (params.action === "vicchat_config") { var c = JSON.parse(params.config); c.postsRecentes = 12; c.minutos = 1; demoDados.config = c; }
     return JSON.parse(JSON.stringify(demoDados));
   }
 
