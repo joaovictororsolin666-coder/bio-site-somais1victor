@@ -39,7 +39,7 @@ const IG = {
 
 function responderComentarios() {
   const props = PropertiesService.getScriptProperties();
-  const token = props.getProperty('IG_TOKEN');
+  let token = props.getProperty('IG_TOKEN');
   if (!token) throw new Error('Falta a propriedade IG_TOKEN');
 
   // Só responde comentários feitos depois que a automação foi ligada (nunca a fila antiga)
@@ -49,6 +49,7 @@ function responderComentarios() {
 
   try {
     const eu = igConta_(token);
+    token = eu.token || token; // token da Página, quando houver
     const log = igLog_();
     const feitos = igFeitos_(log);
     let hoje = feitos.hoje, enviadas = 0;
@@ -86,11 +87,12 @@ function responderComentarios() {
 
 // Mostra no registro a conta, os últimos posts e alguns comentários. Não responde nada.
 function testarInstagram() {
-  const token = PropertiesService.getScriptProperties().getProperty('IG_TOKEN');
+  let token = PropertiesService.getScriptProperties().getProperty('IG_TOKEN');
   if (!token) throw new Error('Falta a propriedade IG_TOKEN');
   PropertiesService.getScriptProperties().deleteProperty('IG_CONTA'); // procura a conta de novo
   const eu = igConta_(token);
-  Logger.log('Conta: @' + eu.username + ' (id ' + eu.id + ', ' + eu.base + ')');
+  token = eu.token || token;
+  Logger.log('Conta: @' + eu.username + ' (id ' + eu.id + ', ' + eu.base + (eu.token ? ', via token da Página' : '') + ')');
   const media = igGet_('/' + eu.id + '/media', { fields: 'id,permalink,timestamp,comments_count', limit: 5 }, token).data || [];
   media.forEach(function (m) {
     Logger.log(m.timestamp + '  ' + m.permalink + '  (' + m.comments_count + ' comentários)');
@@ -213,10 +215,25 @@ function igConta_(token) {
     const me = igGet_(base + '/me', { fields: 'user_id,username' }, token);
     conta = { id: me.user_id, username: me.username, base: base };
   } else {
-    // Token do login unificado: o id da conta do Instagram vem da propriedade IG_USER_ID
-    // ou das permissões do próprio token
     const base = 'https://graph.facebook.com';
     let id = props.getProperty('IG_USER_ID');
+
+    // Token da sua conta do Facebook: usa o token da Página ligada ao Instagram (não expira)
+    let paginas = [];
+    try {
+      paginas = igGet_(base + '/me/accounts', { fields: 'access_token,instagram_business_account{id,username}' }, token).data || [];
+    } catch (e) { /* token de usuário do sistema não lista Páginas */ }
+    const pagina = paginas.filter(function (p) {
+      return p.instagram_business_account && (!id || p.instagram_business_account.id === id);
+    })[0];
+    if (pagina) {
+      conta = { id: pagina.instagram_business_account.id, username: pagina.instagram_business_account.username, base: base, token: pagina.access_token };
+      props.setProperty('IG_CONTA', JSON.stringify(conta));
+      return conta;
+    }
+
+    // Token do login unificado: o id da conta do Instagram vem da propriedade IG_USER_ID
+    // ou das permissões do próprio token
     if (!id) {
       const info = igGet_(base + '/debug_token', { input_token: token }, token).data || {};
       const escopo = (info.granular_scopes || []).filter(function (g) { return /^instagram_/.test(g.scope) && g.target_ids; })[0];
