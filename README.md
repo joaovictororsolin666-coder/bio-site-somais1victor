@@ -92,7 +92,7 @@ Os dados enviados incluem as respostas, o consentimento, as UTMs, o site de orig
 
 `integracoes/instagram-comentarios.gs` responde publicamente comentários com "quero", "passo a passo", "link"… apontando para o link da bio (sem DM). Roda no mesmo Apps Script da planilha, a cada 5 minutos, pela API oficial do Instagram — grátis.
 
-1. **App na Meta:** developers.facebook.com → Meus apps → Criar app → caso de uso de **Instagram** (gerenciar mensagens e conteúdo) → *Configuração da API com login do Instagram* → **Gerar tokens de acesso** → adicionar a conta do Instagram → copiar o token. Permissões: `instagram_business_basic` e `instagram_business_manage_comments`.
+1. **Token (o que funcionou):** app **VicChat** na Meta → **Graph API Explorer** com as permissões `pages_show_list`, `pages_read_engagement`, `business_management`, `instagram_basic` e `instagram_manage_comments` → *Generate Access Token* (marcar a Página Victor Orsolin e o @somais1victor) → ⓘ → *Abrir na ferramenta de token de acesso* → **Estender token**. O script troca esse token pelo token da Página ligada ao Instagram, que não expira. (Token de usuário do sistema não serve: a Página não pertence ao portfólio.)
 2. **Apps Script:** Arquivo **+ → Script** com o nome `instagram-comentarios`, cole o arquivo. Propriedades do script → `IG_TOKEN` = token.
 3. Rode **`testarInstagram`** (só mostra a conta e os posts no registro) e depois **`ligarComentarios`** (autorize). Para parar: **`desligarComentarios`**.
 
