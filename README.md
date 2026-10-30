@@ -88,6 +88,18 @@ Crie um formulário em formspree.io e cole a URL `https://formspree.io/f/XXXX` e
 
 Os dados enviados incluem as respostas, o consentimento, as UTMs, o site de origem e a página de entrada.
 
+## Respostas automáticas no Instagram (comentários)
+
+`integracoes/instagram-comentarios.gs` responde publicamente comentários com "quero", "passo a passo", "link"… apontando para o link da bio (sem DM). Roda no mesmo Apps Script da planilha, a cada 5 minutos, pela API oficial do Instagram — grátis.
+
+1. **App na Meta:** developers.facebook.com → Meus apps → Criar app → caso de uso de **Instagram** (gerenciar mensagens e conteúdo) → *Configuração da API com login do Instagram* → **Gerar tokens de acesso** → adicionar a conta do Instagram → copiar o token. Permissões: `instagram_business_basic` e `instagram_business_manage_comments`.
+2. **Apps Script:** Arquivo **+ → Script** com o nome `instagram-comentarios`, cole o arquivo. Propriedades do script → `IG_TOKEN` = token.
+3. Rode **`testarInstagram`** (só mostra a conta e os posts no registro) e depois **`ligarComentarios`** (autorize). Para parar: **`desligarComentarios`**.
+
+- Responde só comentários feitos **depois de ligar** (nunca a fila antiga), nunca a mesma pessoa duas vezes no mesmo post, até 6 por rodada e 150 por dia, alternando 5 textos.
+- Olha os 12 posts mais recentes + os de `postsFixos` (código do link do post). Palavras e textos ficam no topo do arquivo.
+- Tudo fica registrado na aba **Respostas IG**. O token é renovado sozinho a cada 7 dias.
+
 ## 4. Rastreamento (Meta Pixel e Google Analytics 4)
 
 Em `config.js → tracking`, preencha `gaId` e/ou `metaPixelId`. Enquanto estiverem vazios, nada é carregado.
