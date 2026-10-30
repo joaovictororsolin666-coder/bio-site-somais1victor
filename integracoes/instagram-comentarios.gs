@@ -306,8 +306,8 @@ function igPosts_(token) {
     return f && !posts.some(function (m) { return m.id === f.id; });
   });
   if (fixos.length) {
-    // Contagem dos fixos numa chamada só
-    const n = igGet_('/', { ids: fixos.map(function (f) { return f.id; }).join(','), fields: 'comments_count' }, token);
+    // Contagem dos fixos: uma chamada por post (o parâmetro "ids" foi descontinuado na Graph API v26)
+    const n = {}; fixos.forEach(function (f) { n[f.id] = igGet_('/' + f.id, { fields: 'comments_count' }, token); });
     fixos.forEach(function (f) { posts.push({ id: f.id, permalink: f.permalink, comments_count: n[f.id] && n[f.id].comments_count }); });
   }
   return posts;
