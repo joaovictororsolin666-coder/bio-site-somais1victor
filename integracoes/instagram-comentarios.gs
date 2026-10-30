@@ -4,7 +4,9 @@
  *
  * A cada 5 minutos olha os comentários novos dos posts recentes e, quando o comentário
  * tem uma das palavras-chave ("quero"...), responde publicamente apontando para o link da bio.
- * Usa a API oficial do Instagram (login do Instagram) — grátis, sem ManyChat.
+ * Usa a API oficial do Instagram — grátis, sem ManyChat. Aceita os dois tipos de token:
+ *  - login unificado / Facebook (token de usuário do sistema, não expira) → graph.facebook.com
+ *  - login do Instagram (começa com "IG", vale 60 dias e é renovado sozinho) → graph.instagram.com
  *
  * Instalação (passo a passo completo no README.md → "Respostas automáticas no Instagram"):
  *  1. Propriedades do script → IG_TOKEN = token gerado no app da Meta.
@@ -14,7 +16,6 @@
  */
 
 const IG = {
-  api: 'https://graph.instagram.com',
   // Responde em comentários com qualquer um destes trechos (sem acento, minúsculas)
   palavras: ['quero', 'passo a passo', 'link', 'como faz', 'me manda', 'manda pra mim'],
   ignorar: ['nao quero', 'n quero'],
@@ -47,7 +48,7 @@ function responderComentarios() {
   if (!lock.tryLock(1000)) return; // rodada anterior ainda em andamento
 
   try {
-    const eu = igGet_('/me', { fields: 'user_id,username' }, token);
+    const eu = igConta_(token);
     const log = igLog_();
     const feitos = igFeitos_(log);
     let hoje = feitos.hoje, enviadas = 0;
@@ -87,9 +88,10 @@ function responderComentarios() {
 function testarInstagram() {
   const token = PropertiesService.getScriptProperties().getProperty('IG_TOKEN');
   if (!token) throw new Error('Falta a propriedade IG_TOKEN');
-  const eu = igGet_('/me', { fields: 'user_id,username' }, token);
-  Logger.log('Conta: @' + eu.username);
-  const media = igGet_('/me/media', { fields: 'id,permalink,timestamp,comments_count', limit: 5 }, token).data || [];
+  PropertiesService.getScriptProperties().deleteProperty('IG_CONTA'); // procura a conta de novo
+  const eu = igConta_(token);
+  Logger.log('Conta: @' + eu.username + ' (id ' + eu.id + ', ' + eu.base + ')');
+  const media = igGet_('/' + eu.id + '/media', { fields: 'id,permalink,timestamp,comments_count', limit: 5 }, token).data || [];
   media.forEach(function (m) {
     Logger.log(m.timestamp + '  ' + m.permalink + '  (' + m.comments_count + ' comentários)');
   });
@@ -97,6 +99,7 @@ function testarInstagram() {
   if (media[0]) {
     const cs = igGet_('/' + media[0].id + '/comments', { fields: 'id,text,timestamp,username', limit: 5 }, token).data || [];
     cs.forEach(function (c) { Logger.log('   ' + c.timestamp + ' @' + c.username + ': ' + c.text); });
+    if (cs.length > 1) Logger.log(new Date(cs[0].timestamp) >= new Date(cs[cs.length - 1].timestamp) ? 'Ordem: mais novos primeiro ✓' : 'ATENÇÃO: comentários vêm do mais antigo para o mais novo');
   }
 }
 
@@ -117,12 +120,13 @@ function desligarComentarios() {
   });
 }
 
-// O token vale 60 dias; renova sozinho a cada 7 dias
+// Token do login do Instagram vale 60 dias: renova sozinho a cada 7 dias
 function renovarTokenInstagram() {
   const props = PropertiesService.getScriptProperties();
   const token = props.getProperty('IG_TOKEN');
-  if (!token || Date.now() - Number(props.getProperty('IG_TOKEN_EM') || 0) < 7 * 86400000) return;
-  const r = igGet_('/refresh_access_token', { grant_type: 'ig_refresh_token' }, token);
+  if (!token || !/^IG/.test(token)) return; // token de usuário do sistema não expira
+  if (Date.now() - Number(props.getProperty('IG_TOKEN_EM') || 0) < 7 * 86400000) return;
+  const r = igGet_('https://graph.instagram.com/refresh_access_token', { grant_type: 'ig_refresh_token' }, token);
   if (r.access_token) {
     props.setProperty('IG_TOKEN', r.access_token);
     props.setProperty('IG_TOKEN_EM', String(Date.now()));
@@ -175,7 +179,8 @@ function igFeitos_(sheet) {
 function igPosts_(token) {
   const props = PropertiesService.getScriptProperties();
   const cache = JSON.parse(props.getProperty('IG_FIXOS') || '{}');
-  let r = igGet_('/me/media', { fields: 'id,permalink', limit: IG.postsRecentes }, token);
+  const eu = igConta_(token);
+  let r = igGet_('/' + eu.id + '/media', { fields: 'id,permalink', limit: IG.postsRecentes }, token);
   const posts = (r.data || []).slice();
   const faltam = IG.postsFixos.filter(function (code) { return !cache[code]; });
   // procura os fixos que ainda não têm id (até ~300 posts para trás)
@@ -186,7 +191,7 @@ function igPosts_(token) {
       });
     });
     if (!faltam.length || !r.paging || !r.paging.next) break;
-    r = igGet_('/me/media', { fields: 'id,permalink', limit: 50, after: r.paging.cursors.after }, token);
+    r = igGet_('/' + eu.id + '/media', { fields: 'id,permalink', limit: 50, after: r.paging.cursors.after }, token);
   }
   props.setProperty('IG_FIXOS', JSON.stringify(cache));
   IG.postsFixos.forEach(function (code) {
@@ -196,15 +201,49 @@ function igPosts_(token) {
   return posts;
 }
 
+// Conta do Instagram ligada ao token: { id, username, base } (guardada nas propriedades)
+function igConta_(token) {
+  const props = PropertiesService.getScriptProperties();
+  const salva = JSON.parse(props.getProperty('IG_CONTA') || 'null');
+  if (salva) return salva;
+
+  let conta;
+  if (/^IG/.test(token)) {
+    const base = 'https://graph.instagram.com';
+    const me = igGet_(base + '/me', { fields: 'user_id,username' }, token);
+    conta = { id: me.user_id, username: me.username, base: base };
+  } else {
+    // Token do login unificado: o id da conta do Instagram vem da propriedade IG_USER_ID
+    // ou das permissões do próprio token
+    const base = 'https://graph.facebook.com';
+    let id = props.getProperty('IG_USER_ID');
+    if (!id) {
+      const info = igGet_(base + '/debug_token', { input_token: token }, token).data || {};
+      const escopo = (info.granular_scopes || []).filter(function (g) { return /^instagram_/.test(g.scope) && g.target_ids; })[0];
+      id = escopo && escopo.target_ids[0];
+    }
+    if (!id) throw new Error('Não achei a conta do Instagram no token. Coloque o id dela na propriedade IG_USER_ID.');
+    conta = { id: id, username: igGet_(base + '/' + id, { fields: 'username' }, token).username, base: base };
+  }
+  props.setProperty('IG_CONTA', JSON.stringify(conta));
+  return conta;
+}
+
+// path relativo usa a API da conta; URL completa é usada como está
+function igUrl_(path) {
+  if (/^https:/.test(path)) return path;
+  return JSON.parse(PropertiesService.getScriptProperties().getProperty('IG_CONTA')).base + path;
+}
+
 function igGet_(path, params, token) {
   const q = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); });
   q.push('access_token=' + encodeURIComponent(token));
-  return igResp_(UrlFetchApp.fetch(IG.api + path + '?' + q.join('&'), { muteHttpExceptions: true }));
+  return igResp_(UrlFetchApp.fetch(igUrl_(path) + '?' + q.join('&'), { muteHttpExceptions: true }));
 }
 
 function igPost_(path, params, token) {
   params = Object.assign({ access_token: token }, params);
-  return igResp_(UrlFetchApp.fetch(IG.api + path, { method: 'post', payload: params, muteHttpExceptions: true }));
+  return igResp_(UrlFetchApp.fetch(igUrl_(path), { method: 'post', payload: params, muteHttpExceptions: true }));
 }
 
 function igResp_(res) {
