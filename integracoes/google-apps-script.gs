@@ -3,6 +3,7 @@
  *  - Aplicações da Mentoria  → aba "Aplicações"
  *  - Jornada do quiz do MPR  → aba "Quiz" (uma linha por visitante, anônima)
  *  - Dados do painel /painel → protegidos pela senha PAINEL_SENHA
+ *  - Painel /aplicacoes      → lista as aplicações e grava o status de contato (mesma senha)
  *
  * Como usar (passo a passo completo no README.md):
  *  1. Planilha no Google Sheets → Extensões → Apps Script → cole este arquivo.
@@ -49,6 +50,8 @@ function doPost(e) {
     const p = (e && e.parameter) || {};
     if (p.action === 'quiz') return saveQuiz_(p);
     if (p.action === 'stats') return stats_(p);
+    if (p.action === 'aplicacoes') return aplicacoes_(p);
+    if (p.action === 'status') return status_(p);
     return saveApplication_(p);
   } catch (err) {
     return json_({ ok: false, error: String(err) });
@@ -131,13 +134,20 @@ function saveQuiz_(p) {
 
 /* ───────────── Dados do painel (protegido por senha) ───────────── */
 
-function stats_(p) {
+// Retorna null se a senha confere; senão, a resposta de erro
+function checkSenha_(p) {
   const senha = PropertiesService.getScriptProperties().getProperty('PAINEL_SENHA');
   if (!senha) return json_({ ok: false, error: 'senha_nao_configurada' });
   if (String(p.senha || '') !== senha) {
     Utilities.sleep(1200); // atrasa tentativas de adivinhar a senha
     return json_({ ok: false, error: 'senha_invalida' });
   }
+  return null;
+}
+
+function stats_(p) {
+  const negado = checkSenha_(p);
+  if (negado) return negado;
 
   const dias = Math.max(1, Math.min(90, parseInt(p.dias, 10) || 1));
   const agora = new Date();
@@ -156,6 +166,47 @@ function stats_(p) {
     });
   }
   return json_({ ok: true, agora: agora.toISOString(), dias: dias, rows: rows });
+}
+
+/* ───────────── Aplicações da mentoria (painel /aplicacoes) ───────────── */
+
+// O status de contato fica numa coluna extra "Status", depois das colunas do formulário
+const STATUS_COL = COLUMNS.length + 1;
+const STATUS_OK = ['novo', 'chamei', 'respondeu', 'fechou', 'descartado'];
+
+function aplicacoes_(p) {
+  const negado = checkSenha_(p);
+  if (negado) return negado;
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const rows = [];
+  if (sheet && sheet.getLastRow() > 1) {
+    const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, STATUS_COL).getValues();
+    values.forEach(function (v, i) {
+      const o = { linha: i + 2, status: String(v[STATUS_COL - 1] || 'novo') };
+      COLUMNS.forEach(function (c, j) { o[c[0]] = v[j] instanceof Date ? v[j].toISOString() : String(v[j]); });
+      rows.push(o);
+    });
+  }
+  return json_({ ok: true, rows: rows });
+}
+
+function status_(p) {
+  const negado = checkSenha_(p);
+  if (negado) return negado;
+  if (STATUS_OK.indexOf(p.status) < 0) return json_({ ok: false, error: 'status inválido' });
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const linha = parseInt(p.linha, 10);
+  if (!sheet || !(linha >= 2) || linha > sheet.getLastRow()) return json_({ ok: false, error: 'linha inválida' });
+
+  // Confere se a linha ainda é da mesma pessoa (a planilha pode ter sido reordenada)
+  const whats = String(sheet.getRange(linha, COLUMNS.map(function (c) { return c[0]; }).indexOf('whatsapp') + 1).getValue());
+  if (whats !== String(p.whatsapp || '')) return json_({ ok: false, error: 'planilha_mudou' });
+
+  if (!sheet.getRange(1, STATUS_COL).getValue()) sheet.getRange(1, STATUS_COL).setValue('Status').setFontWeight('bold');
+  sheet.getRange(linha, STATUS_COL).setValue(p.status);
+  return json_({ ok: true });
 }
 
 /* ───────────── Utilitários ───────────── */

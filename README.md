@@ -47,6 +47,13 @@ Como funciona: o quiz envia a jornada anônima de cada visitante para a aba **Qu
 - **Visual sem dados reais:** `/painel?demo=1` mostra dados fictícios (só para conferir o layout).
 - O painel mede até o **clique no checkout**; as vendas aprovadas ficam no painel da NeonPay (cruze pelas UTMs).
 
+### Painel de aplicações (`/aplicacoes`)
+
+Lista as aplicações da mentoria (aba **Aplicações**) com a mesma senha do painel: botão do WhatsApp com mensagem pronta (editável em "Mensagem pronta", usa `{nome}`), botão do Instagram e status de contato (Novo, Chamei, Respondeu, Fechou, Descartado), gravado numa coluna **Status** da planilha. Abrir o WhatsApp de alguém "Novo" já marca como "Chamei". A lista se atualiza sozinha a cada 2 minutos.
+
+- Precisa da versão do `integracoes/google-apps-script.gs` com as ações `aplicacoes` e `status` (Implantar → Gerenciar implantações → editar → Nova versão).
+- **Visual sem dados reais:** `/aplicacoes?demo=1`.
+
 ## 2. Imagens
 
 Use **WebP ou AVIF** (converta grátis em squoosh.app). Salve em `assets/img/` e substitua os placeholders — o código pronto está em comentários no `index.html`:

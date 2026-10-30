@@ -238,10 +238,10 @@
 
   /* ───────────── Controles ───────────── */
 
-  $$(".pn-tab").forEach(function (t) {
+  $$(".pn-tab[data-tab]").forEach(function (t) {
     t.addEventListener("click", function () {
       state.tab = t.getAttribute("data-tab");
-      $$(".pn-tab").forEach(function (x) { var on = x === t; x.classList.toggle("is-active", on); x.setAttribute("aria-selected", on); });
+      $$(".pn-tab[data-tab]").forEach(function (x) { var on = x === t; x.classList.toggle("is-active", on); x.setAttribute("aria-selected", on); });
       $("#view-performance").hidden = state.tab !== "performance";
       $("#view-respostas").hidden = state.tab !== "respostas";
       renderAll();

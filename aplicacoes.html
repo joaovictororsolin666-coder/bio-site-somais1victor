@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Aplicações da Mentoria | Victor Gomes</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#080808">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/painel.css">
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/aplicacoes.js" defer></script>
+</head>
+<body class="pn">
+
+  <!-- Login (mesma senha do painel do funil) -->
+  <main class="pn-login" id="login" hidden>
+    <form class="pn-login__card" id="login-form">
+      <img src="assets/img/quiz/logo-mpr.webp" alt="" width="64" height="64">
+      <h1>Aplicações da Mentoria</h1>
+      <p>Digite a senha do painel para ver quem aplicou.</p>
+      <label class="pn-sr" for="senha">Senha</label>
+      <input class="input" id="senha" name="senha" type="password" autocomplete="current-password" placeholder="Senha do painel" required>
+      <label class="pn-check"><input type="checkbox" id="lembrar" checked> Lembrar neste aparelho</label>
+      <p class="pn-login__error" id="login-error" role="alert" hidden></p>
+      <button class="btn btn--primary" type="submit"><span class="btn__label">ENTRAR</span></button>
+    </form>
+  </main>
+
+  <div class="pn-app" id="app" hidden>
+    <header class="pn-top">
+      <div class="pn-top__brand">
+        <img src="assets/img/quiz/logo-mpr.webp" alt="" width="36" height="36">
+        <div><strong>Mentoria</strong><span>Aplicações recebidas</span></div>
+      </div>
+      <nav class="pn-tabs" aria-label="Painéis">
+        <a class="pn-tab" href="painel">Funil</a>
+        <a class="pn-tab is-active" href="aplicacoes" aria-current="page">Aplicações</a>
+      </nav>
+      <div class="pn-top__actions">
+        <button class="btn btn--ghost btn--sm" type="button" id="abrir-msg">Mensagem pronta</button>
+        <button class="pn-icon" type="button" id="refresh" aria-label="Atualizar" title="Atualizar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>
+        </button>
+        <button class="pn-icon" type="button" id="logout" aria-label="Sair" title="Sair">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <p class="pn-status" id="status" role="status" hidden></p>
+
+    <div class="pn-toolbar ap-toolbar">
+      <input class="input pn-search" id="busca" type="search" placeholder="Buscar por nome, @ ou WhatsApp" aria-label="Buscar aplicação">
+      <div class="ap-filtros" id="filtros" role="group" aria-label="Filtrar por status"></div>
+    </div>
+
+    <div class="pn-card pn-card--flush">
+      <div class="pn-table-wrap"><table class="pn-table ap-table" id="lista"></table></div>
+      <p class="ap-vazio" id="vazio" hidden>Nenhuma aplicação por aqui ainda.</p>
+    </div>
+  </div>
+
+  <dialog class="ac-edit ap-msg" id="msg-dialog">
+    <form method="dialog" class="ac-edit__card">
+      <h3>Mensagem pronta do WhatsApp</h3>
+      <p class="pn-muted">Use <strong>{nome}</strong> para entrar o primeiro nome da pessoa. Fica salva neste aparelho.</p>
+      <label class="pn-sr" for="msg-texto">Mensagem</label>
+      <textarea class="input" id="msg-texto" rows="7"></textarea>
+      <div class="ac-edit__actions">
+        <button class="btn btn--ghost btn--sm" type="button" id="msg-padrao">Voltar ao padrão</button>
+        <button class="btn btn--primary btn--sm" value="salvar">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
