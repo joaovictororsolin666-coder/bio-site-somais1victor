@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VicChat | Automações do Instagram</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#f4f4f5">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/vicchat.css">
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/vicchat.js" defer></script>
+</head>
+<body>
+
+  <!-- Login (mesma senha do /painel) -->
+  <main class="vc-login" id="login" hidden>
+    <form class="vc-login__card" id="login-form">
+      <span class="vc-logo">VicChat</span>
+      <p>Digite a senha do painel para entrar.</p>
+      <label class="vc-sr" for="senha">Senha</label>
+      <input class="vc-input" id="senha" type="password" autocomplete="current-password" placeholder="Senha do painel" required>
+      <label class="vc-check"><input type="checkbox" id="lembrar" checked> Lembrar neste aparelho</label>
+      <p class="vc-erro" id="login-erro" role="alert" hidden></p>
+      <button class="vc-btn vc-btn--primary" type="submit">Entrar</button>
+    </form>
+  </main>
+
+  <div class="vc-app" id="app" hidden>
+    <aside class="vc-side">
+      <span class="vc-logo">VicChat</span>
+      <div class="vc-conta">
+        <span class="vc-conta__avatar" aria-hidden="true">V</span>
+        <div><strong id="conta-nome">Victor Gomes</strong><span id="conta-user">@somais1victor</span></div>
+      </div>
+      <nav class="vc-nav" aria-label="Menu">
+        <a href="#inicio" data-view="inicio"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início</a>
+        <a href="#automacoes" data-view="automacoes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>Automação</a>
+        <span class="is-off"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>Direct <em>em breve</em></span>
+        <span class="is-off"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Contatos <em>em breve</em></span>
+      </nav>
+      <div class="vc-side__rodape">
+        <a href="painel">Funil</a>
+        <a href="aplicacoes">Aplicações</a>
+        <button type="button" id="sair">Sair</button>
+      </div>
+    </aside>
+
+    <main class="vc-main">
+      <header class="vc-top">
+        <h1 id="titulo">Início</h1>
+        <button class="vc-icone" type="button" id="atualizar" aria-label="Atualizar" title="Atualizar">
+          <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>
+        </button>
+      </header>
+      <p class="vc-aviso" id="aviso" role="status" hidden></p>
+
+      <!-- Início -->
+      <section class="vc-view" id="view-inicio">
+        <h2 class="vc-ola">Olá, Victor!</h2>
+        <p class="vc-sub"><span class="vc-ponto" id="inicio-ponto"></span> <span id="inicio-status">Carregando…</span></p>
+
+        <div class="vc-tiles" id="inicio-tiles"></div>
+
+        <h3 class="vc-h3">Suas automações</h3>
+        <div class="vc-atalhos">
+          <a class="vc-atalho" href="#comentarios">
+            <span class="vc-atalho__tag">Comentários</span>
+            <strong>Resposta com link da bio</strong>
+            <span class="vc-muted" id="inicio-auto">—</span>
+          </a>
+          <div class="vc-atalho is-off">
+            <span class="vc-atalho__tag vc-atalho__tag--cinza">Direct</span>
+            <strong>Enviar link por DM a partir dos comentários</strong>
+            <span class="vc-muted">Em breve, quando o direct voltar</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Lista de automações -->
+      <section class="vc-view" id="view-automacoes" hidden>
+        <div class="vc-lista">
+          <article class="vc-card vc-card--link" id="card-comentarios" tabindex="0" role="link" aria-label="Abrir automação de comentários">
+            <div class="vc-card__linha">
+              <span class="vc-pill" id="lista-pill">—</span>
+              <strong class="vc-card__nome">[COMENTÁRIOS] Resposta com link da bio</strong>
+              <div class="vc-card__num"><b id="lista-total">0</b><span>respondidos</span></div>
+            </div>
+            <div class="vc-card__gatilho">
+              <svg viewBox="0 0 24 24" class="vc-ig"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+              O usuário comenta uma palavra-chave em um post ou reels
+              <label class="vc-switch" title="Ativar ou pausar"><input type="checkbox" id="lista-toggle"><span></span></label>
+            </div>
+          </article>
+
+          <article class="vc-card is-off">
+            <div class="vc-card__linha">
+              <span class="vc-pill vc-pill--cinza">EM BREVE</span>
+              <strong class="vc-card__nome">[DIRECT] Link por DM a partir dos comentários</strong>
+            </div>
+            <div class="vc-card__gatilho">
+              <svg viewBox="0 0 24 24" class="vc-ig"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+              Liberado quando o direct do Instagram voltar a funcionar
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Detalhe: automação de comentários -->
+      <section class="vc-view" id="view-comentarios" hidden>
+        <div class="vc-det__topo">
+          <a class="vc-voltar" href="#automacoes">← Automações</a>
+          <div class="vc-det__titulo">
+            <span class="vc-pill" id="det-pill">—</span>
+            <h2>Resposta com link da bio</h2>
+            <label class="vc-switch vc-switch--grande" title="Ativar ou pausar"><input type="checkbox" id="det-toggle"><span></span></label>
+          </div>
+          <p class="vc-muted" id="det-rodada">—</p>
+          <p class="vc-erro" id="det-erro" hidden></p>
+        </div>
+
+        <nav class="vc-tabs" role="tablist">
+          <button type="button" role="tab" data-tab="geral" class="is-on">Visão geral</button>
+          <button type="button" role="tab" data-tab="respostas">Respostas</button>
+          <button type="button" role="tab" data-tab="config">Configurar</button>
+        </nav>
+
+        <div class="vc-tab" id="tab-geral">
+          <div class="vc-tiles" id="det-tiles"></div>
+          <div class="vc-card">
+            <div class="vc-card__cab"><h3>Respostas por dia</h3><span class="vc-muted">últimos 14 dias</span></div>
+            <div class="vc-grafico" id="grafico"></div>
+          </div>
+          <div class="vc-card vc-fluxo">
+            <h3>Como funciona</h3>
+            <ol>
+              <li><b>Quando</b> alguém comenta <span id="fluxo-palavras"></span> nos últimos <span id="fluxo-posts">12</span> posts ou nos posts fixos</li>
+              <li><b>Então</b> responde o comentário com uma das <span id="fluxo-respostas">5</span> mensagens, sorteada</li>
+              <li><b>Limites:</b> até <span id="fluxo-rodada">6</span> a cada 5 min e <span id="fluxo-dia">150</span> por dia, uma vez por pessoa em cada post</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="vc-tab" id="tab-respostas" hidden>
+          <div class="vc-card vc-card--flush">
+            <div class="vc-tabela-wrap"><table class="vc-tabela" id="tabela"></table></div>
+            <p class="vc-vazio" id="tabela-vazia" hidden>Nenhuma resposta ainda. Assim que alguém comentar uma palavra-chave, ela aparece aqui.</p>
+          </div>
+        </div>
+
+        <form class="vc-tab vc-config" id="tab-config" hidden>
+          <div class="vc-card">
+            <h3>Palavras-chave</h3>
+            <p class="vc-muted">Responde quando o comentário tiver qualquer uma delas (sem diferenciar maiúscula ou acento).</p>
+            <div class="vc-chips" id="chips-palavras"></div>
+          </div>
+          <div class="vc-card">
+            <h3>Ignorar comentários com</h3>
+            <p class="vc-muted">Evita responder, por exemplo, "não quero".</p>
+            <div class="vc-chips" id="chips-ignorar"></div>
+          </div>
+          <div class="vc-card">
+            <h3>Mensagens de resposta</h3>
+            <p class="vc-muted">Uma delas é sorteada a cada resposta, para não repetir sempre o mesmo texto.</p>
+            <div class="vc-respostas" id="lista-respostas"></div>
+            <button class="vc-btn vc-btn--ghost" type="button" id="add-resposta">+ Adicionar mensagem</button>
+          </div>
+          <div class="vc-card">
+            <h3>Posts antigos que também devem ser respondidos</h3>
+            <p class="vc-muted">Os 12 posts mais recentes já entram sozinhos. Cole aqui o link de posts antigos que ainda recebem comentários.</p>
+            <div class="vc-chips" id="chips-posts"></div>
+          </div>
+          <div class="vc-card vc-limites">
+            <label>Respostas a cada 5 min <input class="vc-input" type="number" id="max-rodada" min="1" max="20"></label>
+            <label>Respostas por dia <input class="vc-input" type="number" id="max-dia" min="1" max="500"></label>
+          </div>
+          <div class="vc-salvar">
+            <span class="vc-muted" id="salvo"></span>
+            <button class="vc-btn vc-btn--primary" type="submit">Salvar alterações</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

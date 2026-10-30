@@ -39,8 +39,21 @@ const IG = {
 
 function responderComentarios() {
   const props = PropertiesService.getScriptProperties();
+  if (props.getProperty('IG_ATIVO') === '0') return; // pausada pelo painel /vicchat
   let token = props.getProperty('IG_TOKEN');
   if (!token) throw new Error('Falta a propriedade IG_TOKEN');
+  igAplicarConfig_();
+  try {
+    igRodada_(props, token);
+    props.setProperty('IG_ULTIMA', String(Date.now()));
+    props.deleteProperty('IG_ERRO');
+  } catch (e) {
+    props.setProperty('IG_ERRO', new Date().toISOString() + ' ' + String(e.message || e).slice(0, 300));
+    throw e;
+  }
+}
+
+function igRodada_(props, token) {
 
   // Só responde comentários feitos depois que a automação foi ligada (nunca a fila antiga)
   const desde = new Date(Number(props.getProperty('IG_DESDE')) || Date.now());
@@ -90,6 +103,7 @@ function testarInstagram() {
   let token = PropertiesService.getScriptProperties().getProperty('IG_TOKEN');
   if (!token) throw new Error('Falta a propriedade IG_TOKEN');
   PropertiesService.getScriptProperties().deleteProperty('IG_CONTA'); // procura a conta de novo
+  igAplicarConfig_();
   const eu = igConta_(token);
   token = eu.token || token;
   Logger.log('Conta: @' + eu.username + ' (id ' + eu.id + ', ' + eu.base + (eu.token ? ', via token da Página' : '') + ')');
@@ -110,6 +124,7 @@ function ligarComentarios() {
   const props = PropertiesService.getScriptProperties();
   props.setProperty('IG_DESDE', String(Date.now()));
   props.setProperty('IG_TOKEN_EM', String(Date.now()));
+  props.setProperty('IG_ATIVO', '1');
   ScriptApp.newTrigger('responderComentarios').timeBased().everyMinutes(5).create();
   ScriptApp.newTrigger('renovarTokenInstagram').timeBased().everyDays(1).create();
   igLog_();
@@ -133,6 +148,88 @@ function renovarTokenInstagram() {
     props.setProperty('IG_TOKEN', r.access_token);
     props.setProperty('IG_TOKEN_EM', String(Date.now()));
   }
+}
+
+/* ───────────── Painel /vicchat (ações vicchat, vicchat_ativar, vicchat_config) ───────────── */
+
+// Palavras, textos e limites editados no painel ficam em IG_CONFIG e sobrepõem os valores do topo
+function igAplicarConfig_() {
+  Object.assign(IG, JSON.parse(PropertiesService.getScriptProperties().getProperty('IG_CONFIG') || '{}'));
+}
+
+function vicchat_(p) {
+  const negado = checkSenha_(p);
+  if (negado) return negado;
+  const props = PropertiesService.getScriptProperties();
+  igAplicarConfig_();
+
+  if (p.action === 'vicchat_ativar') {
+    const ligar = p.ativo === '1';
+    props.setProperty('IG_ATIVO', ligar ? '1' : '0');
+    if (ligar) props.setProperty('IG_DESDE', String(Date.now())); // ao religar, não responde o que chegou pausado
+  } else if (p.action === 'vicchat_config') {
+    let c;
+    try { c = JSON.parse(p.config || '{}'); } catch (e) { return json_({ ok: false, error: 'config_invalida' }); }
+    const lista = function (v, max, len) {
+      return (Array.isArray(v) ? v : []).map(function (s) { return String(s).trim().slice(0, len); }).filter(Boolean).slice(0, max);
+    };
+    const norm = function (s) { return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); };
+    const num = function (v, min, max, def) { v = parseInt(v, 10); return isNaN(v) ? def : Math.max(min, Math.min(max, v)); };
+    const novo = {
+      palavras: lista(c.palavras, 40, 60).map(norm),
+      ignorar: lista(c.ignorar, 40, 60).map(norm),
+      respostas: lista(c.respostas, 20, 300),
+      postsFixos: lista(c.postsFixos, 20, 200).map(function (s) {
+        const m = s.match(/instagram\.com\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/);
+        return m ? m[1] : s.replace(/[^A-Za-z0-9_-]/g, '');
+      }).filter(Boolean),
+      maxPorRodada: num(c.maxPorRodada, 1, 20, 6),
+      maxPorDia: num(c.maxPorDia, 1, 500, 150)
+    };
+    if (!novo.palavras.length || !novo.respostas.length) return json_({ ok: false, error: 'config_invalida' });
+    props.setProperty('IG_CONFIG', JSON.stringify(novo));
+    igAplicarConfig_();
+  }
+  return json_(igResumo_(props));
+}
+
+function igResumo_(props) {
+  const gatilho = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'responderComentarios'; });
+  const conta = JSON.parse(props.getProperty('IG_CONTA') || '{}');
+  const agora = new Date(), hoje = agora.toDateString(), semana = agora.getTime() - 7 * 86400000;
+  const porDia = {}, ultimas = [];
+  let total = 0, hojeOk = 0, semanaOk = 0, erros = 0;
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(IG.aba);
+  if (sheet && sheet.getLastRow() > 1) {
+    const n = Math.min(sheet.getLastRow() - 1, 5000);
+    const rows = sheet.getRange(sheet.getLastRow() - n + 1, 1, n, 6).getValues();
+    rows.forEach(function (v) {
+      const d = v[0] instanceof Date ? v[0] : new Date(v[0]);
+      if (isNaN(d)) return;
+      if (v[5] !== 'ok') { if (d.getTime() >= semana) erros++; return; }
+      total++;
+      if (d.toDateString() === hoje) hojeOk++;
+      if (d.getTime() >= semana) semanaOk++;
+      const dia = Utilities.formatDate(d, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+      porDia[dia] = (porDia[dia] || 0) + 1;
+    });
+    rows.slice(-60).reverse().forEach(function (v) {
+      ultimas.push({ data: v[0] instanceof Date ? v[0].toISOString() : String(v[0]), post: String(v[1]), usuario: String(v[2]), comentario: String(v[3]), resposta: String(v[4]), status: String(v[5]) });
+    });
+  }
+
+  return {
+    ok: true,
+    ativo: gatilho && props.getProperty('IG_ATIVO') !== '0',
+    gatilho: gatilho,
+    conta: conta.username || '',
+    ultimaRodada: Number(props.getProperty('IG_ULTIMA')) || null,
+    erro: props.getProperty('IG_ERRO') || '',
+    config: { palavras: IG.palavras, ignorar: IG.ignorar, respostas: IG.respostas, postsFixos: IG.postsFixos, maxPorRodada: IG.maxPorRodada, maxPorDia: IG.maxPorDia, postsRecentes: IG.postsRecentes },
+    stats: { total: total, hoje: hojeOk, semana: semanaOk, erros: erros, porDia: porDia },
+    ultimas: ultimas
+  };
 }
 
 /* ───────────── Apoio ───────────── */

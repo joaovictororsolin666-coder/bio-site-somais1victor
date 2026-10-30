@@ -52,6 +52,7 @@ function doPost(e) {
     if (p.action === 'stats') return stats_(p);
     if (p.action === 'aplicacoes') return aplicacoes_(p);
     if (p.action === 'status') return status_(p);
+    if (/^vicchat/.test(p.action || '')) return vicchat_(p); // painel /vicchat (instagram-comentarios.gs)
     return saveApplication_(p);
   } catch (err) {
     return json_({ ok: false, error: String(err) });
