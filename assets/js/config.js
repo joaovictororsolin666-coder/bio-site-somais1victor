@@ -37,7 +37,7 @@ window.SITE_CONFIG = {
     // Opção A: Google Apps Script (planilha Google) → "https://script.google.com/macros/s/XXXX/exec"
     // Opção B: Formspree → "https://formspree.io/f/XXXX"
     // Enquanto estiver vazio, o formulário mostra erro e NÃO finge que enviou.
-    endpoint: "https://script.google.com/macros/s/AKfycbxpYV1SOs5N0PpV4HJjKRtfY0uABw-wg0BrRMgKABwGqdQ4sTyr0AStDBRJzcApjqnkBA/exec",
+    endpoint: "https://script.google.com/macros/s/AKfycbxHUSv0yxrKLLKxdQDUslAVdOzAlKkOKllPaICQuDnnhipj7cX9W2g8qKzBNhkMjOEJAA/exec",
     timeoutMs: 20000
   },
 
