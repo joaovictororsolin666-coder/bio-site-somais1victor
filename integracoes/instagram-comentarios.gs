@@ -41,6 +41,8 @@ const IG = {
 function responderComentarios() {
   const props = PropertiesService.getScriptProperties();
   if (props.getProperty('IG_ATIVO') === '0') return; // pausada pelo painel /vicchat
+  const agora = new Date(); // fuso do projeto (São Paulo)
+  if (agora.getHours() >= 1 && agora.getHours() < 7 && agora.getMinutes() % 5) return; // madrugada: a cada 5 min, para caber na cota diária do Google
   let token = props.getProperty('IG_TOKEN');
   if (!token) throw new Error('Falta a propriedade IG_TOKEN');
   igAplicarConfig_();
