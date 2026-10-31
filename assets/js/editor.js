@@ -145,22 +145,34 @@
 
   /* ───────────── Composição do quadro ───────────── */
 
-  function desenharQuadro(ctx, video, cartao) {
+  // fonte: um <video> ou { el: VideoFrame, w, h, rot } (w×h já na orientação de exibição; rot em radianos)
+  function pintar(ctx, f, x, y, w, h) {
+    if (!f.rot) { ctx.drawImage(f.el, x, y, w, h); return; }
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2);
+    ctx.rotate(f.rot);
+    if (Math.abs(Math.sin(f.rot)) > 0.5) ctx.drawImage(f.el, -h / 2, -w / 2, h, w);
+    else ctx.drawImage(f.el, -w / 2, -h / 2, w, h);
+    ctx.restore();
+  }
+
+  function desenharQuadro(ctx, fonte, cartao) {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, W, H);
-    if (video && video.videoWidth) {
-      const vw = video.videoWidth, vh = video.videoHeight;
+    const f = fonte && fonte.tagName === 'VIDEO' ? { el: fonte, w: fonte.videoWidth, h: fonte.videoHeight, rot: 0 } : fonte;
+    if (f && f.w) {
+      const vw = f.w, vh = f.h;
       if ($('encaixe').value === 'desfoque') {
         const sc = Math.max(W / vw, H / vh);
         ctx.save();
         ctx.filter = 'blur(40px) brightness(.6)';
-        ctx.drawImage(video, (W - vw * sc) / 2, (H - vh * sc) / 2, vw * sc, vh * sc);
+        pintar(ctx, f, (W - vw * sc) / 2, (H - vh * sc) / 2, vw * sc, vh * sc);
         ctx.restore();
         const s2 = Math.min(W / vw, H / vh);
-        ctx.drawImage(video, (W - vw * s2) / 2, (H - vh * s2) / 2, vw * s2, vh * s2);
+        pintar(ctx, f, (W - vw * s2) / 2, (H - vh * s2) / 2, vw * s2, vh * s2);
       } else {
         const sc = Math.max(W / vw, H / vh);
-        ctx.drawImage(video, (W - vw * sc) / 2, (H - vh * sc) / 2, vw * sc, vh * sc);
+        pintar(ctx, f, (W - vw * sc) / 2, (H - vh * sc) / 2, vw * sc, vh * sc);
       }
     }
     if (!cartao) return;
@@ -301,17 +313,20 @@
   /* ───────────── Codificação ───────────── */
 
   async function configVideo() {
-    for (const codec of ['avc1.640028', 'avc1.4d0028', 'avc1.42e028', 'avc1.640032']) {
-      const cfg = { codec: codec, width: W, height: H, bitrate: 10000000, framerate: 30, avc: { format: 'avc' } };
-      try { if ((await VideoEncoder.isConfigSupported(cfg)).supported) return cfg; } catch (e) { /* tenta o próximo */ }
+    // Em 1080×1920 o codificador por software costuma ser mais rápido que o da placa (medido: ~100 vs ~65 quadros/s)
+    for (const acel of ['prefer-software', 'no-preference']) {
+      for (const codec of ['avc1.640028', 'avc1.4d0028', 'avc1.42e028', 'avc1.640032']) {
+        const cfg = { codec: codec, width: W, height: H, bitrate: 10000000, framerate: 30, avc: { format: 'avc' }, hardwareAcceleration: acel };
+        try { if ((await VideoEncoder.isConfigSupported(cfg)).supported) return cfg; } catch (e) { /* tenta o próximo */ }
+      }
     }
     throw new Error('o navegador não gera H.264');
   }
 
-  async function lerAudio(arquivo) {
+  async function lerAudio(bruto) {
     try {
       const ac = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
-      const buf = await ac.decodeAudioData(await arquivo.arrayBuffer());
+      const buf = await ac.decodeAudioData(bruto);
       ac.close();
       return buf;
     } catch (e) {
@@ -320,8 +335,8 @@
   }
 
   async function gerarUm(item, cfgVideo) {
-    const video = item.el;
-    const audio = await lerAudio(item.arquivo);
+    const bruto = await item.arquivo.arrayBuffer();
+    const audio = await lerAudio(bruto.slice(0)); // decodeAudioData consome o buffer: vai uma cópia
     let cfgAudio = null;
     if (audio) {
       cfgAudio = { codec: 'mp4a.40.2', sampleRate: audio.sampleRate, numberOfChannels: Math.min(2, audio.numberOfChannels), bitrate: 160000 };
@@ -336,13 +351,13 @@
       firstTimestampBehavior: 'offset'
     });
 
-    let erro = null;
-    const venc = new VideoEncoder({ output: function (c, m) { muxer.addVideoChunk(c, m); }, error: function (e) { erro = e; } });
-    venc.configure(cfgVideo);
+    const enc = { erro: null };
+    enc.video = new VideoEncoder({ output: function (c, m) { muxer.addVideoChunk(c, m); }, error: function (e) { enc.erro = e; } });
+    enc.video.configure(cfgVideo);
 
     // Áudio: codifica tudo de uma vez a partir do arquivo decodificado
     if (cfgAudio) {
-      const aenc = new AudioEncoder({ output: function (c, m) { muxer.addAudioChunk(c, m); }, error: function (e) { erro = e; } });
+      const aenc = new AudioEncoder({ output: function (c, m) { muxer.addAudioChunk(c, m); }, error: function (e) { enc.erro = e; } });
       aenc.configure(cfgAudio);
       const canais = cfgAudio.numberOfChannels, bloco = 4800, total = audio.length;
       const dados = []; for (let c = 0; c < canais; c++) dados.push(audio.getChannelData(c));
@@ -355,14 +370,123 @@
       await aenc.flush(); aenc.close();
     }
 
-    // Vídeo: toca o arquivo e desenha cada quadro com o cartão por cima
     const canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
+    enc.quadros = 0;
+    enc.quadro = function (fonte, t, p) {
+      desenharQuadro(ctx, fonte, cartaoAtual);
+      const vf = new VideoFrame(canvas, { timestamp: t });
+      enc.video.encode(vf, { keyFrame: enc.quadros % 60 === 0 });
+      vf.close();
+      enc.quadros++;
+      item.li.querySelector('.mini i').style.width = (p * 100).toFixed(1) + '%';
+      item.progresso = p;
+      progressoGeral();
+    };
+
+    // Caminho rápido: lê os quadros direto do arquivo (MP4/MOV), sem tocar o vídeo.
+    // Se o formato não der, cai no caminho antigo, que toca o vídeo em tempo real.
+    let rapido = false;
+    try { rapido = await videoDireto(bruto, enc); } catch (e) { if (enc.quadros) throw e; }
+    if (!rapido) await videoTocando(item.el, enc);
+
+    await enc.video.flush(); enc.video.close();
+    if (enc.erro) throw enc.erro;
+    if (!enc.quadros) throw new Error('nenhum quadro lido');
+    muxer.finalize();
+    item.rapido = rapido;
+    return new Blob([muxer.target.buffer], { type: 'video/mp4' });
+  }
+
+  // Separa as amostras de vídeo do MP4/MOV com o mp4box
+  function demux(bruto) {
+    return new Promise(function (ok, falha) {
+      const mp4 = MP4Box.createFile();
+      let trilha = null;
+      const amostras = [];
+      mp4.onError = falha;
+      mp4.onReady = function (info) {
+        trilha = info.videoTracks[0];
+        if (!trilha) { falha(new Error('sem vídeo')); return; }
+        mp4.setExtractionOptions(trilha.id, null, { nbSamples: 1e9 });
+        mp4.start();
+      };
+      mp4.onSamples = function (id, user, lista) { Array.prototype.push.apply(amostras, lista); };
+      const buf = bruto.slice(0);
+      buf.fileStart = 0;
+      mp4.appendBuffer(buf);
+      mp4.flush();
+      if (!trilha) { falha(new Error('formato não suportado')); return; }
+
+      const entrada = mp4.getTrackById(trilha.id).mdia.minf.stbl.stsd.entries[0];
+      const caixa = entrada.avcC || entrada.hvcC || entrada.vpcC || entrada.av1C;
+      let descricao;
+      if (caixa) {
+        const s = new DataStream(undefined, 0, DataStream.BIG_ENDIAN);
+        caixa.write(s);
+        descricao = new Uint8Array(s.buffer, 8); // tira o cabeçalho da caixa
+      }
+      const m = trilha.matrix || [65536, 0, 0, 0, 65536];
+      ok({ trilha: trilha, amostras: amostras, descricao: descricao, rot: Math.round(Math.atan2(m[1], m[0]) / (Math.PI / 2)) * (Math.PI / 2) });
+    });
+  }
+
+  // Decodifica as amostras na velocidade máxima do computador
+  async function videoDireto(bruto, enc) {
+    if (!window.MP4Box || !('VideoDecoder' in window)) return false;
+    const d = await demux(bruto);
+    const cfg = { codec: d.trilha.codec, codedWidth: d.trilha.video.width, codedHeight: d.trilha.video.height, description: d.descricao };
+    if (!(await VideoDecoder.isConfigSupported(cfg)).supported) return false;
+
+    const deitado = Math.abs(Math.sin(d.rot)) > 0.5;
+    const total = d.amostras.length;
+    let t0 = null, feitos = 0, erro = null;
+    const dec = new VideoDecoder({
+      output: function (frame) {
+        if (t0 === null) t0 = frame.timestamp;
+        const fw = frame.displayWidth, fh = frame.displayHeight;
+        try {
+          enc.quadro({ el: frame, w: deitado ? fh : fw, h: deitado ? fw : fh, rot: d.rot }, frame.timestamp - t0, ++feitos / total);
+        } catch (e) { erro = e; }
+        frame.close();
+      },
+      error: function (e) { erro = e; }
+    });
+    dec.configure(cfg);
+
+    const espera = function () { return new Promise(function (r) { setTimeout(r, 4); }); };
+    for (const a of d.amostras) {
+      if (erro || enc.erro) break;
+      while (dec.decodeQueueSize > 12 || enc.video.encodeQueueSize > 12) await espera(); // não lota a memória
+      dec.decode(new EncodedVideoChunk({
+        type: a.is_sync ? 'key' : 'delta',
+        timestamp: Math.round(a.cts * 1e6 / a.timescale),
+        duration: Math.round(a.duration * 1e6 / a.timescale),
+        data: a.data
+      }));
+    }
+    if (!erro) await dec.flush();
+    dec.close();
+    if (erro) throw erro;
+    return feitos > 0;
+  }
+
+  // Caminho antigo (WebM e formatos que o mp4box não lê): toca o vídeo e captura cada quadro
+  // Só um vídeo por vez pode usar o monitor do canto
+  let monitorLivre = Promise.resolve();
+  function videoTocando(video, enc) {
+    const vez = monitorLivre.then(function () { return tocar(video, enc); });
+    monitorLivre = vez.catch(function () {});
+    return vez;
+  }
+
+  async function tocar(video, enc) {
     const dur = video.duration;
-    let ultimo = -1, quadros = 0;
+    let ultimo = -1;
 
     // O Chrome pula quadros de vídeo fora da tela: durante a geração ele fica no monitor fixo do canto
+    const casa = video.parentNode;
     $('monitor').appendChild(video);
     $('monitor').hidden = false;
 
@@ -373,19 +497,11 @@
 
     await new Promise(function (ok, falha) {
       function quadro(agora, meta) {
-        if (erro) { falha(erro); return; }
+        if (enc.erro) { falha(enc.erro); return; }
         const t = Math.round(meta.mediaTime * 1e6);
         if (t > ultimo) {
           ultimo = t;
-          desenharQuadro(ctx, video, cartaoAtual);
-          const vf = new VideoFrame(canvas, { timestamp: t });
-          venc.encode(vf, { keyFrame: quadros % 60 === 0 });
-          vf.close();
-          quadros++;
-          const p = Math.min(1, meta.mediaTime / dur);
-          item.li.querySelector('.mini i').style.width = (p * 100).toFixed(1) + '%';
-          item.progresso = p;
-          progressoGeral();
+          enc.quadro(video, t, Math.min(1, meta.mediaTime / dur));
         }
         if (!video.ended) video.requestVideoFrameCallback(quadro);
       }
@@ -394,16 +510,10 @@
       video.addEventListener('error', function () { falha(new Error('não consegui ler este vídeo')); }, { once: true });
       video.play().catch(falha);
     }).finally(function () {
-      item.li.querySelector('.th').appendChild(video);
+      if (casa) casa.appendChild(video);
       $('monitor').hidden = true;
+      video.playbackRate = 1;
     });
-
-    await venc.flush(); venc.close();
-    if (erro) throw erro;
-    if (!quadros) throw new Error('nenhum quadro lido');
-    muxer.finalize();
-    video.playbackRate = 1;
-    return new Blob([muxer.target.buffer], { type: 'video/mp4' });
   }
 
   function progressoGeral() {
@@ -424,10 +534,20 @@
     }
 
     const fila = estado.itens.filter(function (i) { return !i.blob; });
-    let feitos = 0, falhas = 0;
-    for (const item of fila) {
-      status('gerando ' + (feitos + falhas + 1) + ' de ' + fila.length, true);
-      $('progresso').textContent = 'Gerando ' + item.arquivo.name + '… deixe esta aba aberta e na frente.';
+    let feitos = 0, falhas = 0, proximo = 0;
+    $('progresso').textContent = 'Gerando… deixe esta aba aberta e na frente.';
+
+    // Dois vídeos ao mesmo tempo: aproveita melhor os núcleos do processador (~40% mais rápido no total)
+    async function trabalhador() {
+      while (proximo < fila.length) {
+        const item = fila[proximo++];
+        status('gerando ' + Math.min(fila.length, feitos + falhas + 1) + ' de ' + fila.length, true);
+        await gerarItem(item);
+      }
+    }
+    await Promise.all([trabalhador(), trabalhador()]);
+
+    async function gerarItem(item) {
       info(item, 'gerando…');
       item.progresso = 0;
       try {
