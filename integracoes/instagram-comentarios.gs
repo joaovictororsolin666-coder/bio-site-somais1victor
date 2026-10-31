@@ -72,7 +72,8 @@ function igRodada_(props, token) {
     if (!posts.length) return; // nada novo: a rodada fica em 1 ou 2 chamadas
 
     const log = igLog_();
-    const feitos = igFeitos_(log);
+    igGravarPendentes_(log, props);
+    const feitos = igFeitos_(log, props);
     let hoje = feitos.hoje, enviadas = 0;
 
     for (const m of posts) {
@@ -94,7 +95,7 @@ function igRodada_(props, token) {
         } catch (e) {
           status = 'erro: ' + String(e.message || e).slice(0, 300);
         }
-        log.appendRow([new Date(), m.permalink, quem, clean_(c.text), texto, status, c.id, m.id]);
+        igGravar_(log, props, [new Date(), m.permalink, quem, clean_(c.text), texto, status, c.id, m.id]);
         feitos.ids[c.id] = true; feitos.pessoas[m.id + '|' + quem] = true;
         if (status !== 'ok') return; // erro (limite, permissão…): para e tenta na próxima rodada
         Utilities.sleep(3000 + Math.random() * 5000); // pausa humana entre respostas
@@ -261,28 +262,92 @@ function igComentarios_(mediaId, desde, token) {
   return out.reverse(); // responde na ordem em que comentaram
 }
 
+// Palavras curtas (até 3 letras, como "ia" ou "clt") só valem inteiras: "bom dia" não dispara "ia"
 function igTemPalavra_(texto) {
   const t = String(texto || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  if (IG.ignorar.some(function (p) { return t.indexOf(p) > -1; })) return false;
-  return IG.palavras.some(function (p) { return t.indexOf(p) > -1; });
+  const tem = function (p) {
+    if (p.length > 3) return t.indexOf(p) > -1;
+    return new RegExp('(^|[^a-z0-9])' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z0-9]|$)').test(t);
+  };
+  if (IG.ignorar.some(tem)) return false;
+  return IG.palavras.some(tem);
 }
 
 function igLog_() {
   return getSheet_(IG.aba, ['Data', 'Post', 'Usuário', 'Comentário', 'Resposta', 'Status', 'comment_id', 'media_id']);
 }
 
-function igFeitos_(sheet) {
+// A planilha às vezes recusa a escrita ("You do not have permission…") logo depois da resposta já
+// ter sido postada: tenta de novo e, se não der, guarda a linha em IG_PENDENTES para a próxima rodada
+function igGravar_(log, props, linha) {
+  for (let i = 0; i < 3; i++) {
+    try {
+      log.getRange(log.getLastRow() + 1, 1, 1, linha.length).setValues([linha]);
+      return;
+    } catch (e) {
+      Utilities.sleep(1500 * (i + 1));
+    }
+  }
+  const fila = JSON.parse(props.getProperty('IG_PENDENTES') || '[]');
+  fila.push([linha[0].toISOString()].concat(linha.slice(1)));
+  props.setProperty('IG_PENDENTES', JSON.stringify(fila.slice(-100)));
+}
+
+function igGravarPendentes_(log, props) {
+  const fila = JSON.parse(props.getProperty('IG_PENDENTES') || '[]');
+  if (!fila.length) return;
+  try {
+    const linhas = fila.map(function (v) { return [new Date(v[0])].concat(v.slice(1)); });
+    log.getRange(log.getLastRow() + 1, 1, linhas.length, linhas[0].length).setValues(linhas);
+    props.deleteProperty('IG_PENDENTES');
+  } catch (e) { /* fica para a próxima rodada */ }
+}
+
+function igFeitos_(sheet, props) {
   const ids = {}, pessoas = {};
   let hoje = 0;
   const dia = new Date().toDateString();
-  if (sheet.getLastRow() > 1) {
-    sheet.getRange(2, 1, sheet.getLastRow() - 1, 8).getValues().forEach(function (v) {
-      ids[v[6]] = true;
-      pessoas[v[7] + '|' + v[2]] = true;
-      if (v[5] === 'ok' && new Date(v[0]).toDateString() === dia) hoje++;
-    });
-  }
+  const marcar = function (v) {
+    ids[v[6]] = true;
+    pessoas[v[7] + '|' + v[2]] = true;
+    if (v[5] === 'ok' && new Date(v[0]).toDateString() === dia) hoje++;
+  };
+  if (sheet.getLastRow() > 1) sheet.getRange(2, 1, sheet.getLastRow() - 1, 8).getValues().forEach(marcar);
+  JSON.parse(props.getProperty('IG_PENDENTES') || '[]').forEach(marcar); // ainda não foram para a planilha
   return { ids: ids, pessoas: pessoas, hoje: hoje };
+}
+
+// Rode uma vez: procura nos posts as respostas da automação que não chegaram na planilha e grava
+function recuperarRespostas() {
+  const props = PropertiesService.getScriptProperties();
+  igAplicarConfig_();
+  let token = props.getProperty('IG_TOKEN');
+  const eu = igConta_(token);
+  token = eu.token || token;
+  const log = igLog_();
+  const feitos = igFeitos_(log, props);
+  const desde = new Date(Date.now() - 7 * 86400000);
+  const linhas = [];
+  igPosts_(token).forEach(function (m) {
+    let params = { fields: 'id,text,timestamp,username,replies{username,text,timestamp}', limit: 50 };
+    for (let p = 0; p < 6; p++) {
+      const r = igGet_('/' + m.id + '/comments', params, token);
+      let antigos = 0;
+      (r.data || []).forEach(function (c) {
+        if (new Date(c.timestamp) < desde) { antigos++; return; }
+        if (feitos.ids[c.id]) return;
+        const minha = ((c.replies && c.replies.data) || []).filter(function (x) {
+          return x.username === eu.username && IG.respostas.indexOf(x.text) > -1;
+        })[0];
+        if (minha) linhas.push([new Date(minha.timestamp), m.permalink, c.username, clean_(c.text), minha.text, 'ok', c.id, m.id]);
+      });
+      if (antigos || !r.paging || !r.paging.next) break;
+      params = Object.assign({}, params, { after: r.paging.cursors.after });
+    }
+  });
+  linhas.sort(function (a, b) { return a[0] - b[0]; });
+  if (linhas.length) log.getRange(log.getLastRow() + 1, 1, linhas.length, 8).setValues(linhas);
+  Logger.log('Recuperadas ' + linhas.length + ' respostas.');
 }
 
 // Últimos posts + posts fixos (o id dos fixos é procurado uma vez e guardado)
