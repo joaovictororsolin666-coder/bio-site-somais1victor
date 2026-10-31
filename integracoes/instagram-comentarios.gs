@@ -25,6 +25,7 @@ const IG = {
   postsFixos: ['DdJo0VaRsIc'],
   maxPorRodada: 6,         // respostas por rodada
   maxPorDia: 150,          // trava diária
+  maxPorHora: 20,          // trava por hora (fixa: depois do bloqueio da Meta em 31/10, não sobe pelo painel)
   paginasPorPost: 4,       // até 4 × 50 comentários mais novos por post
   aba: 'Respostas IG',
   respostas: [
@@ -74,13 +75,15 @@ function igRodada_(props, token) {
     const log = igLog_();
     igGravarPendentes_(log, props);
     const feitos = igFeitos_(log, props);
-    let hoje = feitos.hoje, enviadas = 0;
+    let hoje = feitos.hoje, hora = feitos.hora, enviadas = 0;
+    const porRodada = Math.min(IG.maxPorRodada, 3); // no máximo 3 por minuto, mesmo que o painel peça mais
+    const cheio = function () { return enviadas >= porRodada || hoje >= IG.maxPorDia || hora >= IG.maxPorHora; };
 
     for (const m of posts) {
-      if (enviadas >= IG.maxPorRodada || hoje >= IG.maxPorDia) break;
+      if (cheio()) break;
       let completo = true;
       for (const c of igComentarios_(m.id, desde, token)) {
-        if (enviadas >= IG.maxPorRodada || hoje >= IG.maxPorDia) { completo = false; break; }
+        if (cheio()) { completo = false; break; }
         const quem = (c.from && c.from.username) || c.username || '';
         if (!quem || quem === eu.username) continue;                 // comentário meu
         if (feitos.ids[c.id] || feitos.pessoas[m.id + '|' + quem]) continue; // já respondido
@@ -91,14 +94,14 @@ function igRodada_(props, token) {
         let status = 'ok';
         try {
           igPost_('/' + c.id + '/replies', { message: texto }, token);
-          enviadas++; hoje++;
+          enviadas++; hoje++; hora++;
         } catch (e) {
           status = 'erro: ' + String(e.message || e).slice(0, 300);
         }
         igGravar_(log, props, [new Date(), m.permalink, quem, clean_(c.text), texto, status, c.id, m.id]);
         feitos.ids[c.id] = true; feitos.pessoas[m.id + '|' + quem] = true;
         if (status !== 'ok') return; // erro (limite, permissão…): para e tenta na próxima rodada
-        Utilities.sleep(3000 + Math.random() * 5000); // pausa humana entre respostas
+        Utilities.sleep(10000 + Math.random() * 15000); // pausa humana entre respostas (10 a 25 s)
       }
       if (completo) contagens[m.id] = m.comments_count; // post com sobra fica para a próxima rodada
     }
@@ -305,16 +308,17 @@ function igGravarPendentes_(log, props) {
 
 function igFeitos_(sheet, props) {
   const ids = {}, pessoas = {};
-  let hoje = 0;
-  const dia = new Date().toDateString();
+  let hoje = 0, hora = 0;
+  const dia = new Date().toDateString(), umaHora = Date.now() - 3600000;
   const marcar = function (v) {
     ids[v[6]] = true;
     pessoas[v[7] + '|' + v[2]] = true;
     if (v[5] === 'ok' && new Date(v[0]).toDateString() === dia) hoje++;
+    if (v[5] === 'ok' && new Date(v[0]).getTime() >= umaHora) hora++;
   };
   if (sheet.getLastRow() > 1) sheet.getRange(2, 1, sheet.getLastRow() - 1, 8).getValues().forEach(marcar);
   JSON.parse(props.getProperty('IG_PENDENTES') || '[]').forEach(marcar); // ainda não foram para a planilha
-  return { ids: ids, pessoas: pessoas, hoje: hoje };
+  return { ids: ids, pessoas: pessoas, hoje: hoje, hora: hora };
 }
 
 // Rode uma vez: procura nos posts as respostas da automação que não chegaram na planilha e grava
