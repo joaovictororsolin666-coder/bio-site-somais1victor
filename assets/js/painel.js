@@ -55,7 +55,7 @@
     return { i: i, name: name, label: TAIL_LABELS[name], kind: name === "loading" ? "auto" : name === "offer" ? "offer" : "click" };
   });
 
-  var state = { senha: "", dias: 1, tab: "performance", all: [], cur: [], prev: [], now: new Date(), shown: 150, search: "" };
+  var state = { senha: "", dias: 1, hoje: false, tab: "performance", all: [], cur: [], prev: [], now: new Date(), shown: 150, search: "" };
 
   /* ───────────── Formatação ───────────── */
 
@@ -116,11 +116,26 @@
     return "Direto";
   }
 
+  function midnight() {
+    var d = new Date(state.now);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
   function split() {
     var cut = state.now.getTime() - state.dias * 86400000;
     var prevCut = cut - state.dias * 86400000;
+    var prevEnd = cut;
+    if (state.hoje) {
+      // Hoje: da meia-noite até agora, comparado com ontem da meia-noite até este mesmo horário
+      var m0 = midnight(), ontem = new Date(m0);
+      ontem.setDate(m0.getDate() - 1);
+      cut = m0.getTime();
+      prevCut = ontem.getTime();
+      prevEnd = state.now.getTime() - 86400000;
+    }
     state.cur = state.all.filter(function (o) { return o.inicio.getTime() >= cut; });
-    state.prev = state.all.filter(function (o) { var t = o.inicio.getTime(); return t >= prevCut && t < cut; });
+    state.prev = state.all.filter(function (o) { var t = o.inicio.getTime(); return t >= prevCut && t < prevEnd; });
   }
 
   function metrics(list) {
@@ -156,7 +171,7 @@
       state.all = demoRows();
       return Promise.resolve(done("Dados de exemplo (fictícios) — só para visualizar o layout."));
     }
-    return request({ action: "stats", senha: state.senha, dias: state.dias })
+    return request({ action: "stats", senha: state.senha, dias: state.hoje ? 2 : state.dias })
       .then(function (res) {
         if (!res || res.ok !== true) {
           var err = res && res.error;
@@ -210,7 +225,7 @@
     state.senha = $("#senha").value;
     var btn = $("#login-form .btn");
     btn.disabled = true;
-    request({ action: "stats", senha: state.senha, dias: state.dias })
+    request({ action: "stats", senha: state.senha, dias: state.hoje ? 2 : state.dias })
       .then(function (res) {
         btn.disabled = false;
         if (!res || res.ok !== true) {
@@ -252,7 +267,8 @@
 
   $$(".pn-seg button").forEach(function (b) {
     b.addEventListener("click", function () {
-      state.dias = +b.getAttribute("data-dias");
+      state.hoje = b.getAttribute("data-dias") === "hoje";
+      state.dias = state.hoje ? 1 : +b.getAttribute("data-dias");
       $$(".pn-seg button").forEach(function (x) { x.classList.toggle("is-active", x === b); });
       state.shown = 150;
       load();
@@ -291,7 +307,7 @@
     var up = d >= 0;
     var good = invert ? !up : up;
     return '<span class="pn-delta ' + (Math.abs(d) < 0.05 ? "is-flat" : good ? "is-up" : "is-down") + '">' +
-      (up ? "▲ +" : "▼ ") + d.toFixed(1).replace(".", ",") + "%</span> vs período anterior";
+      (up ? "▲ +" : "▼ ") + d.toFixed(1).replace(".", ",") + "%</span> vs " + (state.hoje ? "ontem até esta hora" : "período anterior");
   }
 
   function renderKpis() {
@@ -367,7 +383,8 @@
     var now = new Date(state.now);
     if (state.dias === 1) {
       var h = new Date(now); h.setMinutes(0, 0, 0);
-      for (var i = 23; i >= 0; i--) {
+      var horas = state.hoje ? now.getHours() : 23;
+      for (var i = horas; i >= 0; i--) {
         var s = new Date(h.getTime() - i * 3600000);
         out.push({ start: s.getTime(), end: s.getTime() + 3600000, label: pad(s.getHours()) + "h" });
       }
