@@ -10,21 +10,12 @@ window.QUIZ_DATA = {
     image: { src: 'assets/img/quiz/capa-v2.webp', w: 800, h: 450, alt: 'Victor Gomes com notificações de vendas aprovadas' },
     text: 'Não perca mais tempo apenas <mark>"rolando a tela"</mark> e vendo a vida dos outros. Chegou a hora de transformar <strong>visualizações em dinheiro no seu bolso</strong> com a fórmula que realmente funciona.',
     cta: 'DESCOBRIR COMO FUNCIONA',
-    note: 'Leva cerca de 1 minuto · 9 perguntas rápidas'
+    note: 'Leva cerca de 1 minuto · 10 perguntas rápidas'
   },
 
   // "key" é o nome usado no resumo personalizado do resultado
   questions: [
-    {
-      // Apresenta o mecanismo logo na primeira pergunta (eleva o nível de consciência)
-      key: 'metodo',
-      title: 'Você sabia que dá para vender produtos digitais usando vídeos simples, sem precisar aparecer?',
-      options: [
-        { emoji: '🤯', label: 'Não sabia, quero entender', id: 'nao-sabia' },
-        { emoji: '👀', label: 'Já ouvi falar, mas não sei como funciona', id: 'ouviu' },
-        { emoji: '😓', label: 'Sei, mas nunca consegui fazer funcionar', id: 'tentou' }
-      ]
-    },
+    // Fase 1: genéricas
     {
       key: 'idade',
       title: 'Qual a sua idade?',
@@ -41,6 +32,72 @@ window.QUIZ_DATA = {
         { emoji: '🙌', label: 'Nunca tentei, mas quero começar agora', short: 'Começando do zero', id: 'zero' },
         { emoji: '😓', label: 'Já tentei, mas ainda não consegui vender', short: 'Já tentou, sem vendas', id: 'tentou' },
         { emoji: '🚀', label: 'Sim, já vendo e quero aumentar meus resultados', short: 'Já vende', id: 'vende' }
+      ]
+    },
+    {
+      key: 'tempo',
+      title: 'Quanto tempo por dia você conseguiria dedicar para construir sua renda online?',
+      options: [
+        { emoji: '🕛', label: 'Até 30 minutos por dia', short: 'Até 30 min/dia' },
+        { emoji: '📈', label: 'De 1 a 2 horas por dia', short: '1 a 2 h/dia' },
+        { emoji: '🔥', label: 'Mais de 2 horas por dia', short: '+2 h/dia' }
+      ]
+    },
+    // Fase 2: dor
+    {
+      key: 'situacao',
+      title: 'Qual dessas situações mais combina com o seu momento atual?',
+      subtitle: 'Responda com toda sinceridade 👇',
+      image: { src: 'assets/img/quiz/situacao.webp', w: 600, h: 400, alt: '' },
+      options: [
+        { emoji: '😪', label: 'Meu dinheiro não está sobrando no final do mês' },
+        { emoji: '💸', label: 'Tenho uma renda, mas quero ganhar mais' },
+        { emoji: '🚀', label: 'Quero construir minha própria fonte de renda online' }
+      ]
+    },
+    {
+      // Objeção principal: personaliza o resultado e a oferta (ver result.objection e offer.objectionNotes)
+      key: 'objecao',
+      title: 'O que mais te impede de começar hoje?',
+      subtitle: 'Seja sincero, isso muda o que vou te mostrar 👇',
+      options: [
+        { emoji: '🧭', label: 'Não sei por onde começar', id: 'comeco', short: 'Por onde começar' },
+        { emoji: '😟', label: 'Medo de investir e não dar certo', id: 'medo', short: 'Medo de investir' },
+        { emoji: '⏳', label: 'Tenho pouco tempo no dia', id: 'tempo', short: 'Pouco tempo' },
+        { emoji: '🔁', label: 'Já tentei outras coisas que não funcionaram', id: 'tentou', short: 'Já tentou antes' }
+      ]
+    },
+    // Fase 3: desejo
+    {
+      key: 'meta',
+      title: 'Quanto você gostaria de faturar por dia com seu negócio digital?',
+      subtitle: 'Escolha a meta que mudaria a sua rotina 👇',
+      options: [
+        { emoji: '💸', label: 'Até R$100 por dia', short: 'Até R$100/dia', goal: 'até R$100 por dia' },
+        { emoji: '🔥', label: 'De R$100 a R$200 por dia', short: 'R$100 a R$200/dia', goal: 'R$100 a R$200 por dia' },
+        { emoji: '🚀', label: 'De R$200 a R$300 por dia', short: 'R$200 a R$300/dia', goal: 'R$200 a R$300 por dia' }
+      ]
+    },
+    {
+      key: 'mudanca',
+      title: 'O que mudaria na sua vida com essa renda?',
+      subtitle: 'Escolha o que mais pesa para você 👇',
+      options: [
+        { emoji: '💳', label: 'Pagar minhas contas sem aperto', short: 'Pagar as contas' },
+        { emoji: '👨‍👩‍👧', label: 'Ajudar a minha família', short: 'Ajudar a família' },
+        { emoji: '🕊️', label: 'Ter mais liberdade no meu tempo', short: 'Mais liberdade' },
+        { emoji: '🎯', label: 'Realizar um sonho que está parado', short: 'Realizar um sonho' }
+      ]
+    },
+    // Fase 4: solução
+    {
+      // Apresenta o mecanismo depois da dor e do desejo
+      key: 'metodo',
+      title: 'Você sabia que dá para vender produtos digitais usando vídeos simples, sem precisar aparecer?',
+      options: [
+        { emoji: '🤯', label: 'Não sabia, quero entender', id: 'nao-sabia' },
+        { emoji: '👀', label: 'Já ouvi falar, mas não sei como funciona', id: 'ouviu' },
+        { emoji: '😓', label: 'Sei, mas nunca consegui fazer funcionar', id: 'tentou' }
       ]
     },
     {
@@ -64,51 +121,10 @@ window.QUIZ_DATA = {
           '✅ Precisa de um passo a passo e do seu celular'
         ],
         cta: 'FAZ SENTIDO, CONTINUAR'
-      }
-    },
-    {
-      key: 'tempo',
-      title: 'Quanto tempo por dia você conseguiria dedicar para construir sua renda online?',
-      options: [
-        { emoji: '🕛', label: 'Até 30 minutos por dia', short: 'Até 30 min/dia' },
-        { emoji: '📈', label: 'De 1 a 2 horas por dia', short: '1 a 2 h/dia' },
-        { emoji: '🔥', label: 'Mais de 2 horas por dia', short: '+2 h/dia' }
-      ]
-    },
-    {
-      key: 'situacao',
-      title: 'Qual dessas situações mais combina com o seu momento atual?',
-      subtitle: 'Responda com toda sinceridade 👇',
-      image: { src: 'assets/img/quiz/situacao.webp', w: 600, h: 400, alt: '' },
-      options: [
-        { emoji: '😪', label: 'Meu dinheiro não está sobrando no final do mês' },
-        { emoji: '💸', label: 'Tenho uma renda, mas quero ganhar mais' },
-        { emoji: '🚀', label: 'Quero construir minha própria fonte de renda online' }
-      ]
-    },
-    {
-      key: 'meta',
-      title: 'Quanto você gostaria de faturar por dia com seu negócio digital?',
-      subtitle: 'Escolha a meta que mudaria a sua rotina 👇',
-      options: [
-        { emoji: '💸', label: 'Até R$100 por dia', short: 'Até R$100/dia', goal: 'até R$100 por dia' },
-        { emoji: '🔥', label: 'De R$100 a R$200 por dia', short: 'R$100 a R$200/dia', goal: 'R$100 a R$200 por dia' },
-        { emoji: '🚀', label: 'De R$200 a R$300 por dia', short: 'R$200 a R$300/dia', goal: 'R$200 a R$300 por dia' }
-      ]
-    },
-    {
-      // Objeção principal: personaliza o resultado e a oferta (ver result.objection e offer.objectionNotes)
-      key: 'objecao',
-      title: 'O que mais te impede de começar hoje?',
-      subtitle: 'Seja sincero, isso muda o que vou te mostrar 👇',
-      options: [
-        { emoji: '🧭', label: 'Não sei por onde começar', id: 'comeco', short: 'Por onde começar' },
-        { emoji: '😟', label: 'Medo de investir e não dar certo', id: 'medo', short: 'Medo de investir' },
-        { emoji: '⏳', label: 'Tenho pouco tempo no dia', id: 'tempo', short: 'Pouco tempo' },
-        { emoji: '🔁', label: 'Já tentei outras coisas que não funcionaram', id: 'tentou', short: 'Já tentou antes' }
-      ],
-      // Prova social logo depois da dificuldade: tela própria ("prf" + índice)
+      },
+      // Prova social logo depois da virada: tela própria ("prf" + índice)
       proof: {
+        hideAnswer: true,
         badge: '👀 Veja esse caso real',
         title: 'Muita gente começa <span class="hl">exatamente assim</span>',
         caseText: 'A Poliana entrou perdida, achando que nunca ia vender nada e em <mark>12 dias faturou mais de R$2.000,00</mark> usando o nosso <strong>Sistema de Vendas.</strong>',

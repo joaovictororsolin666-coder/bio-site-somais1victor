@@ -25,7 +25,7 @@ As UTMs do visitante são repassadas automaticamente ao link do funil. Quem cheg
 
 ## Quiz do Método Primeira Renda (`/quiz`)
 
-O botão "QUERO COMEÇAR AGORA" leva ao quiz: capa → 9 perguntas (com tela de "virada" após a pergunta de crença) → apresentação → análise → prova social (caso da Poliana) logo após a pergunta de objeção → resultado personalizado pela objeção e idade → presente → bônus → oferta → checkout NeonPay.
+O botão "QUERO COMEÇAR AGORA" leva ao quiz: capa → 10 perguntas na ordem genéricas, dor, desejo e solução (com tela de "virada" e prova social do caso da Poliana após a pergunta de crença) → apresentação → análise → resultado personalizado pela objeção e idade → presente → bônus → oferta → checkout NeonPay.
 
 - **Textos, perguntas e imagens:** `assets/js/quiz-data.js`
 - **Link do checkout e preço exibido:** `assets/js/config.js` → `links.checkoutMPR` e `oferta`

@@ -27,10 +27,10 @@
   /* ───────────── Etapas do quiz (mesma ordem do quiz.js) ───────────── */
 
   var Q = D.questions || [];
-  var QSHORT = { metodo: "Conhece o método", idade: "Idade", experiencia: "Experiência", crenca: "Crença", rosto: "Sem aparecer", tempo: "Tempo/dia", situacao: "Situação", meta: "Meta", objecao: "Objeção", disposicao: "Disposição" };
+  var QSHORT = { metodo: "Conhece o método", idade: "Idade", experiencia: "Experiência", crenca: "Crença", rosto: "Sem aparecer", tempo: "Tempo/dia", situacao: "Situação", meta: "Meta", mudanca: "O que mudaria", objecao: "Objeção", disposicao: "Disposição" };
   var TAIL = ["about", "loading", "result", "gift", "bonus", "offer"];
 
-  // Etapas por NOME (independente da versão do quiz). Versão 3 = fluxo atual, montado igual ao quiz.js.
+  // Etapas por NOME (independente da versão do quiz). Versão 4 = fluxo atual, montado igual ao quiz.js.
   var NEW_NAMES = ["intro"];
   Q.forEach(function (q) {
     NEW_NAMES.push("q:" + q.key);
@@ -38,8 +38,10 @@
     if (q.proof) NEW_NAMES.push("prf:" + q.key);
   });
   NEW_NAMES = NEW_NAMES.concat(TAIL);
+  // Versão 3 = 9 perguntas na ordem antiga, com a prova social depois da objeção
+  var V3_NAMES = ["intro", "q:metodo", "q:idade", "q:experiencia", "q:crenca", "ins:crenca", "q:tempo", "q:situacao", "q:meta", "q:objecao", "prf:objecao", "q:disposicao"].concat(TAIL);
   // Versão 2 = mesmo fluxo, sem a tela de prova social (o caso da Poliana ficava no resultado)
-  var V2_NAMES = NEW_NAMES.filter(function (n) { return n.indexOf("prf:") !== 0; });
+  var V2_NAMES = V3_NAMES.filter(function (n) { return n.indexOf("prf:") !== 0; });
   // Versão 1 = quiz antigo (7 perguntas), para ler as visitas registradas antes da mudança
   var OLD_NAMES = ["intro", "q:idade", "q:experiencia", "q:rosto", "q:tempo", "q:situacao", "q:meta", "q:disposicao"].concat(TAIL);
 
@@ -89,14 +91,14 @@
     try { o.resp = typeof r.respostas === "string" ? JSON.parse(r.respostas || "{}") : (r.respostas || {}); } catch (e) { o.resp = {}; }
     var et = {};
     try { et = typeof r.etapas === "string" ? JSON.parse(r.etapas || "{}") : (r.etapas || {}); } catch (e) { et = {}; }
-    withFlow(o, Number(et.v) === 3 ? 3 : Number(et.v) === 2 ? 2 : 1);
+    withFlow(o, Number(et.v) === 4 ? 4 : Number(et.v) === 3 ? 3 : Number(et.v) === 2 ? 2 : 1);
     o.origem = origin(o);
     return o;
   }
 
   // Converte a etapa máxima (índice) em nomes, conforme a versão do quiz da visita
   function withFlow(o, v) {
-    var names = v === 3 ? NEW_NAMES : v === 2 ? V2_NAMES : OLD_NAMES;
+    var names = v === 4 ? NEW_NAMES : v === 3 ? V3_NAMES : v === 2 ? V2_NAMES : OLD_NAMES;
     var mx = Math.min(o.max, names.length - 1);
     o.v = v;
     o.flowLen = names.length;
@@ -656,7 +658,7 @@
         dur: 20 + max * 8 + Math.random() * 40, src: s[0], med: s[1], camp: s[2], ref: s[0] ? "" : "direto", resp: resp
       });
     }
-    rows.forEach(function (o) { withFlow(o, 3); o.origem = origin(o); });
+    rows.forEach(function (o) { withFlow(o, 4); o.origem = origin(o); });
     return rows;
   }
 

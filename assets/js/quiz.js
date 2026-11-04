@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Quiz do Método Primeira Renda
-   Telas renderizadas a partir de assets/js/quiz-data.js. Sem dependências.
+   Motor dos quizzes (Método Primeira Renda e Clube Dark Viral)
+   Telas renderizadas a partir de quiz-data.js ou clube-data.js. Sem dependências.
    ========================================================================== */
 (function () {
   "use strict";
@@ -27,15 +27,16 @@
     FLOW.push("q" + i);
     if (q.insight) FLOW.push("ins" + i);
     if (q.proof) FLOW.push("prf" + i);
+    if (q.reveal) FLOW.push("rvl" + i);
   });
   FLOW = FLOW.concat(["about", "loading", "result", "gift", "bonus", "offer"]);
-  var FLOW_VERSION = 3; // painel usa para ler etapas antigas e novas
+  var FLOW_VERSION = 4; // painel usa para ler etapas antigas e novas
   var TRANSIENT = { loading: true };
   var NO_BACK = { intro: true, loading: true };
 
   /* ───────────── Estado (sobrevive a recarregar a página) ───────────── */
 
-  var STORE = "vg_quiz" + FLOW_VERSION;
+  var STORE = (D.id || "vg_quiz") + FLOW_VERSION; // cada funil guarda o próprio progresso
   var state = { step: 0, answers: {} };
   try {
     var saved = JSON.parse(sessionStorage.getItem(STORE));
@@ -53,7 +54,7 @@
 
   var Journey = (function () {
     var endpoint = (CFG.form || {}).endpoint;
-    var enabled = !!endpoint && !!navigator.sendBeacon && (CFG.painel || {}).ativo !== false;
+    var enabled = !!endpoint && !!navigator.sendBeacon && (CFG.painel || {}).ativo !== false && D.painel !== false;
     var dirty = true;
 
     function rid() {
@@ -124,17 +125,18 @@
   // Link do checkout: UTMs do visitante + UTMs fixas do funil (só onde faltar) + botão clicado em utm_term
   function checkoutUrl(term) {
     var links = CFG.links || {};
-    if (!links.checkoutMPR) return "#";
+    var checkout = links[D.checkoutKey || "checkoutMPR"];
+    if (!checkout) return "#";
     try {
-      var u = new URL(VG.withUtms(links.checkoutMPR));
-      var fixed = links.checkoutUtms || {};
+      var u = new URL(VG.withUtms(checkout));
+      var fixed = links[D.checkoutUtmsKey || "checkoutUtms"] || {};
       Object.keys(fixed).forEach(function (k) {
         if (!u.searchParams.has(k)) u.searchParams.set(k, fixed[k]);
       });
       if (term && !u.searchParams.has("utm_term")) u.searchParams.set("utm_term", term);
       return u.toString();
     } catch (e) {
-      return links.checkoutMPR;
+      return checkout;
     }
   }
 
@@ -258,6 +260,45 @@
     return o.short || o.label;
   }
 
+  // Carrossel de fotos com as opções (o card é o próprio botão de resposta)
+  function nichesHtml(q, chosen) {
+    return '<div class="qz-niches" data-niches><div class="qz-niches__track">' +
+      q.options.map(function (o, j) {
+        return '<button class="qz-niche' + (chosen === j ? " is-selected" : "") + '" type="button" data-answer="' + j + '" aria-pressed="' + (chosen === j) + '" style="--a:' + o.colors[0] + ";--b:" + o.colors[1] + '">' +
+          (o.image ? '<img src="' + o.image + '" alt="" loading="lazy" decoding="async">' : '<span class="qz-niche__emoji" aria-hidden="true">' + o.emoji + "</span>") +
+          '<span class="qz-niche__text"><strong>' + o.label + "</strong><small>" + o.desc + "</small></span></button>";
+      }).join("") +
+      '</div><p class="qz-note">' + q.hint + "</p></div>";
+  }
+
+  // Passa as fotos sozinho até a pessoa tocar ou arrastar
+  function bindNiches(root) {
+    var track = $(".qz-niches__track", root);
+    if (!track || reduceMotion) return;
+    var timer = setInterval(function () {
+      if (!track.isConnected) { clearInterval(timer); return; }
+      var card = track.firstElementChild, step = card.offsetWidth + 12;
+      var fim = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+      track.scrollTo({ left: fim ? 0 : track.scrollLeft + step, behavior: "smooth" });
+    }, 2200);
+    var stop = function () { clearInterval(timer); };
+    ["pointerdown", "touchstart", "wheel", "focusin"].forEach(function (ev) {
+      track.addEventListener(ev, stop, { passive: true });
+    });
+  }
+
+  // Prévia da página da pessoa, com o nome sugerido para o nicho escolhido
+  function pageCard(o) {
+    var estilo = answerOf("estilo");
+    return '<div class="qz-page"><div class="qz-page__head"><span class="qz-page__avatar" aria-hidden="true" style="--a:' + o.colors[0] + ";--b:" + o.colors[1] + '">' + o.emoji + "</span>" +
+      '<div><p class="qz-page__handle">@' + o.names[0] + "</p>" +
+      '<p class="qz-page__bio">' + (o.short || o.label) + (estilo ? " · " + estilo : "") + "</p></div></div>" +
+      '<p class="qz-page__label">Outro nome possível: <strong>@' + o.names[1] + "</strong></p>" +
+      (o.conteudo ? '<p class="qz-page__label">Tipo de conteúdo: <strong>' + o.conteudo + "</strong></p>" : "") +
+      (o.formato ? '<p class="qz-page__label">Formato: <strong>' + o.formato + "</strong></p>" : "") +
+      "</div>";
+  }
+
   /* ───────────── Telas ───────────── */
 
   var screens = {
@@ -277,18 +318,30 @@
       var q = Q[i];
       var chosen = state.answers[q.key];
       return '<section class="qz-screen">' +
-        '<p class="qz-step">Pergunta ' + (i + 1) + " de " + Q.length + "</p>" +
+        '<p class="qz-step">' + (D.stepLabel || "Pergunta") + " " + (i + 1) + " de " + Q.length + "</p>" +
         '<h1 class="qz-title">' + q.title + "</h1>" +
         (q.subtitle ? '<p class="qz-sub">' + q.subtitle + "</p>" : "") +
         (q.image ? '<div class="qz-media qz-media--sm">' + img(q.image, "", true) + "</div>" : "") +
-        '<div class="qz-options">' +
+        (q.layout === "carousel" ? nichesHtml(q, chosen) : '<div class="qz-options">' +
         q.options.map(function (o, j) {
           return '<button class="qz-option' + (chosen === j ? " is-selected" : "") + '" type="button" data-answer="' + j + '" aria-pressed="' + (chosen === j) + '">' +
             (o.emoji ? '<span class="qz-option__emoji" aria-hidden="true">' + o.emoji + "</span>" : "") +
             '<span class="qz-option__label">' + o.label + "</span>" +
             '<span class="qz-option__check" aria-hidden="true"></span></button>';
         }).join("") +
-        "</div></section>";
+        "</div>") + "</section>";
+    },
+
+    // Tela que mostra o que a pessoa ganhou com a opção escolhida (ex.: nome da página no nicho)
+    reveal: function (i) {
+      var q = Q[i], s = q.reveal, o = q.options[state.answers[q.key]] || q.options[0];
+      return '<section class="qz-screen qz-center qz-insight">' +
+        '<p class="qz-insight__badge">' + s.badge + "</p>" +
+        '<h1 class="qz-title">' + s.title.replace("{opcao}", o.short || o.label) + "</h1>" +
+        '<p class="qz-text">' + s.text + "</p>" +
+        pageCard(o) +
+        cta(s.cta) +
+        "</section>";
     },
 
     about: function () {
@@ -353,11 +406,13 @@
       var goal = mq && mi != null && mq.options[mi] ? mq.options[mi].goal : null;
       var title = goal
         ? s.title.replace("{meta}", goal).replace("{fim}", (s.titleEnd || {})[ex] || s.titleEnd.zero)
-        : s.titleFallback;
+        : s.titleFallback.replace("{nicho}", answerOf("nicho") || "");
+      var nq = Q.filter(function (x) { return x.key === "nicho"; })[0];
       return '<section class="qz-screen qz-center qz-result">' +
         '<p class="qz-badge"><span aria-hidden="true">✔</span> ' + s.badge + "</p>" +
         '<h1 class="qz-title">' + title + "</h1>" +
         (s.subtitle ? '<p class="qz-sub">' + s.subtitle + "</p>" : "") +
+        (nq && nq.options[state.answers.nicho] ? pageCard(nq.options[state.answers.nicho]) : "") +
         (rows.length ? '<div class="qz-diag"><h2 class="qz-diag__title">' + s.diagTitle + "</h2>" + rows.map(function (r) {
           return '<div class="qz-diag__row"><span>' + r[0] + "</span><strong>" + r[1] + "</strong></div>";
         }).join("") + "</div>" : "") +
@@ -373,7 +428,7 @@
       var q = Q[i], s = q.proof, chosen = state.answers[q.key];
       var picked = chosen != null && q.options[chosen] ? q.options[chosen].label : "";
       return '<section class="qz-screen qz-center qz-insight qz-proofscreen">' +
-        (picked ? '<p class="qz-insight__you">Você respondeu: <strong>' + picked + "</strong></p>" : "") +
+        (picked && !s.hideAnswer ? '<p class="qz-insight__you">Você respondeu: <strong>' + picked + "</strong></p>" : "") +
         '<p class="qz-insight__badge">' + s.badge + "</p>" +
         '<h1 class="qz-title">' + s.title + "</h1>" +
         '<div class="qz-case">' +
@@ -432,7 +487,7 @@
 
     offer: function () {
       var s = D.offer;
-      var price = CFG.oferta || {};
+      var price = CFG[D.ofertaKey || "oferta"] || {};
       var isMinor = optId("idade") === "menor" && !!s.minor;
       var ctaLabel = s.cta.replace("{preco}", price.precoVista || "").replace(/\s+POR\s*$/, "");
       // Preço à vista em destaque (verde, grande) e o parcelado embaixo
@@ -442,7 +497,7 @@
       var off = price.precoDe ? Math.round((1 - toNum(price.precoVista) / toNum(price.precoDe)) * 100) : 0;
       var priceHtml = price.precoVista ?
         '<div class="qz-price">' +
-        '<p class="qz-price__label">Acesso completo + todos os bônus</p>' +
+        '<p class="qz-price__label">' + (s.priceLabel || "Acesso completo + todos os bônus") + "</p>" +
         (price.precoDe ? '<p class="qz-price__from">De <s>' + price.precoDe + "</s> por apenas" +
           (off > 0 ? ' <span class="qz-price__off">' + off + "% OFF</span>" : "") + "</p>" : "") +
         '<p class="qz-price__main"><small>R$</small>' + vista + "</p>" +
@@ -468,7 +523,7 @@
             "<div><h2>" + p.title + "</h2><p>" + p.text + "</p></div></div>";
         }).join('<div class="qz-pillar-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15M5 12l7 7 7-7"/></svg></div>') + "</div>" +
 
-        '<h2 class="qz-h2 qz-center qz-gap">' + s.proofTitle + "</h2>" +
+        (s.proofs && s.proofs.length ? '<h2 class="qz-h2 qz-center qz-gap">' + s.proofTitle + "</h2>" +
         // Provas em loop automático (a lista vai duas vezes; a segunda é só visual)
         '<div class="qz-marquee qz-marquee--proof" aria-label="Resultados de alunos"><div class="qz-marquee__track">' +
         s.proofs.map(function (p, i) {
@@ -477,7 +532,7 @@
         s.proofs.map(function (p) {
           return '<img class="qz-proof-card" src="' + p.src + '" width="' + p.w + '" height="' + p.h + '" alt="" aria-hidden="true" decoding="async">';
         }).join("") +
-        "</div></div>" +
+        "</div></div>" : "") +
 
         '<div class="qz-stack" id="qz-price">' +
         '<h2 class="qz-h2 qz-center">' + s.stackTitle + "</h2>" +
@@ -514,6 +569,7 @@
     if (name.charAt(0) === "q" && name !== "q") return screens.question(+name.slice(1));
     if (name.indexOf("ins") === 0) return screens.insight(+name.slice(3));
     if (name.indexOf("prf") === 0) return screens.proof(+name.slice(3));
+    if (name.indexOf("rvl") === 0) return screens.reveal(+name.slice(3));
     return screens[name]();
   }
 
@@ -615,6 +671,7 @@
 
     if (name.charAt(0) === "q" && name !== "q") {
       var q = Q[+name.slice(1)];
+      if (q.layout === "carousel") bindNiches(root);
       $$("[data-answer]", root).forEach(function (b) {
         b.addEventListener("click", function () {
           if (busy) return;
