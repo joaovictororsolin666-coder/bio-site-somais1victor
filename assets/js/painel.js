@@ -136,6 +136,8 @@
     }
     state.cur = state.all.filter(function (o) { return o.inicio.getTime() >= cut; });
     state.prev = state.all.filter(function (o) { var t = o.inicio.getTime(); return t >= prevCut && t < prevEnd; });
+    state.cliquesCur = (state.cliques || []).filter(function (o) { return o.inicio.getTime() >= cut; });
+    state.cliquesPrev = (state.cliques || []).filter(function (o) { var t = o.inicio.getTime(); return t >= prevCut && t < prevEnd; });
   }
 
   function metrics(list) {
@@ -169,6 +171,7 @@
     if (DEMO) {
       state.now = new Date();
       state.all = demoRows();
+      state.cliques = state.all.slice(0, Math.round(state.all.length / 12)).map(function (o) { return { alvo: "sombra", inicio: o.inicio }; });
       return Promise.resolve(done("Dados de exemplo (fictícios) — só para visualizar o layout."));
     }
     return request({ action: "stats", senha: state.senha, dias: state.hoje ? 2 : state.dias })
@@ -180,13 +183,22 @@
           throw new Error(err || "Resposta inválida");
         }
         state.now = new Date(res.agora);
-        state.all = (res.rows || []).map(parse).filter(function (o) { return o.id && !isNaN(o.inicio); });
+        receber(res.rows || []);
         done("");
       })
       .catch(function (e) {
         if (window.console) console.error("[painel]", e);
         status("Não foi possível carregar os dados. Verifique sua conexão e clique em atualizar.", true);
       });
+  }
+
+  // Linhas "clique_<alvo>" são cliques em indicações da bio: não são visitas do quiz
+  function ehClique(r) { return /^clique_/.test(String(r.etapa_nome || "")); }
+  function receber(rows) {
+    state.cliques = rows.filter(ehClique).map(function (r) {
+      return { alvo: String(r.etapa_nome).slice(7), inicio: new Date(r.inicio) };
+    });
+    state.all = rows.filter(function (r) { return !ehClique(r); }).map(parse).filter(function (o) { return o.id && !isNaN(o.inicio); });
   }
 
   function done(msg) {
@@ -238,7 +250,7 @@
         if ($("#lembrar").checked) { try { localStorage.setItem(STORE, state.senha); } catch (e2) { /* ignore */ } }
         showApp();
         state.now = new Date(res.agora);
-        state.all = (res.rows || []).map(parse).filter(function (o) { return o.id && !isNaN(o.inicio); });
+        receber(res.rows || []);
         done("");
       })
       .catch(function () {
@@ -295,6 +307,7 @@
       renderTraffic();
       renderCampaigns();
       renderTesteCheckout();
+      renderCliques();
       renderDevices();
     } else {
       renderResponses();
@@ -500,6 +513,16 @@
       list.map(function (g) {
         return "<tr><td>" + esc(g.name) + "</td><td>" + num(g.visits) + "</td><td>" + num(g.started) + "</td><td>" + num(g.offer) +
           "</td><td>" + num(g.checkout) + "</td><td><strong>" + pct(g.checkout, g.visits) + "</strong></td></tr>";
+      }).join("") + "</tbody>";
+  }
+
+  // Cliques nas indicações da bio (contagem anônima; comissões ficam na plataforma de afiliado)
+  function renderCliques() {
+    var nomes = { sombra: "Sombra Viral" };
+    function conta(list, k) { return list.filter(function (o) { return o.alvo === k; }).length; }
+    $("#cliques-bio").innerHTML = "<thead><tr><th>Indicação</th><th>Cliques</th><th>Período anterior</th></tr></thead><tbody>" +
+      Object.keys(nomes).map(function (k) {
+        return "<tr><td>" + nomes[k] + "</td><td><strong>" + num(conta(state.cliquesCur, k)) + "</strong></td><td>" + num(conta(state.cliquesPrev, k)) + "</td></tr>";
       }).join("") + "</tbody>";
   }
 

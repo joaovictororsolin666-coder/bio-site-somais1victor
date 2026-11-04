@@ -136,6 +136,27 @@
     return { init: init, track: track };
   })();
 
+  /* ───────────── Contagem anônima de cliques ─────────────
+     Vai para a mesma aba da planilha do quiz, com etapa_nome "clique_<alvo>"; o painel separa essas linhas das visitas. */
+
+  function contarClique(alvo) {
+    if (!FORM.endpoint || !navigator.sendBeacon || (CFG.painel || {}).ativo === false) return;
+    var id = "", c = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    for (var i = 0; i < 10; i++) id += c.charAt(Math.floor(Math.random() * c.length));
+    var ua = navigator.userAgent, a = Attribution.all();
+    var p = new URLSearchParams();
+    p.append("action", "quiz");
+    p.append("id", id);
+    p.append("inicio", new Date().toISOString());
+    p.append("dispositivo", /iPad|Tablet/i.test(ua) ? "Tablet" : /Mobi|Android|iPhone|iPod/i.test(ua) ? "Celular" : "Computador");
+    p.append("etapa_max", 0);
+    p.append("etapa_nome", "clique_" + alvo);
+    ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "referrer"].forEach(function (k) {
+      p.append(k, a[k] || "");
+    });
+    navigator.sendBeacon(FORM.endpoint, p);
+  }
+
   /* ───────────── Toast ───────────── */
 
   var toastTimer;
@@ -181,6 +202,11 @@
 
     $$("[data-track]").forEach(function (el) {
       el.addEventListener("click", function () { Tracking.track(el.getAttribute("data-track")); });
+    });
+
+    // Cliques nas indicações: contagem anônima que aparece no /painel (não depende de GA/Pixel)
+    $$("[data-clique]").forEach(function (el) {
+      el.addEventListener("click", function () { contarClique(el.getAttribute("data-clique")); });
     });
 
     // O card inteiro é tocável e aciona o botão dele
