@@ -285,13 +285,6 @@ window.QUIZ_DATA = {
       tempo: '⏳ Comece pelo celular, no seu ritmo',
       tentou: '🔁 Estratégias prontas para aplicar, sem tentativa e erro'
     },
-    // Quem marca "menos de 18" não vê o botão de compra: vê este bloco e envia o link a um responsável
-    minor: {
-      title: '🔞 A compra precisa ser feita por um maior de 18 anos',
-      text: 'Você marcou que tem menos de 18. Se quiser começar, mostre o método para seu pai, mãe ou responsável.',
-      cta: 'ENVIAR PARA MEU RESPONSÁVEL',
-      message: 'Olha esse método para vender produtos digitais com vídeos simples, sem aparecer. Quero começar, pode dar uma olhada? '
-    },
     guarantee: {
       image: { src: 'assets/img/quiz/garantia.webp', w: 480, h: 320, alt: 'Selo de garantia de 7 dias' },
       title: 'Garantia incondicional de 7 dias',
