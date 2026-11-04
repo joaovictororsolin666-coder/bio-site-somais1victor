@@ -1,0 +1,61 @@
+/* ==========================================================================
+   Link na bio — indicação de sites de IA (abaixo das ofertas)
+   ========================================================================== */
+
+.ia { margin-top: 36px; }
+
+.ia__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ia__title::before,
+.ia__title::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
+.ia__title svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ia-lista { display: grid; gap: 12px; margin-top: 16px; }
+
+.ia-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid rgba(239, 68, 68, .28);
+  border-radius: var(--r-md);
+  background: linear-gradient(120deg, #1f0a0c, #0c0808 70%);
+  color: var(--text);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .25s var(--ease), border-color .25s;
+}
+.ia-card:active { transform: scale(.985); }
+.ia-card img { flex: none; width: 64px; height: 64px; border-radius: 12px; background: #050303; object-fit: cover; }
+.ia-card__text { display: grid; gap: 3px; min-width: 0; }
+.ia-card__text strong { font-size: 16px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; }
+.ia-card__text span { color: #c9c9c9; font-size: 13.5px; line-height: 1.35; }
+
+.ia__nota { margin: 8px 0 0; color: var(--dim); font-size: 11.5px; text-align: center; }
+
+@media (hover: hover) {
+  .ia-card:hover { transform: translateY(-2px); border-color: rgba(239, 68, 68, .6); }
+}
+
+@media (min-width: 900px) {
+  .ia { max-width: 520px; margin: 48px auto 0; }
+}
