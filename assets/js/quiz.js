@@ -122,14 +122,30 @@
       '<span class="btn__label">' + label + "</span>" + ARROW + "</button>";
   }
 
+  // Teste de checkout: cada visitante é sorteado uma vez e fica sempre no mesmo lado ("kiwify" ou "neon")
+  var ladoSorteado = null;
+  function ladoCheckout() {
+    var t = (CFG.links || {}).testeCheckout;
+    if (D.checkoutKey || !t || !t.ativo) return "";
+    if (ladoSorteado) return ladoSorteado;
+    var forcado = /[?&]ck=(kiwify|neon)\b/.exec(location.search); // só para conferir cada lado
+    if (forcado) return (ladoSorteado = forcado[1]);
+    var guardado = "";
+    try { guardado = localStorage.getItem("vg_ck") || ""; } catch (e) { /* sem storage: sorteia nesta visita */ }
+    ladoSorteado = guardado === "kiwify" || guardado === "neon" ? guardado : (Math.random() < t.neon ? "neon" : "kiwify");
+    try { localStorage.setItem("vg_ck", ladoSorteado); } catch (e) { /* ignore */ }
+    return ladoSorteado;
+  }
+
   // Link do checkout: UTMs do visitante + UTMs fixas do funil (só onde faltar) + botão clicado em utm_term
   function checkoutUrl(term) {
     var links = CFG.links || {};
-    var checkout = links[D.checkoutKey || "checkoutMPR"];
+    var neon = ladoCheckout() === "neon";
+    var checkout = neon ? links.testeCheckout.link : links[D.checkoutKey || "checkoutMPR"];
     if (!checkout) return "#";
     try {
       var u = new URL(VG.withUtms(checkout));
-      var fixed = links[D.checkoutUtmsKey || "checkoutUtms"] || {};
+      var fixed = (neon ? links.testeCheckout.utms : links[D.checkoutUtmsKey || "checkoutUtms"]) || {};
       Object.keys(fixed).forEach(function (k) {
         if (!u.searchParams.has(k)) u.searchParams.set(k, fixed[k]);
       });
@@ -487,7 +503,7 @@
 
     offer: function () {
       var s = D.offer;
-      var price = CFG[D.ofertaKey || "oferta"] || {};
+      var price = CFG[D.ofertaKey || (ladoCheckout() === "neon" ? "ofertaNeon" : "oferta")] || {};
       var isMinor = optId("idade") === "menor" && !!s.minor;
       var ctaLabel = s.cta.replace("{preco}", price.precoVista || "").replace(/\s+POR\s*$/, "");
       // Preço à vista em destaque (verde, grande) e o parcelado embaixo
@@ -775,6 +791,7 @@
       completedTracked = true;
       VG.track("quizComplete", { meta_escolhida: answerOf("meta") || "" });
     }
+    if (ladoCheckout()) Journey.answer("checkout_teste", ladoCheckout());
     Journey.flush();
     bindModules(root);
 

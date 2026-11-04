@@ -10,12 +10,20 @@ window.SITE_CONFIG = {
 
     // Checkout do MPR (botões da oferta no fim do quiz) — Kiwify
     checkoutMPR: "https://pay.kiwify.com.br/X9MavXp",
-    // Para voltar à NeonPay: "https://checkout.neonpay.com.br/checkout/cmv6sesvu022k01of5d632afj?offer=VNOV5FS" (utm_content "funil_quiz_neonpay", parcelas "12x de R$ 6,85")
 
     // UTMs fixas no link do checkout para identificar vendas vindas do quiz.
     // As UTMs do visitante (anúncio, stories etc.) têm prioridade; estas só preenchem o que faltar.
     // utm_term recebe o botão clicado: oferta ou garantia. "src" identifica o quiz nos relatórios de vendas.
     checkoutUtms: { utm_campaign: "mpr", utm_content: "funil_quiz_kiwify", src: "quiz_mpr" },
+
+    // Teste de checkout do quiz: "neon" é a parte dos visitantes sorteada para a NeonPay (0.5 = metade).
+    // Para encerrar o teste, coloque ativo: false e todos voltam para checkoutMPR.
+    testeCheckout: {
+      ativo: true,
+      neon: 0.5,
+      link: "https://checkout.neonpay.com.br/checkout/cmv6sesvu022k01of5d632afj?offer=VNOV5FS",
+      utms: { utm_campaign: "mpr", utm_content: "funil_quiz_neonpay", src: "quiz_mpr" }
+    },
 
     // Repassa as UTMs do visitante para o link do funil (mantém a origem rastreável)
     repassarUtms: true,
@@ -29,6 +37,13 @@ window.SITE_CONFIG = {
     precoDe: "R$ 297", // preço cheio, aparece riscado acima do preço à vista
     precoVista: "R$ 67",
     parcelas: "12x de R$ 6,93" // Kiwify (na NeonPay era 12x de R$ 6,85)
+  },
+
+  /* ── Preço exibido na oferta para quem cai na NeonPay no teste de checkout ── */
+  ofertaNeon: {
+    precoDe: "R$ 297",
+    precoVista: "R$ 67",
+    parcelas: "12x de R$ 6,85"
   },
 
   /* ── Formulário de aplicação da mentoria ── */

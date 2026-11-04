@@ -294,6 +294,7 @@
       renderFunnel();
       renderTraffic();
       renderCampaigns();
+      renderTesteCheckout();
       renderDevices();
     } else {
       renderResponses();
@@ -502,6 +503,22 @@
       }).join("") + "</tbody>";
   }
 
+  // Teste de checkout: oferta e cliques de cada lado (vendas e reembolsos ficam em cada plataforma)
+  function renderTesteCheckout() {
+    var nomes = { kiwify: "Kiwify", neon: "NeonPay" };
+    var list = Object.keys(nomes).map(function (k) {
+      var lado = state.cur.filter(function (o) { return o.resp.checkout_teste === k; });
+      return { name: nomes[k], offer: lado.length, checkout: lado.filter(function (o) { return o.checkout; }).length };
+    });
+    var tem = list[0].offer + list[1].offer > 0;
+    $("#teste-checkout-card").hidden = !tem;
+    if (!tem) return;
+    $("#teste-checkout").innerHTML = "<thead><tr><th>Checkout</th><th>Viram oferta</th><th>Cliques</th><th>Taxa de clique</th></tr></thead><tbody>" +
+      list.map(function (g) {
+        return "<tr><td>" + g.name + "</td><td>" + num(g.offer) + "</td><td>" + num(g.checkout) + "</td><td><strong>" + pct(g.checkout, g.offer) + "</strong></td></tr>";
+      }).join("") + "</tbody>";
+  }
+
   function renderDevices() {
     var box = $("#devices");
     var counts = {};
@@ -668,6 +685,7 @@
       Q.forEach(function (q) {
         if (NEW_NAMES.indexOf("q:" + q.key) < max) resp[q.key] = q.options[Math.random() < 0.55 ? 0 : Math.floor(Math.random() * q.options.length)].label;
       });
+      if (max >= last) resp.checkout_teste = pick(["kiwify", "neon"]);
       var s = pick(sources);
       rows.push({
         id: Math.random().toString(36).slice(2, 12), inicio: new Date(now - Math.random() * span),
