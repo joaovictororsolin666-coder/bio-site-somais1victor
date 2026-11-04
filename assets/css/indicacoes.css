@@ -50,7 +50,6 @@
 .ia-card__text strong { font-size: 16px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; }
 .ia-card__text span { color: #c9c9c9; font-size: 13.5px; line-height: 1.35; }
 
-.ia__nota { margin: 8px 0 0; color: var(--dim); font-size: 11.5px; text-align: center; }
 
 @media (hover: hover) {
   .ia-card:hover { transform: translateY(-2px); border-color: rgba(239, 68, 68, .6); }
