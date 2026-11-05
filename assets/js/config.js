@@ -40,7 +40,7 @@ window.SITE_CONFIG = {
   },
 
   /* ── Página do grupo VIP do Clube (/clube-vip): link do grupo do WhatsApp e data de abertura ("2026-11-14T19:00:00-03:00") ── */
-  clubeVip: { grupo: "https://chat.whatsapp.com/JXfjoL9JCZBL35Au8XWuel", abertura: "" },
+  clubeVip: { grupo: "https://chat.whatsapp.com/JXfjoL9JCZBL35Au8XWuel", abertura: "2026-11-14T19:00:00-03:00" },
 
   /* ── Preço exibido na oferta para quem cai na NeonPay no teste de checkout ── */
   ofertaNeon: {
