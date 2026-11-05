@@ -1,0 +1,228 @@
+/* ==========================================================================
+   Clube Dark Viral — página do grupo VIP (/clube-vip)
+   ========================================================================== */
+
+.vip {
+  --roxo: #c084fc;
+  --roxo-forte: #a855f7;
+  --roxo-fundo: #150c20;
+  --roxo-linha: rgba(168, 85, 247, .32);
+  background: #0a0612;
+  color: var(--text);
+}
+.vip .cookie .btn--primary { background: var(--roxo); color: #12041f; box-shadow: none; }
+
+.vip-wrap { width: 100%; max-width: 560px; margin: 0 auto; padding: 0 20px; }
+.vip .hl { color: var(--roxo); }
+.vip h1, .vip h2 { margin: 0; font-weight: 800; letter-spacing: -.01em; text-wrap: balance; }
+.vip h1 { font-size: clamp(27px, 7.4vw, 38px); line-height: 1.16; }
+.vip h2 { font-size: clamp(23px, 6vw, 30px); line-height: 1.2; text-align: center; }
+
+/* Contagem */
+.vip-timer {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: linear-gradient(90deg, #7e22ce, #c026d3);
+  color: #fff;
+}
+.vip-timer[hidden] { display: none; }
+.vip-timer__label { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.vip-timer__unit { display: grid; min-width: 40px; padding: 4px 2px; border-radius: 8px; background: #12041f; text-align: center; }
+.vip-timer__unit strong { font-size: 16px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.vip-timer__unit small { color: #d8b4fe; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+
+/* Topo */
+.vip-hero {
+  background: radial-gradient(90% 300px at 50% 90px, rgba(126, 34, 206, .3), transparent 75%);
+  text-align: center;
+}
+/* A arte some aos poucos no fundo da página, sem linha de corte */
+.vip-hero__art {
+  display: block;
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+  margin: 0 auto;
+  -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+}
+.vip-pill {
+  display: inline-block;
+  position: relative;
+  margin: -6px 0 14px;
+  padding: 6px 14px;
+  border: 1px solid var(--roxo-linha);
+  border-radius: 999px;
+  background: rgba(168, 85, 247, .12);
+  color: #e9d5ff;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.vip-lead { margin: 14px 0 22px; color: #d4d4d4; font-size: 16.5px; line-height: 1.5; }
+.vip-lead strong { color: #fff; }
+
+/* Botão */
+.vip-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 58px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--roxo);
+  box-shadow: 0 14px 34px -12px rgba(168, 85, 247, .85);
+  color: #12041f;
+  font-size: 16.5px;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .2s var(--ease), background .2s;
+}
+.vip-cta:active { transform: scale(.98); }
+.vip-cta svg { flex: none; width: 22px; height: 22px; fill: currentColor; }
+.vip-cta:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.vip-section { margin-top: 56px; }
+
+/* Nichos: passam sozinhos e também podem ser arrastados */
+.vip-niches {
+  margin-top: 22px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.vip-niches::-webkit-scrollbar { display: none; }
+.vip-niches__track { display: flex; gap: 12px; width: max-content; padding: 2px 20px; }
+
+/* Cards no modelo de perfil do Instagram */
+.vip-perfil {
+  flex: none;
+  width: 300px;
+  padding: 12px 14px 16px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 18px;
+  background: #000;
+}
+.vip-perfil p { margin: 0; }
+.vip-perfil__top { padding-bottom: 12px; color: #fff; font-size: 14px; font-weight: 800; text-align: center; }
+.vip-perfil__head { display: flex; align-items: center; gap: 14px; }
+.vip-perfil__head img { flex: none; width: 76px; height: 76px; border-radius: 50%; object-fit: cover; }
+.vip-perfil__head > div { flex: 1; min-width: 0; }
+.vip-perfil__handle { color: #fff; font-size: 13.5px; font-weight: 700; overflow-wrap: anywhere; }
+.vip-perfil dl { display: flex; justify-content: space-between; gap: 6px; margin: 6px 0 0; }
+.vip-perfil dl div { display: grid; }
+.vip-perfil dd { margin: 0; color: #fff; font-size: 14px; font-weight: 800; white-space: nowrap; }
+.vip-perfil dt { order: 1; color: #d4d4d4; font-size: 11.5px; }
+.vip-perfil__bio { display: grid; gap: 2px; margin-top: 12px; color: #f5f5f4; font-size: 13px; line-height: 1.35; }
+.vip-perfil__bio strong { font-size: 13.5px; font-weight: 800; }
+.vip-perfil__bio em { color: #a3a3a3; font-style: normal; }
+
+/* O que tem no Clube */
+.vip-list { display: grid; gap: 12px; margin: 22px 0 0; padding: 0; list-style: none; }
+.vip-list li { padding: 16px; border: 1px solid var(--roxo-linha); border-radius: 16px; background: var(--roxo-fundo); }
+.vip-list__tag { color: var(--roxo); font-size: 11.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.vip-list strong { display: block; margin-top: 4px; font-size: 17px; font-weight: 800; }
+.vip-list p { margin: 4px 0 0; color: #c9c9c9; font-size: 14.5px; line-height: 1.45; }
+
+.vip-price {
+  display: grid;
+  gap: 4px;
+  margin-top: 20px;
+  padding: 22px 18px;
+  border: 1px solid rgba(192, 132, 252, .65);
+  border-radius: 18px;
+  background: linear-gradient(170deg, #2a1040, #120a1c);
+  text-align: center;
+}
+.vip-price p { margin: 0; color: #e9d5ff; font-size: 14px; font-weight: 700; }
+.vip-price strong { color: var(--roxo); font-size: 38px; font-weight: 800; line-height: 1.15; }
+.vip-price span { margin-bottom: 14px; color: #c9c9c9; font-size: 14px; }
+
+/* Quem é */
+.vip-about { display: flex; align-items: flex-start; gap: 14px; }
+.vip-about img { flex: none; width: 72px; height: 72px; border: 2px solid var(--roxo-forte); border-radius: 50%; object-fit: cover; }
+.vip .vip-about h2 { font-size: 21px; text-align: left; }
+.vip-about p { margin: 8px 0 0; color: #d4d4d4; font-size: 15px; line-height: 1.5; }
+
+/* Perguntas */
+.vip-faq { display: grid; gap: 10px; margin-top: 22px; }
+.vip-faq details { border: 1px solid var(--line-2); border-radius: 14px; background: #110b19; }
+.vip-faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  padding: 12px 16px;
+  font-size: 15.5px;
+  font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+}
+.vip-faq summary::-webkit-details-marker { display: none; }
+.vip-faq summary::after { content: "+"; flex: none; color: var(--roxo); font-size: 22px; font-weight: 700; line-height: 1; }
+.vip-faq details[open] summary::after { content: "–"; }
+.vip-faq p { margin: 0; padding: 0 16px 14px; color: #c9c9c9; font-size: 14.5px; line-height: 1.5; }
+
+.vip-final h2 { margin-bottom: 18px; }
+
+.vip-footer { margin-top: 48px; padding: 20px; border-top: 1px solid var(--line); color: var(--dim); font-size: 12.5px; text-align: center; }
+.vip-footer p { margin: 0; }
+.vip-footer a { color: var(--muted); }
+
+/* Brilho dos cards: luz roxa em volta e um reflexo que passa de tempos em tempos */
+.vip-niches { margin-top: 4px; }
+.vip-niches__track { padding: 18px 20px 28px; }
+.vip-perfil, .vip-list li, .vip-price {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(192, 132, 252, .5);
+  box-shadow: 0 0 22px -4px rgba(168, 85, 247, .55), inset 0 0 26px -14px rgba(192, 132, 252, .55);
+}
+.vip-price { box-shadow: 0 0 36px -4px rgba(168, 85, 247, .7), inset 0 0 34px -14px rgba(192, 132, 252, .7); }
+.vip-perfil::after, .vip-list li::after, .vip-price::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(105deg, transparent, rgba(233, 213, 255, .16), transparent);
+  pointer-events: none;
+  transform: translateX(-120%);
+  animation: vip-reflexo 5.5s var(--ease) infinite;
+}
+.vip-perfil:nth-child(even)::after, .vip-list li:nth-child(2)::after { animation-delay: 1.2s; }
+.vip-list li:nth-child(3)::after { animation-delay: 2.4s; }
+.vip-price::after { animation-delay: 3.2s; }
+@keyframes vip-reflexo {
+  0%, 55% { transform: translateX(-120%); }
+  100% { transform: translateX(340%); }
+}
+
+@media (min-width: 760px) {
+  /* No computador a arte não ocupa a tela toda: as laterais também somem no fundo */
+  .vip-hero__art {
+    -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+    mask-image: linear-gradient(180deg, #000 78%, transparent 100%), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vip-perfil::after, .vip-list li::after, .vip-price::after { display: none; }
+}
+
+@media (hover: hover) {
+  .vip-cta:hover { background: #d8b4fe; }
+}

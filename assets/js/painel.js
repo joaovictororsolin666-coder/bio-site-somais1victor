@@ -518,7 +518,7 @@
 
   // Cliques nas indicações da bio (contagem anônima; comissões ficam na plataforma de afiliado)
   function renderCliques() {
-    var nomes = { mpr: "Método Primeira Renda", sombra: "Sombra Viral" };
+    var nomes = { mpr: "Método Primeira Renda", sombra: "Sombra Viral", clube_grupo: "Grupo VIP do Clube" };
     function conta(list, k) { return list.filter(function (o) { return o.alvo === k; }).length; }
     $("#cliques-bio").innerHTML = "<thead><tr><th>Botão</th><th>Cliques</th><th>Período anterior</th></tr></thead><tbody>" +
       Object.keys(nomes).map(function (k) {
