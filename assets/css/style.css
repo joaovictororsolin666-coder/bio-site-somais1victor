@@ -251,6 +251,11 @@ a { color: inherit; }
 .card--dark .card__title { font-size: 25px; }
 .card__desc { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
 .card__cta { margin-top: auto; padding-top: 22px; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* Clube: sem título visível (o nome já está na arte), subtítulo em destaque e card mais baixo */
+.card--dark .card__body { padding-top: 18px; }
+.card--dark .card__desc { margin: 0; color: #f5f5f4; font-size: 15px; font-weight: 600; line-height: 1.45; text-wrap: balance; }
+.card--dark .card__cta { padding-top: 16px; }
 
 /* ───────────── Botões ───────────── */
 
