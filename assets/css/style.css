@@ -184,7 +184,7 @@ a { color: inherit; }
 }
 .card--featured .card__media { aspect-ratio: 50 / 21; } /* mesma proporção do banner (1200×504) */
 .card--premium .card__media { aspect-ratio: 16 / 7; }
-.card--dark .card__media { aspect-ratio: 853 / 354; } /* mesma proporção do banner (853×354) */
+.card--dark .card__media { aspect-ratio: 2 / 1; } /* mesma proporção do banner (1200×600) */
 .card__media picture { display: block; width: 100%; height: 100%; }
 .card__media img,
 .ph {

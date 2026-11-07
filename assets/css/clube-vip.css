@@ -49,8 +49,8 @@
   max-width: 900px;
   height: auto;
   margin: 0 auto;
-  -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 86%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 86%, transparent 100%);
 }
 .vip-pill {
   display: inline-block;
@@ -212,8 +212,8 @@
 @media (min-width: 760px) {
   /* No computador a arte não ocupa a tela toda: as laterais também somem no fundo */
   .vip-hero__art {
-    -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
-    mask-image: linear-gradient(180deg, #000 78%, transparent 100%), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+    -webkit-mask-image: linear-gradient(180deg, #000 86%, transparent 100%), linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(180deg, #000 86%, transparent 100%), linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
     -webkit-mask-composite: source-in;
     mask-composite: intersect;
   }
