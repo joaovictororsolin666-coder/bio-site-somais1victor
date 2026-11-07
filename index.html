@@ -71,19 +71,18 @@
     <!-- ─────────── Ofertas ─────────── -->
     <section class="offers" aria-label="Como posso te ajudar">
 
-      <!-- Card 01 — Método Primeira Renda (destaque principal) -->
-      <article class="card card--featured reveal" style="--i:5" data-card>
+      <!-- Card 01 — Método Primeira Renda -->
+      <article class="card card--featured reveal" style="--i:4" data-card>
         <div class="card__media">
           <!-- Banner: proporção 1200×504. Para trocar, substitua mpr-800.webp e mpr-1200.webp -->
           <img src="assets/img/mpr-1200.webp"
                srcset="assets/img/mpr-800.webp 800w, assets/img/mpr-1200.webp 1200w"
                sizes="(min-width: 900px) 520px, calc(100vw - 34px)"
                alt="Método Primeira Renda: aprenda a vender produtos na internet usando vídeos simples, sem precisar aparecer"
-               width="1200" height="504" decoding="async">
+               width="1200" height="504" fetchpriority="high" decoding="async">
         </div>
 
         <div class="card__body">
-          <span class="card__eyebrow">01 · Comece por aqui</span>
           <h2 class="card__title">Método Primeira Renda</h2>
           <p class="card__desc">Aprenda a vender produtos digitais utilizando vídeos simples, sem precisar aparecer.</p>
           <div class="card__cta">
@@ -96,7 +95,31 @@
         </div>
       </article>
 
-      <!-- Card 02 — Mentoria de Criação de Conteúdo -->
+      <!-- Card 02 — Clube Dark Viral -->
+      <article class="card card--dark reveal" style="--i:5" data-card>
+        <div class="card__media">
+          <!-- Banner: proporção 2:1 (1200×600). Para trocar, substitua clube-card-800.webp e clube-card-1200.webp -->
+          <img src="assets/img/clube-card-1200.webp"
+               srcset="assets/img/clube-card-800.webp 800w, assets/img/clube-card-1200.webp 1200w"
+               sizes="(min-width: 900px) 970px, calc(100vw - 34px)"
+               alt="Clube Dark Viral (CDV)"
+               width="1200" height="600" decoding="async">
+        </div>
+
+        <div class="card__body">
+          <h2 class="card__title">Clube Dark Viral</h2>
+          <p class="card__desc">A comunidade para quem quer monetizar páginas dark, de cortes e com inteligência artificial, sem precisar aparecer.</p>
+          <div class="card__cta">
+            <!-- O link é definido em assets/js/config.js → links.clubeDarkViral -->
+            <a class="btn btn--dark" href="#" data-link="clubeDarkViral" data-track="clubeClick" data-clique="clube" data-card-action>
+              <span class="btn__label">QUERO ENTRAR NO CLUBE</span>
+              <svg class="btn__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 03 — Mentoria de Criação de Conteúdo -->
       <!-- Em stand-by: para voltar, tire o atributo hidden -->
       <article class="card card--premium reveal" style="--i:6" data-card hidden>
         <div class="card__media">
@@ -114,7 +137,7 @@
         </div>
 
         <div class="card__body">
-          <span class="card__eyebrow">02 · Acompanhamento personalizado</span>
+          <span class="card__eyebrow">03 · Acompanhamento personalizado</span>
           <h2 class="card__title">Mentoria de Criação de Conteúdo</h2>
           <p class="card__desc">Tenha uma estratégia personalizada para melhorar seus conteúdos, aumentar seu alcance e fortalecer seu posicionamento nas redes sociais.</p>
           <div class="card__cta">
