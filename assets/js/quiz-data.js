@@ -104,14 +104,16 @@ window.QUIZ_DATA = {
       // Pergunta de crença + tela de "virada" logo depois (insight)
       key: 'crenca',
       title: 'Na sua opinião, o que é preciso para fazer a primeira venda na internet?',
+      // "virada": completa o título da tela seguinte ("Para começar, você não precisa ...")
       options: [
-        { emoji: '👥', label: 'Ter muitos seguidores' },
-        { emoji: '🎥', label: 'Aparecer nos vídeos' },
-        { emoji: '💰', label: 'Investir em anúncios' },
-        { emoji: '📦', label: 'Ter um produto próprio' }
+        { emoji: '👥', label: 'Ter muitos seguidores', virada: 'ter muitos seguidores' },
+        { emoji: '🎥', label: 'Aparecer nos vídeos', virada: 'aparecer nos vídeos' },
+        { emoji: '💰', label: 'Investir em anúncios', virada: 'investir em anúncios' },
+        { emoji: '📦', label: 'Ter um produto próprio', virada: 'ter um produto próprio' }
       ],
       insight: {
         badge: '💡 A verdade é que…',
+        // Título usado só se a resposta não tiver "virada"
         title: 'Para começar, você <span class="hl">não precisa</span> do que a maioria pensa.',
         text: 'No Método Primeira Renda você aprende a vender produtos digitais usando <strong>perfis dark e cortes de vídeos</strong>, mesmo começando do zero.',
         points: [

@@ -424,13 +424,19 @@
     // Tela de virada depois de uma pergunta de crença
     insight: function (i) {
       var q = Q[i], s = q.insight, chosen = state.answers[q.key];
-      var picked = chosen != null && q.options[chosen] ? q.options[chosen].label : "";
+      var opt = chosen != null ? q.options[chosen] : null;
+      var virada = opt && opt.virada;
+      var picked = opt ? opt.label : "";
+      // Com "virada", a própria resposta vira o título e sai da lista (tela mais curta, botão sem rolar)
+      var title = virada ? 'Para começar, você <span class="hl">não precisa ' + virada + "</span>." : s.title;
+      var points = virada ? s.points.filter(function (p) { return p.toLowerCase().indexOf(virada.toLowerCase()) < 0; }) : s.points;
+      if (virada && points.length === s.points.length) points = points.slice(1); // mantém a lista com no máximo 3 itens
       return '<section class="qz-screen qz-center qz-insight">' +
-        (picked ? '<p class="qz-insight__you">Você respondeu: <strong>' + picked + "</strong></p>" : "") +
+        (picked && !virada ? '<p class="qz-insight__you">Você respondeu: <strong>' + picked + "</strong></p>" : "") +
         '<p class="qz-insight__badge">' + s.badge + "</p>" +
-        '<h1 class="qz-title">' + s.title + "</h1>" +
+        '<h1 class="qz-title">' + title + "</h1>" +
         '<p class="qz-text">' + s.text + "</p>" +
-        '<ul class="qz-insight__list">' + s.points.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul>" +
+        '<ul class="qz-insight__list">' + points.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul>" +
         cta(s.cta) +
         "</section>";
     },
