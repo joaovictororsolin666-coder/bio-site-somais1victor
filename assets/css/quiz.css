@@ -574,3 +574,12 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-footer { position: relative; z-index: 1; padding: 20px 16px calc(28px + env(safe-area-inset-bottom)); color: var(--dim); font-size: 12px; text-align: center; }
 .qz-footer p { margin: 0; }
 .qz-footer a { color: var(--muted); text-decoration: none; }
+
+/* Tela inicial em celulares de tela baixa: espaços menores para o botão de começar aparecer sem rolar */
+@media (max-height: 760px) {
+  .qz-is-intro .qz-main { padding-top: 14px; }
+  .qz-is-intro .qz-tagline { margin-top: 12px; }
+  .qz-is-intro .qz-media { margin-top: 14px; }
+  .qz-is-intro .qz-text { margin-top: 12px; font-size: 15px; line-height: 1.5; }
+  .qz-is-intro .qz-cta { margin-top: 16px; }
+}

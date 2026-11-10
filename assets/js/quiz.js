@@ -17,6 +17,7 @@
   var bar = $(".qz-progress__bar");
   var progress = $(".qz-progress");
   var backBtn = $("[data-back]");
+  var header = $(".qz-header");
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var Q = D.questions;
@@ -635,6 +636,9 @@
     bar.style.width = Math.max(pct, 4) + "%";
     progress.setAttribute("aria-valuenow", pct);
     backBtn.hidden = !!NO_BACK[name] || step === 0;
+    // Na tela inicial a barra de progresso some, para o botão de começar aparecer sem rolar em celulares menores
+    if (header) header.style.display = name === "intro" ? "none" : "";
+    document.body.classList.toggle("qz-is-intro", name === "intro");
 
     if (animate && !reduceMotion && app.firstElementChild) {
       app.firstElementChild.classList.add("is-out");
