@@ -23,10 +23,13 @@ window.SITE_CONFIG = {
     // utm_term recebe o botão clicado: oferta ou garantia. "src" identifica o quiz nos relatórios de vendas.
     checkoutUtms: { utm_campaign: "mpr", utm_content: "funil_quiz_kiwify", src: "quiz_mpr" },
 
-    // Teste de checkout do quiz: "neon" é a parte dos visitantes sorteada para a NeonPay (0.5 = metade).
-    // Para encerrar o teste, coloque ativo: false e todos voltam para checkoutMPR.
+    // Checkout do quiz por país (desde 10/11): quem está no Brasil vai para a NeonPay (Pix, paga na hora)
+    // e quem está fora vai para a Kiwify (cobra em outras moedas). O país vem do fuso horário do celular.
+    // Para voltar ao sorteio, troque modo: "pais" por modo: "sorteio" ("neon" = parte sorteada para a NeonPay).
+    // Para desligar, coloque ativo: false e todos voltam para checkoutMPR (Kiwify).
     testeCheckout: {
       ativo: true,
+      modo: "pais",
       neon: 0.5,
       link: "https://checkout.neonpay.com.br/checkout/cmv6sesvu022k01of5d632afj?offer=VNOV5FS",
       utms: { utm_campaign: "mpr", utm_content: "funil_quiz_neonpay", src: "quiz_mpr" }

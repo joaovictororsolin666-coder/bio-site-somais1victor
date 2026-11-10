@@ -122,7 +122,17 @@
       '<span class="btn__label">' + label + "</span>" + ARROW + "</button>";
   }
 
-  // Teste de checkout: cada visitante é sorteado uma vez e fica sempre no mesmo lado ("kiwify" ou "neon")
+  // Fusos horários do Brasil: quem está em um deles paga na NeonPay; o resto do mundo, na Kiwify
+  var FUSOS_BR = /^America\/(Sao_Paulo|Rio_Branco|Manaus|Cuiaba|Campo_Grande|Porto_Velho|Boa_Vista|Belem|Fortaleza|Recife|Maceio|Bahia|Araguaina|Santarem|Noronha|Eirunepe)$/;
+  function estaNoBrasil() {
+    var fuso = "";
+    try { fuso = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) { /* sem fuso: decide pelo idioma */ }
+    if (fuso) return FUSOS_BR.test(fuso) || fuso === "Brazil/East" || fuso === "Brazil/West";
+    return /^pt-BR$/i.test(navigator.language || "pt-BR");
+  }
+
+  // Checkout do quiz: por país (Brasil → Neon, exterior → Kiwify) ou, no modo "sorteio",
+  // cada visitante é sorteado uma vez e fica sempre no mesmo lado ("kiwify" ou "neon")
   var ladoSorteado = null;
   function ladoCheckout() {
     var t = (CFG.links || {}).testeCheckout;
@@ -130,6 +140,7 @@
     if (ladoSorteado) return ladoSorteado;
     var forcado = /[?&]ck=(kiwify|neon)\b/.exec(location.search); // só para conferir cada lado
     if (forcado) return (ladoSorteado = forcado[1]);
+    if (t.modo === "pais") return (ladoSorteado = estaNoBrasil() ? "neon" : "kiwify");
     var guardado = "";
     try { guardado = localStorage.getItem("vg_ck") || ""; } catch (e) { /* sem storage: sorteia nesta visita */ }
     ladoSorteado = guardado === "kiwify" || guardado === "neon" ? guardado : (Math.random() < t.neon ? "neon" : "kiwify");
