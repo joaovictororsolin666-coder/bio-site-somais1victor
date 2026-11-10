@@ -118,6 +118,41 @@
 
   var ARROW = '<svg class="btn__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
+  // Animações leves dos blocos da oferta (SVG + CSS, sem imagem nem biblioteca)
+  var ANIM = {
+    celular:
+      '<svg viewBox="0 0 120 120">' +
+        '<g class="a-float">' +
+          '<rect class="a-body" x="34" y="6" width="52" height="108" rx="11"/>' +
+          '<rect class="a-screen" x="39" y="16" width="42" height="90" rx="5"/>' +
+          '<rect class="a-notch" x="53" y="10" width="14" height="3" rx="1.5"/>' +
+          '<g class="a-notif"><rect x="42" y="22" width="36" height="15" rx="4"/><circle cx="49" cy="29.5" r="3.2"/><rect class="a-txt" x="55" y="26" width="19" height="3" rx="1.5"/><rect class="a-txt" x="55" y="31" width="12" height="3" rx="1.5"/></g>' +
+          '<g class="a-notif a-notif--2"><rect x="42" y="41" width="36" height="15" rx="4"/><circle cx="49" cy="48.5" r="3.2"/><rect class="a-txt" x="55" y="45" width="19" height="3" rx="1.5"/><rect class="a-txt" x="55" y="50" width="12" height="3" rx="1.5"/></g>' +
+          '<polyline class="a-line" points="44,96 52,88 59,91 67,80 76,72"/>' +
+        "</g>" +
+      "</svg>",
+    estrategia:
+      '<svg viewBox="0 0 120 120">' +
+        '<g class="a-float">' +
+          '<rect class="a-body" x="26" y="10" width="68" height="100" rx="9"/>' +
+          '<rect class="a-tab" x="46" y="5" width="28" height="10" rx="4"/>' +
+          '<g class="a-row"><rect class="a-box" x="36" y="30" width="13" height="13" rx="3"/><path class="a-check" d="M39 36.5l3 3 5-6"/><rect class="a-txt" x="55" y="32" width="28" height="4" rx="2"/><rect class="a-txt a-txt--dim" x="55" y="39" width="18" height="3" rx="1.5"/></g>' +
+          '<g class="a-row a-row--2"><rect class="a-box" x="36" y="56" width="13" height="13" rx="3"/><path class="a-check" d="M39 62.5l3 3 5-6"/><rect class="a-txt" x="55" y="58" width="28" height="4" rx="2"/><rect class="a-txt a-txt--dim" x="55" y="65" width="18" height="3" rx="1.5"/></g>' +
+          '<g class="a-row a-row--3"><rect class="a-box" x="36" y="82" width="13" height="13" rx="3"/><path class="a-check" d="M39 88.5l3 3 5-6"/><rect class="a-txt" x="55" y="84" width="28" height="4" rx="2"/><rect class="a-txt a-txt--dim" x="55" y="91" width="18" height="3" rx="1.5"/></g>' +
+        "</g>" +
+      "</svg>",
+    vendas:
+      '<svg viewBox="0 0 120 120">' +
+        '<path class="a-axis" d="M18 102h86"/>' +
+        '<rect class="a-bar" x="24" y="72" width="16" height="30" rx="3"/>' +
+        '<rect class="a-bar a-bar--2" x="46" y="58" width="16" height="44" rx="3"/>' +
+        '<rect class="a-bar a-bar--3" x="68" y="40" width="16" height="62" rx="3"/>' +
+        '<polyline class="a-trend" points="22,66 46,50 64,54 94,24"/>' +
+        '<path class="a-arrow" d="M84 22l11 1-2 11"/>' +
+        '<g class="a-coin"><circle cx="98" cy="62" r="11"/><text x="98" y="66.5">$</text></g>' +
+      "</svg>"
+  };
+
   function cta(label, attrs, extraCls) {
     return '<button class="btn btn--primary btn--pulse qz-cta ' + (extraCls || "") + '" type="button" ' + (attrs || "data-next") + '>' +
       '<span class="btn__label">' + label + "</span>" + ARROW + "</button>";
@@ -547,6 +582,10 @@
         planHtml +
 
         '<div class="qz-pillars">' + s.pillars.map(function (p) {
+          if (p.anim && ANIM[p.anim]) {
+            return '<div class="qz-pillar qz-pillar--anim"><span class="qz-anim qz-anim--' + p.anim + '" aria-hidden="true">' + ANIM[p.anim] + "</span>" +
+              "<div><h2>" + p.title + "</h2><p>" + p.text + "</p></div></div>";
+          }
           return '<div class="qz-pillar"><span class="qz-pillar__icon" aria-hidden="true">' + p.emoji + "</span>" +
             "<div><h2>" + p.title + "</h2><p>" + p.text + "</p></div></div>";
         }).join('<div class="qz-pillar-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15M5 12l7 7 7-7"/></svg></div>') + "</div>" +

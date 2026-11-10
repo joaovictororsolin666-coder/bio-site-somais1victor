@@ -253,9 +253,10 @@ window.QUIZ_DATA = {
       ]
     },
     pillars: [
-      { emoji: '📱', title: 'Comece do zero usando apenas o celular', text: 'Aprenda a vender produtos digitais, mesmo sem experiência, seguidores ou precisar aparecer.' },
-      { emoji: '🧩', title: 'Use estratégias prontas', text: 'Acesse conteúdos e estratégias prontas para adaptar e colocar em prática.' },
-      { emoji: '🤖', title: 'Estruture suas vendas', text: 'Ative nosso Sistema de Vendas para atrair compradores e fazer vendas todos os dias.' }
+      // anim: animação leve no lugar do emoji ("celular", "estrategia" ou "vendas"); sem anim, mostra o emoji
+      { emoji: '📱', anim: 'celular', title: 'Comece do zero usando apenas o celular', text: 'Aprenda a vender produtos digitais, mesmo sem experiência, seguidores ou precisar aparecer.' },
+      { emoji: '🧩', anim: 'estrategia', title: 'Use estratégias prontas', text: 'Acesse conteúdos e estratégias prontas para adaptar e colocar em prática.' },
+      { emoji: '🤖', anim: 'vendas', title: 'Estruture suas vendas', text: 'Ative nosso Sistema de Vendas para atrair compradores e fazer vendas todos os dias.' }
     ],
     proofTitle: 'Veja os resultados de quem decidiu colocar o método em prática! 🚀',
     proofs: [

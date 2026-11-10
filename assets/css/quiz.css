@@ -583,3 +583,64 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
   .qz-is-intro .qz-text { margin-top: 12px; font-size: 15px; line-height: 1.5; }
   .qz-is-intro .qz-cta { margin-top: 16px; }
 }
+
+/* Blocos da oferta com animação: desenho no topo, card maior e centralizado */
+.qz-pillar--anim { flex-direction: column; align-items: center; gap: 10px; padding: 22px 18px 20px; text-align: center; }
+.qz-pillar--anim h2 { font-size: 15px; }
+.qz-pillar--anim p { font-size: 15px; }
+.qz-anim {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  border: 1px solid rgba(57, 229, 140, .28);
+  border-radius: 24px;
+  background: radial-gradient(70% 70% at 50% 35%, rgba(57, 229, 140, .2), rgba(57, 229, 140, .04) 70%), #0b120e;
+  box-shadow: 0 10px 30px -14px rgba(57, 229, 140, .55);
+}
+.qz-anim svg { width: 96px; height: 96px; overflow: visible; }
+.qz-anim .a-body { fill: #0f1a14; stroke: var(--green); stroke-width: 2.5; }
+.qz-anim .a-screen { fill: #06100a; }
+.qz-anim .a-notch, .qz-anim .a-tab { fill: var(--green); }
+.qz-anim .a-txt { fill: #d6fbe7; }
+.qz-anim .a-txt--dim { fill: rgba(214, 251, 231, .45); }
+.qz-anim .a-float { animation: qza-float 4s ease-in-out infinite; }
+
+/* Celular: notificações de venda chegando e gráfico subindo */
+.qz-anim .a-notif rect:first-child { fill: rgba(57, 229, 140, .2); stroke: var(--green); stroke-width: 1; }
+.qz-anim .a-notif circle { fill: var(--green); }
+.qz-anim .a-notif { opacity: 0; animation: qza-notif 4s ease-out infinite; }
+.qz-anim .a-notif--2 { animation-delay: .9s; }
+.qz-anim .a-line { fill: none; stroke: var(--green); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 48; stroke-dashoffset: 48; animation: qza-draw 4s ease-out infinite 1.5s; }
+
+/* Estratégias: lista que vai sendo marcada */
+.qz-anim .a-box { fill: none; stroke: rgba(57, 229, 140, .6); stroke-width: 1.6; }
+.qz-anim .a-check { fill: none; stroke: var(--green); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 14; stroke-dashoffset: 14; animation: qza-check 4.5s ease-out infinite; }
+.qz-anim .a-row--2 .a-check { animation-delay: .7s; }
+.qz-anim .a-row--3 .a-check { animation-delay: 1.4s; }
+
+/* Vendas: barras crescendo, linha de tendência e moeda */
+.qz-anim .a-axis { stroke: rgba(214, 251, 231, .35); stroke-width: 2; stroke-linecap: round; }
+.qz-anim .a-bar { fill: rgba(57, 229, 140, .85); transform-box: fill-box; transform-origin: bottom; animation: qza-grow 4s ease-out infinite; }
+.qz-anim .a-bar--2 { animation-delay: .25s; }
+.qz-anim .a-bar--3 { animation-delay: .5s; }
+.qz-anim .a-trend { fill: none; stroke: #d6fbe7; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 90; stroke-dashoffset: 90; animation: qza-draw 4s ease-out infinite .8s; }
+.qz-anim .a-arrow { fill: none; stroke: #d6fbe7; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; animation: qza-show 4s ease-out infinite .8s; }
+.qz-anim .a-coin circle { fill: #facc15; stroke: #a16207; stroke-width: 1.5; }
+.qz-anim .a-coin text { fill: #713f12; font: 800 13px/1 sans-serif; text-anchor: middle; }
+.qz-anim .a-coin { animation: qza-coin 2.4s ease-in-out infinite; }
+
+@keyframes qza-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes qza-notif { 0% { opacity: 0; transform: translateY(-6px); } 10%, 70% { opacity: 1; transform: none; } 85%, 100% { opacity: 0; transform: none; } }
+@keyframes qza-draw { 0% { stroke-dashoffset: var(--d, 90); } 35%, 80% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes qza-check { 0%, 8% { stroke-dashoffset: 14; } 20%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 14; } }
+@keyframes qza-grow { 0% { transform: scaleY(.15); } 30%, 85% { transform: scaleY(1); } 100% { transform: scaleY(.15); } }
+@keyframes qza-show { 0%, 30% { opacity: 0; } 40%, 80% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes qza-coin { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.qz-anim .a-line { --d: 48; }
+
+@media (prefers-reduced-motion: reduce) {
+  .qz-anim * { animation: none !important; }
+  .qz-anim .a-notif, .qz-anim .a-arrow { opacity: 1; }
+  .qz-anim .a-line, .qz-anim .a-trend, .qz-anim .a-check { stroke-dashoffset: 0; }
+}
