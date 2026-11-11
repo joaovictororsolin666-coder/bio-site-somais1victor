@@ -160,11 +160,18 @@
 
   // Fusos horários do Brasil: quem está em um deles paga na NeonPay; o resto do mundo, na Kiwify
   var FUSOS_BR = /^America\/(Sao_Paulo|Rio_Branco|Manaus|Cuiaba|Campo_Grande|Porto_Velho|Boa_Vista|Belem|Fortaleza|Recife|Maceio|Bahia|Araguaina|Santarem|Noronha|Eirunepe)$/;
+  // Vai para a Neon se o fuso OU o idioma do aparelho for do Brasil.
+  // A Kiwify fica só para quem tem os dois de fora (alguns navegadores, como o do Instagram, informam um fuso genérico).
+  var sinalPais = { fuso: "", idioma: "" };
   function estaNoBrasil() {
-    var fuso = "";
-    try { fuso = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) { /* sem fuso: decide pelo idioma */ }
-    if (fuso) return FUSOS_BR.test(fuso) || fuso === "Brazil/East" || fuso === "Brazil/West";
-    return /^pt-BR$/i.test(navigator.language || "pt-BR");
+    try { sinalPais.fuso = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) { /* sem fuso */ }
+    var idiomas = [];
+    try { idiomas = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""]).slice(0, 3); } catch (e) { /* sem idioma */ }
+    sinalPais.idioma = idiomas.join(",");
+    var fusoBR = FUSOS_BR.test(sinalPais.fuso) || /^Brazil\//.test(sinalPais.fuso);
+    var idiomaBR = idiomas.some(function (l) { return /^pt-BR$/i.test(l); });
+    if (!sinalPais.fuso && !sinalPais.idioma) return true; // sem nenhum sinal: a maioria do público é do Brasil
+    return fusoBR || idiomaBR;
   }
 
   // Checkout do quiz: por país (Brasil → Neon, exterior → Kiwify) ou, no modo "sorteio",
@@ -851,7 +858,12 @@
       completedTracked = true;
       VG.track("quizComplete", { meta_escolhida: answerOf("meta") || "" });
     }
-    if (ladoCheckout()) Journey.answer("checkout_teste", ladoCheckout());
+    if (ladoCheckout()) {
+      Journey.answer("checkout_teste", ladoCheckout());
+      // Para conferir no painel por que cada visitante foi para cada checkout
+      if (sinalPais.fuso) Journey.answer("checkout_fuso", sinalPais.fuso);
+      if (sinalPais.idioma) Journey.answer("checkout_idioma", sinalPais.idioma);
+    }
     Journey.flush();
     bindModules(root);
 
