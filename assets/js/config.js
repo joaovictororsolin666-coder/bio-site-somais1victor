@@ -78,7 +78,9 @@ window.SITE_CONFIG = {
   /* ── Rastreamento (fica desligado enquanto os IDs estiverem vazios) ── */
   tracking: {
     gaId: "",          // Google Analytics 4, ex.: "G-XXXXXXXXXX"
-    metaPixelId: "1708930687553103",   // Meta Pixel "Site MPR - Claude" (BM victor_orsolinofc), desde 11/11
+    // Meta Pixel desligado em 13/11 (sem campanha rodando; sem ID, o aviso de cookies também não aparece).
+    // Para religar quando voltar a anunciar: "1708930687553103" (Pixel "Site MPR - Claude", BM victor_orsolinofc)
+    metaPixelId: "",
 
     // true = só carrega GA/Pixel depois que o visitante aceitar os cookies (recomendado / LGPD)
     requireConsent: true,
