@@ -27,8 +27,9 @@ window.SITE_CONFIG = {
     // e quem está fora vai para a Kiwify (cobra em outras moedas). O país vem do fuso horário do celular.
     // Para voltar ao sorteio, troque modo: "pais" por modo: "sorteio" ("neon" = parte sorteada para a NeonPay).
     // Para desligar, coloque ativo: false e todos voltam para checkoutMPR (Kiwify).
+    // Desligado em 18/11: em 24h foram 47 cliques no checkout (38 na NeonPay) e só 1 venda; todos vão para a Kiwify.
     testeCheckout: {
-      ativo: true,
+      ativo: false,
       modo: "pais",
       neon: 0.5,
       link: "https://checkout.neonpay.com.br/checkout/cmv6sesvu022k01of5d632afj?offer=VNOV5FS",
