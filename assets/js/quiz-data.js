@@ -109,7 +109,8 @@ window.QUIZ_DATA = {
         { emoji: '👥', label: 'Ter muitos seguidores', virada: 'ter muitos seguidores' },
         { emoji: '🎥', label: 'Aparecer nos vídeos', virada: 'aparecer nos vídeos' },
         { emoji: '💰', label: 'Investir em anúncios', virada: 'investir em anúncios' },
-        { emoji: '📦', label: 'Ter um produto próprio', virada: 'ter um produto próprio' }
+        // Não dizer "não precisa ter um produto próprio": o conteúdo ensina a criar o produto com IA
+        { emoji: '📦', label: 'Ter um produto próprio', virada: 'saber criar um produto sozinho: a IA cria com você' }
       ],
       insight: {
         badge: '💡 A verdade é que…',
