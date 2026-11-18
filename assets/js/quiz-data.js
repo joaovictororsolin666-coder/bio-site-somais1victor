@@ -277,8 +277,7 @@ window.QUIZ_DATA = {
       title: 'Aqui está tudo o que você vai receber no <span class="hl">MPR</span>',
       subtitle: 'Sem precisar aparecer, pelo celular e de forma simples',
       bar: 'Área de membros · MPR',
-      introText: 'Tour pela área de membros',
-      logo: 'assets/img/quiz/logo-mpr.webp',
+      introText: 'Tour pela área de membros', // abertura só com o texto (sem logo, a pedido)
       alt: 'Prévia animada da área de membros do Método Primeira Renda, com as capas dos 10 módulos',
       covers: [
         'assets/img/quiz/modulo-01.webp', 'assets/img/quiz/modulo-02.webp', 'assets/img/quiz/modulo-03.webp',
