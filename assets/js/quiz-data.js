@@ -298,13 +298,7 @@ window.QUIZ_DATA = {
     // Deixa claro que é uma compra (muita gente achava que era grátis)
     payNote: 'Você vai para o pagamento seguro (Pix ou cartão). O acesso é liberado após a confirmação do pagamento.',
     trust: '🔒 Pagamento 100% seguro · 🔓 Acesso imediato',
-    // Linha logo abaixo do preço, pela objeção escolhida no quiz
-    objectionNotes: {
-      comeco: '🧭 Passo a passo do zero, aula por aula',
-      medo: '🛡️ Garantia de 7 dias: se não gostar, recebe 100% de volta',
-      tempo: '⏳ Comece pelo celular, no seu ritmo',
-      tentou: '🔁 Estratégias prontas para aplicar, sem tentativa e erro'
-    },
+    // Linha abaixo do preço pela objeção (objectionNotes: { comeco, medo, tempo, tentou }) removida em 18/11 a pedido
     guarantee: {
       image: { src: 'assets/img/quiz/garantia.webp', w: 480, h: 320, alt: 'Selo de garantia de 7 dias' },
       title: 'Garantia incondicional de 7 dias',
