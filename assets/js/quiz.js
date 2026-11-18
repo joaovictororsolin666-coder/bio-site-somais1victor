@@ -311,23 +311,47 @@
   // Oferta: bônus exclusivos (cards grandes) + bônus extras ("De R$ X por R$ 0"), antes do resumo e do preço
   function bonusSectionHtml(b) {
     if (!b) return "";
-    var cards = (b.items || []).map(function (it) {
-      return '<article class="qz-xb-card">' + img(it.image, "qz-xb-card__img") +
-        '<div class="qz-xb-card__body"><span class="qz-xb-card__tag">' + it.tag + "</span>" +
-        "<h3>" + it.title + "</h3>" + (it.text ? "<p>" + it.text + "</p>" : "") + "</div></article>";
-    }).join("");
-    var extras = (b.extras || []).map(function (it) {
+    // Linha compacta: miniatura + etiqueta + título (+ "De R$ X por R$ 0" nos extras)
+    var row = function (it) {
       return '<li class="qz-xb-extra">' +
         (it.image ? '<img src="' + it.image + '" alt="" width="56" height="56" loading="lazy" decoding="async">' : "") +
         '<div class="qz-xb-extra__body"><span class="qz-xb-card__tag">' + it.tag + "</span><strong>" + it.title + "</strong>" +
-        '<span class="qz-xb-extra__price">' + (it.de ? "De <s>" + it.de + "</s> por " : "") + "<b>" + (it.por || "R$ 0") + "</b></span></div></li>";
-    }).join("");
+        (it.de || it.por ? '<span class="qz-xb-extra__price">' + (it.de ? "De <s>" + it.de + "</s> por " : "") + "<b>" + (it.por || "R$ 0") + "</b></span>" : "") +
+        "</div></li>";
+    };
+    var cards = (b.items || []).map(row).join("");
+    var extras = (b.extras || []).map(row).join("");
     return '<div class="qz-xb">' +
       (b.eyebrow ? '<p class="qz-xb__eyebrow">' + b.eyebrow + "</p>" : "") +
       '<h2 class="qz-h2 qz-center">' + b.title + "</h2>" +
-      '<div class="qz-xb__cards">' + cards + "</div>" +
+      '<ul class="qz-xb__extras qz-xb__extras--main">' + cards + "</ul>" +
       (extras ? (b.extrasTitle ? '<p class="qz-xb__eyebrow qz-xb__eyebrow--gap">' + b.extrasTitle + "</p>" : "") +
         '<ul class="qz-xb__extras">' + extras + "</ul>" : "") +
+      "</div>";
+  }
+
+  // Oferta: "tudo o que você vai receber" com um mini vídeo animado da área de membros (capas dos módulos)
+  // e cards de destaque (não clicáveis), como na página de referência
+  function tourHtml(t) {
+    if (!t) return "";
+    var covers = (t.covers || []).map(function (c, i) {
+      return '<figure class="qz-tour__card"><img src="' + c + '" alt="" width="320" height="400" loading="lazy" decoding="async">' +
+        "<figcaption>Módulo " + (i + 1) + "</figcaption></figure>";
+    }).join("");
+    return '<div class="qz-tour">' +
+      (t.eyebrow ? '<p class="qz-xb__eyebrow">' + t.eyebrow + "</p>" : "") +
+      '<h2 class="qz-h2 qz-center">' + t.title + "</h2>" +
+      (t.subtitle ? '<p class="qz-tour__sub">' + t.subtitle + "</p>" : "") +
+      '<div class="qz-tour__screen" role="img" aria-label="' + (t.alt || "Prévia da área de membros com os módulos") + '">' +
+      '<div class="qz-tour__bar"><i></i><i></i><i></i><span>' + (t.bar || "Área de membros") + "</span></div>" +
+      '<div class="qz-tour__row"><div class="qz-tour__track">' + covers + covers + "</div></div>" +
+      '<div class="qz-tour__progress"><i></i></div>' +
+      '<div class="qz-tour__intro">' + (t.logo ? '<img src="' + t.logo + '" alt="" width="160" height="160" loading="lazy" decoding="async">' : "") +
+      "<p>" + (t.introText || "Tour pela área de membros") + "</p></div>" +
+      "</div>" +
+      (t.chips && t.chips.length ? '<ul class="qz-tour__chips">' + t.chips.map(function (c, i) {
+        return '<li' + (i === 0 || i === t.chips.length - 1 ? ' class="is-on"' : "") + ">" + c + "</li>";
+      }).join("") + "</ul>" : "") +
       "</div>";
   }
 
@@ -639,6 +663,8 @@
         }).join("") +
         "</div></div>" : "") +
 
+        tourHtml(s.tour) +
+
         bonusSectionHtml(s.bonusSection) +
 
         '<div class="qz-stack" id="qz-price">' +
@@ -654,7 +680,8 @@
           '<p class="qz-trust">' + s.trust + "</p>") +
         "</div>" +
 
-        modulesHtml(s.modules) +
+        // Com o "tour" no alto da oferta, o carrossel antigo de módulos não aparece mais aqui embaixo
+        (s.tour ? "" : modulesHtml(s.modules)) +
 
         '<div class="qz-guarantee">' + img(s.guarantee.image, "qz-guarantee__seal") +
         '<h2 class="qz-h2">' + s.guarantee.title + "</h2>" +

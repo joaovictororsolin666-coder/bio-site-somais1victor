@@ -244,7 +244,7 @@ window.QUIZ_DATA = {
   offer: {
     banner: { src: 'assets/img/quiz/banner-oferta.webp', w: 800, h: 336, alt: 'Método Primeira Renda' },
     eyebrow: 'MPR · Método Primeira Renda',
-    title: 'Aprenda a faturar até <span class="hl">R$300 por dia</span> vendendo produtos digitais com vídeos simples, sem precisar aparecer!',
+    title: 'Aprenda a faturar até <span class="hl">R$300 por dia</span> vendendo produtos digitais sem precisar aparecer!',
     subtitle: 'Mesmo que você esteja começando do absoluto zero.',
     // Resumo das respostas logo abaixo do título (continua a conversa do quiz)
     plan: {
@@ -270,23 +270,38 @@ window.QUIZ_DATA = {
       { src: 'assets/img/quiz/resultado-e.webp', w: 540, h: 865 },
       { src: 'assets/img/quiz/resultado-f.webp', w: 540, h: 803 }
     ],
+    // Depois das provas: mini vídeo animado da área de membros (capas dos módulos) + cards de destaque (não clicáveis).
+    // Substitui o carrossel "O que vou aprender?" que ficava depois do preço.
+    tour: {
+      eyebrow: 'Método Primeira Renda',
+      title: 'Aqui está tudo o que você vai receber no <span class="hl">MPR</span>',
+      subtitle: 'Sem precisar aparecer, pelo celular e de forma simples',
+      bar: 'Área de membros · MPR',
+      introText: 'Tour pela área de membros',
+      logo: 'assets/img/quiz/logo-mpr.webp',
+      alt: 'Prévia animada da área de membros do Método Primeira Renda, com as capas dos 10 módulos',
+      covers: [
+        'assets/img/quiz/modulo-01.webp', 'assets/img/quiz/modulo-02.webp', 'assets/img/quiz/modulo-03.webp',
+        'assets/img/quiz/modulo-04.webp', 'assets/img/quiz/modulo-05.webp', 'assets/img/quiz/modulo-06.webp',
+        'assets/img/quiz/modulo-07.webp', 'assets/img/quiz/modulo-08.webp', 'assets/img/quiz/modulo-09.webp',
+        'assets/img/quiz/modulo-10.webp'
+      ],
+      chips: [
+        'Passo a passo atualizado',
+        'Estratégia pronta pra copiar, colar e vender',
+        'Produtos prontos e já validados',
+        'Área de membros completa',
+        'Robô que vende por você'
+      ]
+    },
     // Bônus em destaque antes do resumo (como na página de referência): exclusivos em cards + extras com "De R$ X por R$ 0"
     bonusSection: {
       eyebrow: 'Bônus exclusivos',
       title: 'E para <span class="hl">acelerar seus resultados</span>, você ainda recebe esses bônus:',
+      // Só os títulos (a pessoa já viu a descrição na tela dos presentes)
       items: [
-        {
-          tag: 'Bônus 01',
-          title: 'Estrutura de Vendas',
-          text: 'Tenha toda a estrutura que me fez ganhar mais de 100 mil reais em poucos meses sem vender curso e sem aparecer.',
-          image: { src: 'assets/img/quiz/bonus-1-v2.webp', w: 600, h: 600, alt: 'Bônus Estrutura de Vendas' }
-        },
-        {
-          tag: 'Bônus 02',
-          title: '+2.500 Vídeos Prontos',
-          text: 'Mais de 2.500 vídeos virais prontos pra postar, viralizar e vender todos os dias.',
-          image: { src: 'assets/img/quiz/bonus-2-v2.webp', w: 600, h: 600, alt: 'Bônus +2.500 vídeos prontos' }
-        }
+        { tag: 'Bônus 01', title: 'Estrutura de Vendas', image: 'assets/img/quiz/bonus-1-v2.webp' },
+        { tag: 'Bônus 02', title: '+2.500 Vídeos Prontos', image: 'assets/img/quiz/bonus-2-v2.webp' }
       ],
       extrasTitle: 'Bônus extras',
       extras: [

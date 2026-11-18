@@ -669,3 +669,52 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 /* Resumo da oferta só com títulos: checks menores */
 .qz-stack__list { gap: 10px; }
 .qz-stack__check { width: 26px; height: 26px; border-radius: 8px; font-size: 15px; }
+
+/* Resumo da oferta: o check é um <span> e herdava cor/tamanho/bloco do texto das linhas */
+.qz-stack__list .qz-stack__check { display: grid; place-items: center; margin-top: 0; color: var(--green-ink); font-size: 15px; font-weight: 800; line-height: 1; }
+/* Bônus exclusivos: linhas compactas como os extras, com borda cheia */
+.qz-xb__extras--main { margin-top: 16px; }
+.qz-xb__extras--main .qz-xb-extra { border-style: solid; background: linear-gradient(180deg, var(--green-surface), #0c0e0d); }
+
+/* "Tudo o que você vai receber": mini vídeo da área de membros + cards de destaque */
+.qz-tour { margin-top: 34px; text-align: center; }
+.qz-tour .qz-h2 { margin-top: 0; }
+.qz-tour__sub { margin: 8px 0 0; color: var(--muted); font-size: 14px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.qz-tour__screen {
+  position: relative;
+  overflow: hidden;
+  margin-top: 18px;
+  aspect-ratio: 16 / 10;
+  border: 1px solid rgba(var(--green-rgb), .55);
+  border-radius: 18px;
+  background: radial-gradient(120% 90% at 50% 0%, rgba(var(--green-rgb), .16), transparent 60%), #070908;
+  box-shadow: 0 0 0 4px rgba(var(--green-rgb), .06), 0 24px 60px -30px rgba(var(--green-rgb), .7);
+}
+.qz-tour__bar { position: absolute; inset: 0 0 auto; display: flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px; border-bottom: 1px solid rgba(255, 255, 255, .06); background: rgba(0, 0, 0, .35); }
+.qz-tour__bar i { width: 7px; height: 7px; border-radius: 50%; background: #3f3f46; }
+.qz-tour__bar i:first-child { background: var(--green); }
+.qz-tour__bar span { margin-left: 6px; color: var(--muted); font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.qz-tour__row { position: absolute; inset: 40px 0 26px; display: flex; align-items: center; overflow: hidden; }
+.qz-tour__track { display: flex; gap: 10px; padding-left: 10px; width: max-content; animation: qz-tour-scroll 30s linear infinite; }
+.qz-tour__card { flex: none; width: 92px; margin: 0; animation: qz-tour-pop 3s ease-in-out infinite; }
+.qz-tour__card:nth-child(odd) { animation-delay: -1.5s; }
+.qz-tour__card img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; border-radius: 10px; object-fit: cover; box-shadow: 0 10px 24px -12px rgba(0, 0, 0, .9), inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.qz-tour__card figcaption { margin-top: 5px; color: var(--green-tint); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.qz-tour__progress { position: absolute; inset: auto 12px 10px; height: 4px; overflow: hidden; border-radius: 4px; background: rgba(255, 255, 255, .1); }
+.qz-tour__progress i { display: block; height: 100%; width: 100%; border-radius: inherit; background: var(--green); transform-origin: left; animation: qz-tour-progress 15s linear infinite; }
+.qz-tour__intro { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; background: radial-gradient(80% 70% at 50% 50%, rgba(var(--green-rgb), .2), #050605 75%); animation: qz-tour-intro 15s ease-in-out infinite; }
+.qz-tour__intro img { width: 74px; height: 74px; object-fit: contain; filter: drop-shadow(0 0 18px rgba(var(--green-rgb), .55)); animation: qz-tour-logo 15s ease-in-out infinite; }
+.qz-tour__intro p { margin: 0; color: #d6fbe7; font-size: 11px; font-weight: 800; letter-spacing: .28em; text-transform: uppercase; }
+.qz-tour__chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+.qz-tour__chips li { flex: 0 1 calc(50% - 5px); display: grid; place-items: center; min-height: 56px; padding: 8px 12px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 999px; background: #1c1d1c; color: var(--text); font-size: 13.5px; font-weight: 600; line-height: 1.3; }
+.qz-tour__chips li.is-on { border-color: transparent; background: var(--green); color: var(--green-ink); font-weight: 700; }
+.qz-tour__chips li:last-child { flex-basis: 60%; }
+@keyframes qz-tour-scroll { to { transform: translateX(-50%); } }
+@keyframes qz-tour-pop { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-4px) scale(1.04); } }
+@keyframes qz-tour-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes qz-tour-intro { 0%, 14% { opacity: 1; visibility: visible; } 20%, 94% { opacity: 0; visibility: hidden; } 100% { opacity: 1; visibility: visible; } }
+@keyframes qz-tour-logo { 0% { transform: scale(.8); } 10% { transform: scale(1); } 18% { transform: scale(1.15); } 100% { transform: scale(.8); } }
+@media (prefers-reduced-motion: reduce) {
+  .qz-tour__track, .qz-tour__card, .qz-tour__progress i, .qz-tour__intro, .qz-tour__intro img { animation: none; }
+  .qz-tour__intro { display: none; }
+}
