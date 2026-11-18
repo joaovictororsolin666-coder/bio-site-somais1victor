@@ -718,3 +718,10 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
   .qz-tour__track, .qz-tour__card, .qz-tour__progress i, .qz-tour__intro, .qz-tour__intro img { animation: none; }
   .qz-tour__intro { display: none; }
 }
+
+/* Bônus especiais com resumo: card um pouco maior, imagem maior e texto embaixo do título */
+.qz-xb-extra--desc { align-items: flex-start; gap: 14px; padding: 14px; }
+.qz-xb-extra--desc img { width: 72px; height: 72px; border-radius: 12px; }
+.qz-xb-extra__text { margin: 2px 0 0; color: #c9c9c9; font-size: 13.5px; line-height: 1.45; }
+/* Resumo da oferta: valor de referência riscado à direita de cada item */
+.qz-stack__de { flex: none; margin-left: auto; padding-left: 8px; color: #f87171; font-size: 14px; font-weight: 700; white-space: nowrap; text-decoration-thickness: 2px; }

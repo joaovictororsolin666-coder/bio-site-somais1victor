@@ -313,9 +313,10 @@
     if (!b) return "";
     // Linha compacta: miniatura + etiqueta + título (+ "De R$ X por R$ 0" nos extras)
     var row = function (it) {
-      return '<li class="qz-xb-extra">' +
+      return '<li class="qz-xb-extra' + (it.text ? " qz-xb-extra--desc" : "") + '">' +
         (it.image ? '<img src="' + it.image + '" alt="" width="56" height="56" loading="lazy" decoding="async">' : "") +
         '<div class="qz-xb-extra__body"><span class="qz-xb-card__tag">' + it.tag + "</span><strong>" + it.title + "</strong>" +
+        (it.text ? '<p class="qz-xb-extra__text">' + it.text + "</p>" : "") +
         (it.de || it.por ? '<span class="qz-xb-extra__price">' + (it.de ? "De <s>" + it.de + "</s> por " : "") + "<b>" + (it.por || "R$ 0") + "</b></span>" : "") +
         "</div></li>";
     };
@@ -671,7 +672,8 @@
         '<h2 class="qz-h2 qz-center">' + s.stackTitle + "</h2>" +
         '<ul class="qz-stack__list">' + s.stack.map(function (it) {
           return "<li>" + (it.image ? '<img src="' + it.image + '" alt="" width="48" height="60" loading="lazy" decoding="async">' : '<span class="qz-stack__check" aria-hidden="true">✓</span>') +
-            "<div><strong>" + it.title + "</strong>" + (it.text ? "<span>" + it.text + "</span>" : "") + "</div></li>";
+            "<div><strong>" + it.title + "</strong>" + (it.text ? "<span>" + it.text + "</span>" : "") + "</div>" +
+            (it.de ? '<s class="qz-stack__de">' + it.de + "</s>" : "") + "</li>";
         }).join("") + "</ul>" +
         priceHtml +
         (isMinor ? minorBlock(s.minor) :

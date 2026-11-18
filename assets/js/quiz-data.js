@@ -304,18 +304,24 @@ window.QUIZ_DATA = {
       ],
       extrasTitle: 'Bônus extras',
       extras: [
-        { tag: 'Bônus especial 01', title: 'Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp', de: 'R$ 97', por: 'R$ 0' },
-        { tag: 'Bônus especial 02', title: 'Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp', de: 'R$ 67', por: 'R$ 0' }
+        {
+          tag: 'Bônus especial 01', title: 'Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp',
+          text: 'Dentro do MPR você terá acesso a uma comunidade de networking, com conteúdos exclusivos para você vender na internet e pessoas com o mesmo objetivo que você.'
+        },
+        {
+          tag: 'Bônus especial 02', title: 'Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp',
+          text: 'Sendo meu sócio, eu vou liberar pra você o meu robô de vendas criado por inteligência artificial, que vai vender pra você todos os dias no automático.'
+        }
       ]
     },
-    // Resumo da oferta logo acima do preço: só os títulos
+    // Resumo da oferta logo acima do preço: títulos + valor de referência riscado ("de")
     stackTitle: '🎁 Tudo o que você recebe hoje',
     stack: [
-      { title: 'Método Primeira Renda' },
-      { title: 'Bônus 01 · Estrutura de Vendas' },
-      { title: 'Bônus 02 · +2.500 Vídeos Prontos' },
-      { title: 'Bônus especial · Grupo VIP no WhatsApp' },
-      { title: 'Bônus especial · Robô de Vendas no Automático' },
+      { title: 'Método Primeira Renda', de: 'R$ 97' },
+      { title: 'Bônus 01 · Estrutura de Vendas', de: 'R$ 97' },
+      { title: 'Bônus 02 · +2.500 Vídeos Prontos', de: 'R$ 37' },
+      { title: 'Bônus especial · Grupo VIP no WhatsApp', de: 'R$ 147' },
+      { title: 'Bônus especial · Robô de Vendas no Automático', de: 'R$ 297' },
       { title: 'Garantia de 7 dias' }
     ],
     // Carrossel de arrastar: módulos em destaque com tópicos + card final com os demais (antes da garantia)
