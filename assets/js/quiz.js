@@ -183,7 +183,9 @@
     if (ladoSorteado) return ladoSorteado;
     var forcado = /[?&]ck=(kiwify|neon)\b/.exec(location.search); // só para conferir cada lado
     if (forcado) return (ladoSorteado = forcado[1]);
-    if (t.modo === "pais") return (ladoSorteado = estaNoBrasil() ? "neon" : "kiwify");
+    // Fora do Brasil vai sempre para a Kiwify: a NeonPay não cobra em outras moedas
+    if (!estaNoBrasil()) return (ladoSorteado = "kiwify");
+    if (t.modo === "pais") return (ladoSorteado = "neon");
     var guardado = "";
     try { guardado = localStorage.getItem("vg_ck") || ""; } catch (e) { /* sem storage: sorteia nesta visita */ }
     ladoSorteado = guardado === "kiwify" || guardado === "neon" ? guardado : (Math.random() < t.neon ? "neon" : "kiwify");
