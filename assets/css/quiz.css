@@ -644,3 +644,28 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
   .qz-anim .a-notif, .qz-anim .a-arrow { opacity: 1; }
   .qz-anim .a-line, .qz-anim .a-trend, .qz-anim .a-check { stroke-dashoffset: 0; }
 }
+
+/* Oferta: bônus exclusivos em cards + bônus extras "De R$ X por R$ 0" (antes do resumo e do preço) */
+.qz-xb { margin-top: 34px; text-align: center; }
+.qz-xb__eyebrow { margin: 0 0 8px; color: var(--green); font-size: 12.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.qz-xb__eyebrow--gap { margin-top: 26px; }
+.qz-xb .qz-h2 { margin-top: 0; }
+.qz-xb__cards { display: grid; gap: 14px; margin-top: 18px; text-align: left; }
+.qz-xb-card { overflow: hidden; border: 1px solid rgba(var(--green-rgb), .35); border-radius: 18px; background: linear-gradient(180deg, var(--green-surface), #0c0e0d); }
+.qz-xb-card__img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+.qz-xb-card__body { padding: 14px 16px 16px; }
+.qz-xb-card__tag { display: inline-block; padding: 3px 8px; border-radius: 6px; background: var(--green); color: var(--green-ink); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.qz-xb-card h3 { margin: 8px 0 0; font-size: 19px; font-weight: 800; line-height: 1.25; }
+.qz-xb-card p { margin: 6px 0 0; color: #c9c9c9; font-size: 14px; line-height: 1.45; }
+.qz-xb__extras { display: grid; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; text-align: left; }
+.qz-xb-extra { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px dashed rgba(var(--green-rgb), .45); border-radius: 14px; background: rgba(var(--green-rgb), .05); }
+.qz-xb-extra img { flex: none; width: 56px; height: 56px; border-radius: 10px; background: #000; object-fit: cover; }
+.qz-xb-extra__body { display: grid; gap: 4px; min-width: 0; }
+.qz-xb-extra__body .qz-xb-card__tag { justify-self: start; }
+.qz-xb-extra strong { font-size: 15.5px; line-height: 1.3; }
+.qz-xb-extra__price { color: var(--muted); font-size: 14px; font-weight: 600; }
+.qz-xb-extra__price s { color: #f87171; text-decoration-thickness: 2px; }
+.qz-xb-extra__price b { color: var(--green); font-size: 16px; font-weight: 800; }
+/* Resumo da oferta só com títulos: checks menores */
+.qz-stack__list { gap: 10px; }
+.qz-stack__check { width: 26px; height: 26px; border-radius: 8px; font-size: 15px; }

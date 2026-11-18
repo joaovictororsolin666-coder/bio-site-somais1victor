@@ -270,13 +270,39 @@ window.QUIZ_DATA = {
       { src: 'assets/img/quiz/resultado-e.webp', w: 540, h: 865 },
       { src: 'assets/img/quiz/resultado-f.webp', w: 540, h: 803 }
     ],
+    // Bônus em destaque antes do resumo (como na página de referência): exclusivos em cards + extras com "De R$ X por R$ 0"
+    bonusSection: {
+      eyebrow: 'Bônus exclusivos',
+      title: 'E para <span class="hl">acelerar seus resultados</span>, você ainda recebe esses bônus:',
+      items: [
+        {
+          tag: 'Bônus 01',
+          title: 'Estrutura de Vendas',
+          text: 'Tenha toda a estrutura que me fez ganhar mais de 100 mil reais em poucos meses sem vender curso e sem aparecer.',
+          image: { src: 'assets/img/quiz/bonus-1-v2.webp', w: 600, h: 600, alt: 'Bônus Estrutura de Vendas' }
+        },
+        {
+          tag: 'Bônus 02',
+          title: '+2.500 Vídeos Prontos',
+          text: 'Mais de 2.500 vídeos virais prontos pra postar, viralizar e vender todos os dias.',
+          image: { src: 'assets/img/quiz/bonus-2-v2.webp', w: 600, h: 600, alt: 'Bônus +2.500 vídeos prontos' }
+        }
+      ],
+      extrasTitle: 'Bônus extras',
+      extras: [
+        { tag: 'Bônus especial 01', title: 'Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp', de: 'R$ 97', por: 'R$ 0' },
+        { tag: 'Bônus especial 02', title: 'Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp', de: 'R$ 67', por: 'R$ 0' }
+      ]
+    },
+    // Resumo da oferta logo acima do preço: só os títulos
     stackTitle: '🎁 Tudo o que você recebe hoje',
     stack: [
-      { title: 'Método Primeira Renda', text: 'Treinamento passo a passo + estratégias prontas', image: 'assets/img/quiz/logo-mpr.webp' },
-      { title: 'Bônus 01 · Estrutura de Vendas', text: 'A estrutura para vender sem curso e sem aparecer', image: 'assets/img/quiz/bonus-1-v2.webp' },
-      { title: 'Bônus 02 · +2.500 Vídeos Prontos', text: 'Vídeos virais prontos para postar todos os dias', image: 'assets/img/quiz/bonus-2-v2.webp' },
-      { title: 'Bônus extra · Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp' },
-      { title: 'Bônus extra · Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp' }
+      { title: 'Método Primeira Renda' },
+      { title: 'Bônus 01 · Estrutura de Vendas' },
+      { title: 'Bônus 02 · +2.500 Vídeos Prontos' },
+      { title: 'Bônus especial · Grupo VIP no WhatsApp' },
+      { title: 'Bônus especial · Robô de Vendas no Automático' },
+      { title: 'Garantia de 7 dias' }
     ],
     // Carrossel de arrastar: módulos em destaque com tópicos + card final com os demais (antes da garantia)
     modules: {

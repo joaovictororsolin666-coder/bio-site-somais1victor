@@ -308,6 +308,29 @@
     return notes.join("");
   }
 
+  // Oferta: bônus exclusivos (cards grandes) + bônus extras ("De R$ X por R$ 0"), antes do resumo e do preço
+  function bonusSectionHtml(b) {
+    if (!b) return "";
+    var cards = (b.items || []).map(function (it) {
+      return '<article class="qz-xb-card">' + img(it.image, "qz-xb-card__img") +
+        '<div class="qz-xb-card__body"><span class="qz-xb-card__tag">' + it.tag + "</span>" +
+        "<h3>" + it.title + "</h3>" + (it.text ? "<p>" + it.text + "</p>" : "") + "</div></article>";
+    }).join("");
+    var extras = (b.extras || []).map(function (it) {
+      return '<li class="qz-xb-extra">' +
+        (it.image ? '<img src="' + it.image + '" alt="" width="56" height="56" loading="lazy" decoding="async">' : "") +
+        '<div class="qz-xb-extra__body"><span class="qz-xb-card__tag">' + it.tag + "</span><strong>" + it.title + "</strong>" +
+        '<span class="qz-xb-extra__price">' + (it.de ? "De <s>" + it.de + "</s> por " : "") + "<b>" + (it.por || "R$ 0") + "</b></span></div></li>";
+    }).join("");
+    return '<div class="qz-xb">' +
+      (b.eyebrow ? '<p class="qz-xb__eyebrow">' + b.eyebrow + "</p>" : "") +
+      '<h2 class="qz-h2 qz-center">' + b.title + "</h2>" +
+      '<div class="qz-xb__cards">' + cards + "</div>" +
+      (extras ? (b.extrasTitle ? '<p class="qz-xb__eyebrow qz-xb__eyebrow--gap">' + b.extrasTitle + "</p>" : "") +
+        '<ul class="qz-xb__extras">' + extras + "</ul>" : "") +
+      "</div>";
+  }
+
   // Menor de 18: no lugar do botão de compra, um convite para enviar o link a um responsável
   function minorBlock(m) {
     var link = location.origin + location.pathname + "?utm_source=whatsapp&utm_medium=responsavel";
@@ -615,6 +638,8 @@
           return '<img class="qz-proof-card" src="' + p.src + '" width="' + p.w + '" height="' + p.h + '" alt="" aria-hidden="true" decoding="async">';
         }).join("") +
         "</div></div>" : "") +
+
+        bonusSectionHtml(s.bonusSection) +
 
         '<div class="qz-stack" id="qz-price">' +
         '<h2 class="qz-h2 qz-center">' + s.stackTitle + "</h2>" +
