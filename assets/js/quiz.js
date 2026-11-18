@@ -33,7 +33,9 @@
   FLOW = FLOW.concat(["about", "loading", "result", "gift", "bonus", "offer"]);
   var FLOW_VERSION = 4; // painel usa para ler etapas antigas e novas
   var TRANSIENT = { loading: true };
-  var NO_BACK = { intro: true, loading: true };
+  // bonus e offer: depois de abrir o presente não dá para voltar (senão a pessoa vê que as 3 caixas têm os mesmos bônus)
+  var NO_BACK = { intro: true, loading: true, bonus: true, offer: true };
+  var TRAVA_VOLTA = "bonus";
 
   /* ───────────── Estado (sobrevive a recarregar a página) ───────────── */
 
@@ -342,7 +344,7 @@
   function blackBar(on) {
     if (!header) return;
     var el = $(".qz-blackbar", header);
-    if (!on) { if (el) el.remove(); return; }
+    if (!on || !D.offer.black.bar) { if (el) el.remove(); return; }
     if (el) return;
     var p = precoAtual();
     el = document.createElement("div");
@@ -352,7 +354,7 @@
     header.insertBefore(el, header.firstChild);
   }
   function countdownHtml() {
-    if (!blackAtiva()) return "";
+    if (!blackAtiva() || !D.offer.black.countdownLabel) return "";
     return '<p class="qz-countdown" data-countdown><span>' + (D.offer.black.countdownLabel || "A oferta termina em") + "</span>" +
       '<strong data-countdown-time aria-live="off">--</strong></p>';
   }
@@ -831,6 +833,12 @@
 
   window.addEventListener("popstate", function (e) {
     var step = e.state && typeof e.state.qz === "number" ? e.state.qz : 0;
+    // Voltar do celular/navegador a partir dos bônus ou da oferta: continua na mesma tela
+    var trava = FLOW.indexOf(TRAVA_VOLTA);
+    if (trava > -1 && state.step >= trava && step < state.step) {
+      history.pushState({ qz: state.step }, "", location.pathname + location.search);
+      return;
+    }
     if (step < state.step) depth = Math.max(0, depth - 1); else depth++;
     if (TRANSIENT[FLOW[step]]) step = prevStep(step);
     busy = true;
