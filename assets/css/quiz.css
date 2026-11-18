@@ -725,3 +725,11 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-xb-extra__text { margin: 2px 0 0; color: #c9c9c9; font-size: 13.5px; line-height: 1.45; }
 /* Resumo da oferta: valor de referência riscado à direita de cada item */
 .qz-stack__de { flex: none; margin-left: auto; padding-left: 8px; color: #f87171; font-size: 14px; font-weight: 700; white-space: nowrap; text-decoration-thickness: 2px; }
+
+/* Black November: faixa no topo da oferta (dentro do cabeçalho fixo) e contagem perto do preço */
+.qz-blackbar { padding: 7px 12px; background: #000; color: #fff; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; text-align: center; text-transform: uppercase; }
+.qz-blackbar s { color: #f87171; text-decoration-thickness: 2px; }
+.qz-blackbar b { display: inline-block; margin-left: 2px; padding: 1px 6px; border-radius: 5px; background: #ef4444; color: #fff; }
+.qz-countdown { display: grid; gap: 2px; margin: 14px auto 0; padding: 10px 12px; max-width: 340px; border: 1px dashed rgba(239, 68, 68, .55); border-radius: 12px; background: rgba(239, 68, 68, .08); text-align: center; }
+.qz-countdown span { color: #fca5a5; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.qz-countdown strong { color: #fff; font-size: 21px; font-weight: 800; letter-spacing: .02em; font-variant-numeric: tabular-nums; }

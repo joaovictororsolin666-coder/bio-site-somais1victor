@@ -331,6 +331,47 @@
       "</div>";
   }
 
+  // Black November: faixa fixa no topo da oferta, título do resumo e contagem até offer.black.ate (depois some sozinha)
+  function blackAtiva() {
+    var b = D.offer && D.offer.black;
+    return !!(b && b.ate && Date.now() < Date.parse(b.ate));
+  }
+  function precoAtual() {
+    return CFG[D.ofertaKey || (ladoCheckout() === "neon" ? "ofertaNeon" : "oferta")] || {};
+  }
+  function blackBar(on) {
+    if (!header) return;
+    var el = $(".qz-blackbar", header);
+    if (!on) { if (el) el.remove(); return; }
+    if (el) return;
+    var p = precoAtual();
+    el = document.createElement("div");
+    el.className = "qz-blackbar";
+    el.innerHTML = (D.offer.black.bar || "BLACK NOVEMBER") + ": " +
+      (p.precoDe ? "DE <s>" + p.precoDe + "</s> " : "") + "POR <b>" + (p.precoVista || "") + "</b>";
+    header.insertBefore(el, header.firstChild);
+  }
+  function countdownHtml() {
+    if (!blackAtiva()) return "";
+    return '<p class="qz-countdown" data-countdown><span>' + (D.offer.black.countdownLabel || "A oferta termina em") + "</span>" +
+      '<strong data-countdown-time aria-live="off">--</strong></p>';
+  }
+  function bindCountdown(root) {
+    var box = $("[data-countdown]", root);
+    if (!box) return;
+    var out = $("[data-countdown-time]", box), fim = Date.parse(D.offer.black.ate);
+    var dois = function (n) { return (n < 10 ? "0" : "") + n; };
+    var tick = function () {
+      var s = Math.floor((fim - Date.now()) / 1000);
+      if (!box.isConnected) { clearInterval(t); return; }
+      if (s <= 0) { clearInterval(t); box.hidden = true; blackBar(false); return; }
+      var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+      out.textContent = (d ? d + (d > 1 ? " dias " : " dia ") : "") + dois(h) + ":" + dois(m) + ":" + dois(s % 60);
+    };
+    var t = setInterval(tick, 1000);
+    tick();
+  }
+
   // Oferta: "tudo o que você vai receber" com um mini vídeo animado da área de membros (capas dos módulos)
   // e cards de destaque (não clicáveis), como na página de referência
   function tourHtml(t) {
@@ -669,13 +710,14 @@
         bonusSectionHtml(s.bonusSection) +
 
         '<div class="qz-stack" id="qz-price">' +
-        '<h2 class="qz-h2 qz-center">' + s.stackTitle + "</h2>" +
+        '<h2 class="qz-h2 qz-center">' + (blackAtiva() && s.black.stackTitle ? s.black.stackTitle : s.stackTitle) + "</h2>" +
         '<ul class="qz-stack__list">' + s.stack.map(function (it) {
           return "<li>" + (it.image ? '<img src="' + it.image + '" alt="" width="48" height="60" loading="lazy" decoding="async">' : '<span class="qz-stack__check" aria-hidden="true">✓</span>') +
             "<div><strong>" + it.title + "</strong>" + (it.text ? "<span>" + it.text + "</span>" : "") + "</div>" +
             (it.de ? '<s class="qz-stack__de">' + it.de + "</s>" : "") + "</li>";
         }).join("") + "</ul>" +
         priceHtml +
+        countdownHtml() +
         (isMinor ? minorBlock(s.minor) :
           checkoutCta(ctaLabel, "oferta", "qz-cta--main") +
           (s.payNote ? '<p class="qz-paynote">' + s.payNote + "</p>" : "") +
@@ -746,6 +788,7 @@
     backBtn.hidden = !!NO_BACK[name] || step === 0;
     // Na tela inicial a barra de progresso some, para o botão de começar aparecer sem rolar em celulares menores
     if (header) header.style.display = name === "intro" ? "none" : "";
+    blackBar(name === "offer" && blackAtiva());
     document.body.classList.toggle("qz-is-intro", name === "intro");
 
     if (animate && !reduceMotion && app.firstElementChild) {
@@ -922,6 +965,7 @@
     }
     Journey.flush();
     bindModules(root);
+    bindCountdown(root);
 
     $$("[data-checkout]", root).forEach(function (a) { bindCheckout(a); });
   }

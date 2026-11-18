@@ -314,6 +314,14 @@ window.QUIZ_DATA = {
         }
       ]
     },
+    // Black November até 30/11 23h59 (Brasília): faixa no topo da oferta, título do resumo e contagem regressiva.
+    // Depois do prazo tudo some sozinho e volta o stackTitle normal. Lembrete: reajustar o preço no config.js e nos checkouts.
+    black: {
+      ate: '2026-11-30T23:59:59-03:00',
+      bar: 'BLACK NOVEMBER',
+      stackTitle: '🖤 Oferta de <span class="hl">Black November</span>',
+      countdownLabel: 'A oferta de Black November termina em'
+    },
     // Resumo da oferta logo acima do preço: títulos + valor de referência riscado ("de")
     stackTitle: '🎁 Tudo o que você recebe hoje',
     stack: [
