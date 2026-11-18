@@ -335,7 +335,8 @@ window.QUIZ_DATA = {
       }
     },
     // {preco} vira o preço à vista do config.js (oferta.precoVista)
-    cta: 'SIM! QUERO COMPRAR POR {preco}',
+    // Antes: 'SIM! QUERO COMPRAR POR {preco}' (quebrava em 2 linhas no celular)
+    cta: 'QUERO COMEÇAR AGORA',
     // Deixa claro que é uma compra (muita gente achava que era grátis)
     payNote: 'Você vai para o pagamento seguro (Pix ou cartão). O acesso é liberado após a confirmação do pagamento.',
     trust: '🔒 Pagamento 100% seguro · 🔓 Acesso imediato',
