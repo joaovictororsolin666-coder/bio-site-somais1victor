@@ -103,7 +103,8 @@
           p.append(k, a[k] || "");
         });
         p.append("respostas", JSON.stringify(j.answers));
-        p.append("etapas", JSON.stringify(Object.assign({ v: FLOW_VERSION }, j.steps)));
+        // "f" separa os funis na planilha (ex.: "clube"); o MPV não manda e continua como sempre
+        p.append("etapas", JSON.stringify(Object.assign({ v: FLOW_VERSION }, D.funil ? { f: D.funil } : {}, j.steps)));
         if (navigator.sendBeacon(endpoint, p)) dirty = false;
       }
     };

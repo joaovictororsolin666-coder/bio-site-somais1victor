@@ -8,8 +8,8 @@ window.QUIZ_DATA = {
   checkoutKey: 'checkoutClube',
   checkoutUtmsKey: 'checkoutUtmsClube',
   ofertaKey: 'ofertaClube',
-  // Fora do painel /painel por enquanto: a planilha ainda não separa este funil do quiz atual
-  painel: false,
+  // Vai para o painel /painel marcado como funil "clube" (fica separado do MPV)
+  funil: 'clube',
   // Botão de voltar liberado também no presente, no bônus e na oferta
   travaVolta: false,
 

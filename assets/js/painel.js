@@ -91,6 +91,7 @@
     try { o.resp = typeof r.respostas === "string" ? JSON.parse(r.respostas || "{}") : (r.respostas || {}); } catch (e) { o.resp = {}; }
     var et = {};
     try { et = typeof r.etapas === "string" ? JSON.parse(r.etapas || "{}") : (r.etapas || {}); } catch (e) { et = {}; }
+    o.funil = String(et.f || "mpv");
     withFlow(o, Number(et.v) === 4 ? 4 : Number(et.v) === 3 ? 3 : Number(et.v) === 2 ? 2 : 1);
     o.origem = origin(o);
     return o;
@@ -138,6 +139,8 @@
     state.prev = state.all.filter(function (o) { var t = o.inicio.getTime(); return t >= prevCut && t < prevEnd; });
     state.cliquesCur = (state.cliques || []).filter(function (o) { return o.inicio.getTime() >= cut; });
     state.cliquesPrev = (state.cliques || []).filter(function (o) { var t = o.inicio.getTime(); return t >= prevCut && t < prevEnd; });
+    state.clubeCur = (state.clube || []).filter(function (o) { return o.inicio.getTime() >= cut; });
+    state.clubePrev = (state.clube || []).filter(function (o) { var t = o.inicio.getTime(); return t >= prevCut && t < prevEnd; });
   }
 
   function metrics(list) {
@@ -198,7 +201,10 @@
     state.cliques = rows.filter(ehClique).map(function (r) {
       return { alvo: String(r.etapa_nome).slice(7), inicio: new Date(r.inicio) };
     });
-    state.all = rows.filter(function (r) { return !ehClique(r); }).map(parse).filter(function (o) { return o.id && !isNaN(o.inicio); });
+    var visitas = rows.filter(function (r) { return !ehClique(r); }).map(parse).filter(function (o) { return o.id && !isNaN(o.inicio); });
+    // Clube Dark Viral (desde 19/11) fica fora dos números do MPV e ganha o próprio card
+    state.clube = visitas.filter(function (o) { return o.funil === "clube"; });
+    state.all = visitas.filter(function (o) { return o.funil !== "clube"; });
   }
 
   function done(msg) {
@@ -308,6 +314,7 @@
       renderCampaigns();
       renderTesteCheckout();
       renderCliques();
+      renderClube();
       renderDevices();
     } else {
       renderResponses();
@@ -523,6 +530,29 @@
     $("#cliques-bio").innerHTML = "<thead><tr><th>Botão</th><th>Cliques</th><th>Período anterior</th></tr></thead><tbody>" +
       Object.keys(nomes).map(function (k) {
         return "<tr><td>" + nomes[k] + "</td><td><strong>" + num(conta(state.cliquesCur, k)) + "</strong></td><td>" + num(conta(state.cliquesPrev, k)) + "</td></tr>";
+      }).join("") + "</tbody>";
+  }
+
+  // Funil do Clube Dark Viral: quantos chegaram em cada ponto (índices das telas do quiz do Clube)
+  function renderClube() {
+    var el = $("#funil-clube");
+    if (!el) return;
+    var passos = [
+      ["Abriram o quiz", function (o) { return true; }],
+      ["Começaram (fase 1)", function (o) { return o.max >= 1; }],
+      ["Chegaram na escolha do nicho", function (o) { return o.max >= 7; }],
+      ["Viram a página montada", function (o) { return o.max >= 8; }],
+      ["Chegaram na objeção (fase 9)", function (o) { return o.max >= 11; }],
+      ["Viram o resultado", function (o) { return o.max >= 15; }],
+      ["Chegaram na oferta", function (o) { return o.max >= 18; }],
+      ["Clicaram no checkout", function (o) { return !!o.checkout; }]
+    ];
+    var cur = state.clubeCur || [], prev = state.clubePrev || [];
+    var base = cur.length;
+    el.innerHTML = "<thead><tr><th>Etapa</th><th>Pessoas</th><th>% de quem abriu</th><th>Período anterior</th></tr></thead><tbody>" +
+      passos.map(function (p) {
+        var n = cur.filter(p[1]).length;
+        return "<tr><td>" + p[0] + "</td><td><strong>" + num(n) + "</strong></td><td>" + pct(n, base) + "</td><td>" + num(prev.filter(p[1]).length) + "</td></tr>";
       }).join("") + "</tbody>";
   }
 
