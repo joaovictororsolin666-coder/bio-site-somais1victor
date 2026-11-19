@@ -232,9 +232,9 @@ window.QUIZ_DATA = {
       },
       {
         tag: 'BÔNUS 02',
-        title: '+2.500 Vídeos Prontos',
-        text: 'Acesse mais de 2.500 vídeos virais prontos pra postar, viralizar e vender todos os dias. Mais fácil que isso não existe!',
-        image: { src: 'assets/img/quiz/bonus-2-v2.webp', w: 600, h: 600, alt: 'Bônus +2.500 vídeos prontos' }
+        title: 'Pack de Produtos Ocultos e Validados',
+        text: 'Produtos digitais pouco conhecidos e já validados, prontos para você começar a vender sem precisar criar nada do zero.',
+        image: { src: 'assets/img/quiz/bonus-produtos.webp', w: 600, h: 600, alt: 'Bônus Pack de Produtos Ocultos e Validados' }
       }
     ],
     warning: '(Não desperdice essa oportunidade, hein 🤨)',
@@ -300,7 +300,7 @@ window.QUIZ_DATA = {
       // Só os títulos (a pessoa já viu a descrição na tela dos presentes)
       items: [
         { tag: 'Bônus 01', title: 'Estrutura de Vendas', image: 'assets/img/quiz/bonus-1-v2.webp' },
-        { tag: 'Bônus 02', title: '+2.500 Vídeos Prontos', image: 'assets/img/quiz/bonus-2-v2.webp' }
+        { tag: 'Bônus 02', title: 'Pack de Produtos Ocultos e Validados', image: 'assets/img/quiz/bonus-produtos.webp' }
       ],
       extrasTitle: 'Bônus extras',
       extras: [
@@ -328,7 +328,7 @@ window.QUIZ_DATA = {
     stack: [
       { title: 'Método Primeira Venda', de: 'R$ 97' },
       { title: 'Bônus 01 · Estrutura de Vendas', de: 'R$ 97' },
-      { title: 'Bônus 02 · +2.500 Vídeos Prontos', de: 'R$ 37' },
+      { title: 'Bônus 02 · Pack de Produtos Ocultos e Validados', de: 'R$ 37' },
       { title: 'Bônus especial · Grupo VIP no WhatsApp', de: 'R$ 147' },
       { title: 'Bônus especial · Robô de Vendas no Automático', de: 'R$ 297' },
       { title: 'Garantia de 7 dias' }
