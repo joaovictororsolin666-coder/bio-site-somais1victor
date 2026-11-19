@@ -10,8 +10,7 @@ window.QUIZ_DATA = {
   ofertaKey: 'ofertaClube',
   // Vai para o painel /painel marcado como funil "clube" (fica separado do MPV)
   funil: 'clube',
-  // Botão de voltar liberado também no presente, no bônus e na oferta
-  travaVolta: false,
+  // Voltar: igual ao MPV — depois que a pessoa abre o presente (bônus e oferta) não dá mais para voltar
 
   intro: {
     title: 'Descubra como <span class="hl">ganhar dinheiro com vídeos curtos</span>, sem precisar aparecer!',
