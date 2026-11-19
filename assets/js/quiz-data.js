@@ -116,7 +116,7 @@ window.QUIZ_DATA = {
         badge: '💡 A verdade é que…',
         // Título usado só se a resposta não tiver "virada"
         title: 'Para começar, você <span class="hl">não precisa</span> do que a maioria pensa.',
-        text: 'No Método Primeira Renda você aprende a vender produtos digitais usando <strong>perfis dark e cortes de vídeos</strong>, mesmo começando do zero.',
+        text: 'No Método Primeira Venda você aprende a vender produtos digitais usando <strong>perfis dark e cortes de vídeos</strong>, mesmo começando do zero.',
         points: [
           '❌ Não precisa ter muitos seguidores',
           '❌ Não precisa aparecer nos vídeos',
@@ -131,8 +131,8 @@ window.QUIZ_DATA = {
         badge: '👀 Veja esse caso real',
         title: 'Muita gente começa <span class="hl">exatamente assim</span>',
         caseText: 'A Poliana entrou perdida, achando que nunca ia vender nada e em <mark>12 dias faturou mais de R$2.000,00</mark> usando o nosso <strong>Sistema de Vendas.</strong>',
-        casePhoto: { src: 'assets/img/quiz/poliana.webp', w: 400, h: 534, alt: 'Poliana, aluna do MPR' },
-        caseName: 'Poliana · Aluna MPR',
+        casePhoto: { src: 'assets/img/quiz/poliana.webp', w: 400, h: 534, alt: 'Poliana, aluna do MPV' },
+        caseName: 'Poliana · Aluna MPV',
         audio: { src: 'assets/img/quiz/depoimento.mp3', duration: '0:18' },
         audioHint: '🔊 Toque para ouvir o depoimento dela',
         casePrint: { src: 'assets/img/quiz/resultado-a.webp', w: 540, h: 957, alt: 'Print da conversa com a Poliana mostrando o resultado dela' },
@@ -168,7 +168,7 @@ window.QUIZ_DATA = {
     title: 'Analisando suas respostas...',
     text: 'Organizando tudo para te mostrar os próximos passos.',
     items: ['Seu objetivo financeiro', 'Seu nível de experiência', 'Seu tempo disponível'],
-    done: 'Seu perfil combina com o Método Primeira Renda ✅'
+    done: 'Seu perfil combina com o Método Primeira Venda ✅'
   },
 
   result: {
@@ -242,8 +242,8 @@ window.QUIZ_DATA = {
   },
 
   offer: {
-    banner: { src: 'assets/img/quiz/banner-oferta.webp', w: 800, h: 336, alt: 'Método Primeira Renda' },
-    eyebrow: 'MPR · Método Primeira Renda',
+    banner: { src: 'assets/img/mpv-800.webp', w: 800, h: 336, alt: 'Método Primeira Venda' },
+    eyebrow: 'MPV · Método Primeira Venda',
     title: 'Aprenda a faturar até <span class="hl">R$300 por dia</span> vendendo produtos digitais sem precisar aparecer!',
     subtitle: 'Mesmo que você esteja começando do absoluto zero.',
     // Resumo das respostas logo abaixo do título (continua a conversa do quiz)
@@ -273,12 +273,12 @@ window.QUIZ_DATA = {
     // Depois das provas: mini vídeo animado da área de membros (capas dos módulos) + cards de destaque (não clicáveis).
     // Substitui o carrossel "O que vou aprender?" que ficava depois do preço.
     tour: {
-      eyebrow: 'Método Primeira Renda',
-      title: 'Aqui está tudo o que você vai receber no <span class="hl">MPR</span>',
+      eyebrow: 'Método Primeira Venda',
+      title: 'Aqui está tudo o que você vai receber no <span class="hl">MPV</span>',
       subtitle: 'Sem precisar aparecer, pelo celular e de forma simples',
-      bar: 'Área de membros · MPR',
+      bar: 'Área de membros · MPV',
       introText: 'Tour pela área de membros', // abertura só com o texto (sem logo, a pedido)
-      alt: 'Prévia animada da área de membros do Método Primeira Renda, com as capas dos 10 módulos',
+      alt: 'Prévia animada da área de membros do Método Primeira Venda, com as capas dos 10 módulos',
       covers: [
         'assets/img/quiz/modulo-01.webp', 'assets/img/quiz/modulo-02.webp', 'assets/img/quiz/modulo-03.webp',
         'assets/img/quiz/modulo-04.webp', 'assets/img/quiz/modulo-05.webp', 'assets/img/quiz/modulo-06.webp',
@@ -306,7 +306,7 @@ window.QUIZ_DATA = {
       extras: [
         {
           tag: 'Bônus especial 01', title: 'Grupo VIP no WhatsApp', image: 'assets/img/quiz/extra-1.webp',
-          text: 'Dentro do MPR você terá acesso a uma comunidade de networking, com conteúdos exclusivos para você vender na internet e pessoas com o mesmo objetivo que você.'
+          text: 'Dentro do MPV você terá acesso a uma comunidade de networking, com conteúdos exclusivos para você vender na internet e pessoas com o mesmo objetivo que você.'
         },
         {
           tag: 'Bônus especial 02', title: 'Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp',
@@ -321,10 +321,12 @@ window.QUIZ_DATA = {
       ate: '2026-11-30T23:59:59-03:00',
       stackTitle: 'Oferta de <span class="hl">Black November</span>'
     },
+    // Preço cheio aparece primeiro e "cai" para o à vista quando a pessoa rola até ele
+    priceAnim: true,
     // Resumo da oferta logo acima do preço: títulos + valor de referência riscado ("de")
     stackTitle: '🎁 Tudo o que você recebe hoje',
     stack: [
-      { title: 'Método Primeira Renda', de: 'R$ 97' },
+      { title: 'Método Primeira Venda', de: 'R$ 97' },
       { title: 'Bônus 01 · Estrutura de Vendas', de: 'R$ 97' },
       { title: 'Bônus 02 · +2.500 Vídeos Prontos', de: 'R$ 37' },
       { title: 'Bônus especial · Grupo VIP no WhatsApp', de: 'R$ 147' },
@@ -356,13 +358,13 @@ window.QUIZ_DATA = {
     guarantee: {
       image: { src: 'assets/img/quiz/garantia.webp', w: 480, h: 320, alt: 'Selo de garantia de 7 dias' },
       title: 'Garantia incondicional de 7 dias',
-      text: 'Você terá <strong>7 dias inteiros</strong> para acessar o Método Primeira Renda, assistir às aulas, conhecer as estratégias e colocar o passo a passo em prática.',
+      text: 'Você terá <strong>7 dias inteiros</strong> para acessar o Método Primeira Venda, assistir às aulas, conhecer as estratégias e colocar o passo a passo em prática.',
       list: ['Acesse o conteúdo imediatamente', 'Teste o método durante 7 dias', 'Se não gostar, peça seu dinheiro de volta'],
       footer: 'Sem complicação e sem burocracia!',
       cta: 'COMPRAR COM GARANTIA DE 7 DIAS'
     },
     faq: [
-      { q: 'Funciona mesmo para quem está começando do zero?', a: '<strong>Sim! 🚀</strong> O Método Primeira Renda foi desenvolvido para iniciantes. Você vai aprender o passo a passo para criar sua estrutura, produzir conteúdos e começar a vender produtos digitais, mesmo sem experiência.' },
+      { q: 'Funciona mesmo para quem está começando do zero?', a: '<strong>Sim! 🚀</strong> O Método Primeira Venda foi desenvolvido para iniciantes. Você vai aprender o passo a passo para criar sua estrutura, produzir conteúdos e começar a vender produtos digitais, mesmo sem experiência.' },
       { q: 'Preciso aparecer ou ter muitos seguidores?', a: '<strong>Não! ✅</strong> Você vai aprender estratégias utilizando perfis dark, cortes de vídeos e produtos digitais, sem precisar mostrar o rosto ou já ter uma audiência grande.' },
       { q: 'Quando vou receber meu acesso?', a: '<strong>Imediatamente! 🔓</strong> Após a confirmação do pagamento, você receberá as instruções para acessar a plataforma com as aulas, materiais e bônus.' },
       { q: 'E se eu comprar e não gostar?', a: '<strong>Você tem 7 dias de garantia! 🛡️</strong> Acesse as aulas, conheça o método e teste as estratégias. Se perceber que não é para você, basta solicitar o reembolso dentro do prazo e receber 100% do valor pago de volta.' }

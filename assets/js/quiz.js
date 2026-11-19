@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Motor dos quizzes (Método Primeira Renda e Clube Dark Viral)
+   Motor dos quizzes (Método Primeira Venda e Clube Dark Viral)
    Telas renderizadas a partir de quiz-data.js ou clube-data.js. Sem dependências.
    ========================================================================== */
 (function () {
@@ -36,6 +36,8 @@
   // bonus e offer: depois de abrir o presente não dá para voltar (senão a pessoa vê que as 3 caixas têm os mesmos bônus)
   var NO_BACK = { intro: true, loading: true, bonus: true, offer: true };
   var TRAVA_VOLTA = "bonus";
+  // Funil que libera o voltar no fim (ex.: Clube, com um bônus só): travaVolta: false no QUIZ_DATA
+  if (D.travaVolta === false) { NO_BACK = { intro: true, loading: true }; TRAVA_VOLTA = null; }
 
   /* ───────────── Estado (sobrevive a recarregar a página) ───────────── */
 
@@ -122,6 +124,42 @@
 
   // Animações leves dos blocos da oferta (SVG + CSS, sem imagem nem biblioteca)
   var ANIM = {
+    // Clube: um destaque passa pelos nichos e para em um
+    nichos:
+      '<span class="cb-nichos">' +
+        '<span class="cb-chip">🎮 Games</span><span class="cb-chip">🧠 Curiosidades</span>' +
+        '<span class="cb-chip">🕵️ Mistérios</span><span class="cb-chip">🍳 Receitas</span>' +
+        '<span class="cb-chip">🔥 Motivação</span><span class="cb-chip">🤖 IA</span>' +
+      "</span>",
+    // Clube: celular tocando um vídeo curto, com corações subindo e views contando
+    video:
+      '<span class="cb-phone"><span class="cb-phone__screen">' +
+        '<span class="cb-phone__cap">PARTE 1</span><span class="cb-phone__play"></span>' +
+        '<span class="cb-phone__bar"><i></i></span>' +
+        '<span class="cb-heart">❤</span><span class="cb-heart cb-heart--2">❤</span><span class="cb-heart cb-heart--3">❤</span>' +
+        '<span class="cb-phone__views">▶ 128 mil</span>' +
+      "</span></span>",
+    // Clube: 1 vídeo vira vários cortes, cada um com um modelo diferente (linhas tracejadas saindo do logo)
+    cortes:
+      '<span class="cb-split">' +
+        '<span class="cb-src"><span class="cb-src__img"></span><span class="cb-src__tag">Vídeo original</span><span class="cb-src__bar"><i></i></span></span>' +
+        '<span class="cb-node"><img src="assets/img/clube/logo-cdv-v2.webp" alt=""></span>' +
+        '<svg class="cb-lines" viewBox="0 0 300 44" preserveAspectRatio="none"><path d="M150 0C150 24 50 20 50 44"/><path d="M150 0V44"/><path d="M150 0C150 24 250 20 250 44"/></svg>' +
+        '<span class="cb-cuts">' +
+          '<span class="cb-cut cb-cut--cap"><b>PARTE 1</b></span>' +
+          '<span class="cb-cut cb-cut--tw"><span class="cb-cut__card"><em>@sua.pagina</em><b>Ninguém viu esse detalhe 👀</b></span><span class="cb-cut__pic"></span></span>' +
+          '<span class="cb-cut cb-cut--meme"><b>QUANDO O GTA 6 LANÇAR</b></span>' +
+        "</span>" +
+        '<span class="cb-split__label">1 vídeo → 3 cortes prontos para postar</span>' +
+      "</span>",
+    // Clube: formas de monetizar entrando uma a uma
+    monetizar:
+      '<span class="cb-money">' +
+        '<span class="cb-money__row"><i>🪙</i>Monetização das plataformas</span>' +
+        '<span class="cb-money__row"><i>🤝</i>Publis e parcerias</span>' +
+        '<span class="cb-money__row"><i>🔗</i>Links de afiliado</span>' +
+        '<span class="cb-money__row"><i>🛒</i>Venda de produtos digitais</span>' +
+      "</span>",
     celular:
       '<svg viewBox="0 0 120 120">' +
         '<g class="a-float">' +
@@ -450,8 +488,159 @@
     });
   }
 
+  // Abertura do Clube: um perfil sendo montado (nicho → nome → foto → vídeos), em loop pelos nichos com foto
+  function builderNiches() {
+    var q = Q.filter(function (x) { return x.layout === "carousel"; })[0];
+    return q ? q.options.filter(function (o) { return o.image; }) : [];
+  }
+  function builderHtml() {
+    var ns = builderNiches().slice(0, 4);
+    return '<div class="qz-bld" data-bld aria-hidden="true">' +
+      '<div class="qz-bld__steps"><span data-st="0">1 · Nicho</span><span data-st="1">2 · Nome e foto</span><span data-st="2">3 · Vídeos</span></div>' +
+      '<div class="qz-bld__box">' +
+        '<div class="qz-bld__panel qz-bld__panel--niches">' + ns.map(function (o, k) {
+          return '<span class="qz-bld__chip" data-k="' + k + '">' + o.emoji + " " + (o.short || o.label) + "</span>";
+        }).join("") + "</div>" +
+        '<div class="qz-bld__panel qz-bld__panel--prof">' +
+          '<div class="qz-bld__head"><span class="qz-bld__ava"><img alt="" data-bld-ava></span>' +
+          '<div><p class="qz-bld__name">@<span data-bld-name></span><i class="qz-bld__caret"></i></p>' +
+          '<p class="qz-bld__meta"><b data-bld-f>0</b> seguidores · sem mostrar o rosto</p></div></div>' +
+          '<div class="qz-bld__grid"><span data-bld-post></span><span data-bld-post></span><span data-bld-post></span></div>' +
+        "</div>" +
+        '<span class="qz-bld__toast">🔥 Vídeo viralizando: <b>128 mil views</b></span>' +
+      "</div></div>";
+  }
+  function bindBuilder(root) {
+    var box = $("[data-bld]", root);
+    var ns = builderNiches().slice(0, 4);
+    if (!box || !ns.length) return;
+    var name = $("[data-bld-name]", box), ava = $("[data-bld-ava]", box), fol = $("[data-bld-f]", box);
+    var posts = $$("[data-bld-post]", box), chips = $$(".qz-bld__chip", box);
+    var timers = [], k = 0;
+    function later(fn, ms) { timers.push(setTimeout(function () { if (!box.isConnected) { timers.forEach(clearTimeout); return; } fn(); }, ms)); }
+    function stage(n) {
+      box.setAttribute("data-stage", n);
+      $$("[data-st]", box).forEach(function (el) { el.classList.toggle("is-on", +el.getAttribute("data-st") <= n); });
+    }
+    function cycle() {
+      var o = ns[k % ns.length], handle = o.names[0], t = 0;
+      box.classList.remove("has-ava", "has-toast");
+      posts.forEach(function (el) { el.classList.remove("is-in"); });
+      chips.forEach(function (c) { c.classList.remove("is-on"); });
+      name.textContent = ""; fol.textContent = "0";
+      stage(0);
+      later(function () { chips[k % ns.length].classList.add("is-on"); }, t += 700);
+      later(function () { stage(1); }, t += 1100);
+      t += 300;
+      handle.split("").forEach(function (ch, i) { later(function () { name.textContent += ch; }, t + i * 65); });
+      t += handle.length * 65 + 250;
+      later(function () { ava.src = o.image; box.classList.add("has-ava"); }, t);
+      later(function () {
+        stage(2);
+        posts.forEach(function (el, i) {
+          el.style.backgroundImage = "url('" + o.image + "')";
+          el.style.backgroundPosition = ["50% 30%", "25% 70%", "75% 50%"][i];
+          later(function () { el.classList.add("is-in"); }, i * 220);
+        });
+        var t0 = null;
+        (function step(ts) {
+          if (!box.isConnected) return;
+          if (t0 === null) t0 = ts;
+          var pr = Math.max(0, Math.min(1, (ts - t0) / 1300)), e = 1 - Math.pow(1 - pr, 3);
+          fol.textContent = fmtNum(12400 * e, "k");
+          if (pr < 1) requestAnimationFrame(step);
+        })(performance.now());
+      }, t += 600);
+      later(function () { box.classList.add("has-toast"); }, t += 1300);
+      later(function () { k++; cycle(); }, t += 2300);
+    }
+    if (reduceMotion) {
+      var o = ns[0];
+      chips[0].classList.add("is-on"); name.textContent = o.names[0]; ava.src = o.image; fol.textContent = fmtNum(12400, "k");
+      box.classList.add("has-ava", "has-toast"); stage(2);
+      posts.forEach(function (el) { el.style.backgroundImage = "url('" + o.image + "')"; el.classList.add("is-in"); });
+      return;
+    }
+    cycle();
+  }
+
+  // Preço que "cai": mostra o preço cheio e desce até o preço à vista quando aparece na tela
+  function bindPriceAnim(root) {
+    var el = $("[data-price-anim]", root);
+    if (!el) return;
+    var num = $("span", el), de = +el.getAttribute("data-de"), por = +el.getAttribute("data-por");
+    var from = $(".qz-price__from", el.parentNode);
+    if (reduceMotion || !("IntersectionObserver" in window)) return;
+    num.textContent = de;
+    el.classList.add("is-high");
+    if (from) from.classList.add("is-wait");
+    var io = new IntersectionObserver(function (es) {
+      if (!es[0].isIntersecting) return;
+      io.disconnect();
+      setTimeout(function () {
+        var t0 = null;
+        el.classList.add("is-drop");
+        (function step(ts) {
+          if (t0 === null) t0 = ts;
+          var pr = Math.max(0, Math.min(1, (ts - t0) / 1100)), e = 1 - Math.pow(1 - pr, 3);
+          num.textContent = Math.round(de - (de - por) * e);
+          if (pr < 1) return requestAnimationFrame(step);
+          el.classList.remove("is-high", "is-drop");
+          el.classList.add("is-done");
+          if (from) from.classList.remove("is-wait");
+        })(performance.now());
+      }, 500);
+    }, { threshold: 0.6 });
+    io.observe(el);
+  }
+
+  // Prévia estilo perfil do Instagram (quando o nicho tem foto): números sobem e os vídeos entram um a um
+  function igPreview(o) {
+    var estilo = answerOf("estilo");
+    var hooks = o.hooks || [o.short || o.label, "Parte 2", "Você não vai acreditar"];
+    var views = [128000, 47300, 312000];
+    var pos = ["50% 30%", "30% 70%", "70% 50%"];
+    function n(v, label, fmt) { return '<span><b data-count="' + v + '"' + (fmt ? ' data-fmt="' + fmt + '"' : "") + ">0</b>" + label + "</span>"; }
+    return '<div class="qz-ig">' +
+      '<div class="qz-ig__top"><span class="qz-ig__ring"><img src="' + o.image + '" alt="" width="72" height="72" decoding="async"></span>' +
+      '<div class="qz-ig__stats">' + n(30, "posts") + n(12400, "seguidores", "k") + n(1200000, "views", "k") + "</div></div>" +
+      '<p class="qz-ig__handle">@' + o.names[0] + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5l2.4 1.8 3-.2.9 2.9 2.5 1.7-.9 2.9.9 2.9-2.5 1.7-.9 2.9-3-.2L12 20.5l-2.4-1.8-3 .2-.9-2.9-2.5-1.7.9-2.9-.9-2.9 2.5-1.7.9-2.9 3 .2z"/><path class="qz-ig__tick" d="M8 12.2l2.6 2.6L16 9.4"/></svg></p>' +
+      '<p class="qz-ig__bio">' + (o.conteudo || o.short || o.label) + (estilo ? " · " + estilo : "") + "</p>" +
+      '<div class="qz-ig__grid">' + hooks.slice(0, 3).map(function (h, k) {
+        return '<div class="qz-ig__post" style="--d:' + (0.35 + k * 0.25) + "s;background-image:url('" + o.image + "');background-position:" + pos[k] + '">' +
+          '<span class="qz-ig__hook">' + h + "</span>" +
+          '<span class="qz-ig__views"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg><b data-count="' + views[k] + '" data-fmt="k">0</b></span></div>';
+      }).join("") + "</div>" +
+      '<p class="qz-page__label">Outro nome possível: <strong>@' + o.names[1] + "</strong></p>" +
+      (o.formato ? '<p class="qz-page__label">Formato: <strong>' + o.formato + "</strong></p>" : "") +
+      '<p class="qz-ig__note">Prévia ilustrativa de como a sua página pode ficar</p>' +
+      "</div>";
+  }
+
+  function fmtNum(v, fmt) {
+    if (fmt !== "k") return String(Math.round(v));
+    if (v >= 1e6) return (v / 1e6).toFixed(1).replace(".", ",").replace(",0", "") + " mi";
+    if (v >= 1e3) return (v / 1e3).toFixed(v >= 1e5 ? 0 : 1).replace(".", ",").replace(",0", "") + " mil";
+    return String(Math.round(v));
+  }
+
+  // Faz os números [data-count] subirem de 0 até o valor
+  function bindCounters(root) {
+    var els = $$("[data-count]", root);
+    if (!els.length) return;
+    var dur = reduceMotion ? 0 : 1600, t0 = null;
+    function frame(t) {
+      if (t0 === null) t0 = t;
+      var p = dur ? Math.min(1, (t - t0) / dur) : 1, e = 1 - Math.pow(1 - p, 3);
+      els.forEach(function (el) { el.textContent = fmtNum(+el.getAttribute("data-count") * e, el.getAttribute("data-fmt")); });
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    setTimeout(function () { requestAnimationFrame(frame); }, reduceMotion ? 0 : 450);
+  }
+
   // Prévia da página da pessoa, com o nome sugerido para o nicho escolhido
   function pageCard(o) {
+    if (o.image) return igPreview(o);
     var estilo = answerOf("estilo");
     return '<div class="qz-page"><div class="qz-page__head"><span class="qz-page__avatar" aria-hidden="true" style="--a:' + o.colors[0] + ";--b:" + o.colors[1] + '">' + o.emoji + "</span>" +
       '<div><p class="qz-page__handle">@' + o.names[0] + "</p>" +
@@ -470,7 +659,7 @@
       return '<section class="qz-screen qz-center">' +
         '<h1 class="qz-title qz-title--lg">' + s.title + "</h1>" +
         '<p class="qz-tagline"><span>' + s.tag + "</span></p>" +
-        '<div class="qz-media">' + img(s.image, "", true) + "</div>" +
+        (s.builder ? builderHtml() : '<div class="qz-media">' + img(s.image, "", true) + "</div>") +
         '<p class="qz-text">' + s.text + "</p>" +
         cta(s.cta, "data-next data-start") +
         '<p class="qz-note">⏱ ' + s.note + "</p>" +
@@ -527,6 +716,19 @@
       var opt = chosen != null ? q.options[chosen] : null;
       var virada = opt && opt.virada;
       var picked = opt ? opt.label : "";
+      // Quebra de objeção: cada resposta tem o próprio título, texto e lista (insight.byOption[id])
+      var by = s.byOption && opt && s.byOption[opt.id];
+      if (by) {
+        return '<section class="qz-screen qz-center qz-insight qz-insight--by">' +
+          '<p class="qz-insight__you">Você respondeu: <strong>' + picked + "</strong></p>" +
+          '<span class="qz-insight__bulb" aria-hidden="true">💡</span>' +
+          '<p class="qz-insight__badge">' + s.badge + "</p>" +
+          '<h1 class="qz-title">' + by.title + "</h1>" +
+          '<p class="qz-text">' + by.text + "</p>" +
+          (by.points ? '<ul class="qz-insight__list">' + by.points.map(function (p) { return "<li>" + p + "</li>"; }).join("") + "</ul>" : "") +
+          cta(by.cta || s.cta) +
+          "</section>";
+      }
       // Com "virada", a própria resposta vira o título e sai da lista (tela mais curta, botão sem rolar)
       var title = virada ? 'Para começar, você <span class="hl">não precisa ' + virada + "</span>." : s.title;
       var points = virada ? s.points.filter(function (p) { return p.toLowerCase().indexOf(virada.toLowerCase()) < 0; }) : s.points;
@@ -669,7 +871,9 @@
         '<p class="qz-price__label">' + (s.priceLabel || "Acesso completo + todos os bônus") + "</p>" +
         (price.precoDe ? '<p class="qz-price__from">De <s>' + price.precoDe + "</s> por apenas" +
           (off > 0 ? ' <span class="qz-price__off">' + off + "% OFF</span>" : "") + "</p>" : "") +
-        '<p class="qz-price__main"><small>R$</small>' + vista + "</p>" +
+        (s.priceAnim && price.precoDe ?
+          '<p class="qz-price__main" data-price-anim data-de="' + toNum(price.precoDe) + '" data-por="' + toNum(price.precoVista) + '"><small>R$</small><span>' + vista + "</span></p>" :
+          '<p class="qz-price__main"><small>R$</small>' + vista + "</p>") +
         (price.parcelas ? '<p class="qz-price__alt">ou <strong>' + price.parcelas + "</strong></p>" : "") +
         priceNotes(s) +
         "</div>" : "";
@@ -834,7 +1038,7 @@
   window.addEventListener("popstate", function (e) {
     var step = e.state && typeof e.state.qz === "number" ? e.state.qz : 0;
     // Voltar do celular/navegador a partir dos bônus ou da oferta: continua na mesma tela
-    var trava = FLOW.indexOf(TRAVA_VOLTA);
+    var trava = TRAVA_VOLTA ? FLOW.indexOf(TRAVA_VOLTA) : -1;
     if (trava > -1 && state.step >= trava && step < state.step) {
       history.pushState({ qz: state.step }, "", location.pathname + location.search);
       return;
@@ -852,6 +1056,9 @@
   function vibrate() { try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) { /* ignore */ } }
 
   function bind(name, root) {
+    bindCounters(root);
+    if (name === "intro") bindBuilder(root);
+    if (name === "offer") bindPriceAnim(root);
     $$("[data-next]", root).forEach(function (b) {
       b.addEventListener("click", function () {
         if (b.hasAttribute("data-start")) VG.track("quizStart");

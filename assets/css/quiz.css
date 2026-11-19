@@ -733,3 +733,14 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(57, 229, 140, .18)
 .qz-countdown { display: grid; gap: 2px; margin: 14px auto 0; padding: 10px 12px; max-width: 340px; border: 1px dashed rgba(239, 68, 68, .55); border-radius: 12px; background: rgba(239, 68, 68, .08); text-align: center; }
 .qz-countdown span { color: #fca5a5; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
 .qz-countdown strong { color: #fff; font-size: 21px; font-weight: 800; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+
+/* Preço que "cai" do preço cheio para o à vista ao rolar (offer.priceAnim: true no QUIZ_DATA) */
+.qz-price__main[data-price-anim] span { font-variant-numeric: tabular-nums; }
+.qz-price__main.is-high { color: #a1a1aa; }
+.qz-price__main.is-drop { animation: cb-shake .25s 3; }
+.qz-price__main.is-done { animation: cb-pop .6s cubic-bezier(.2, 1.6, .4, 1); }
+.qz-price__from { transition: opacity .4s, transform .4s; }
+.qz-price__from.is-wait { opacity: 0; transform: translateY(6px); }
+@keyframes cb-shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+@keyframes cb-pop { 0% { transform: scale(.85); } 60% { transform: scale(1.12); text-shadow: 0 0 28px rgba(var(--green-rgb), .9); } 100% { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .qz-price__main.is-drop, .qz-price__main.is-done { animation: none; } }

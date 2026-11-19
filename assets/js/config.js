@@ -7,12 +7,14 @@ window.SITE_CONFIG = {
   links: {
     // Botão do Clube Dark Viral → página do grupo VIP até a abertura. Para abrir as vendas pelo quiz, troque por "clube".
     clubeDarkViral: "clube-vip",
+    // Quiz do Clube (/clube), usado no rascunho da bio (bio-v2.html)
+    clubeQuiz: "clube",
 
     // Checkout do Clube Dark Viral. Enquanto estiver vazio, o botão de compra avisa que ainda não está configurado.
-    checkoutClube: "",
+    checkoutClube: "https://checkout.neonpay.com.br/checkout/cmwnbs44i059g01q11e6klnhn?offer=41EWR8C", // NeonPay · Oferta de Lançamento R$ 97
     checkoutUtmsClube: { utm_campaign: "cdv", utm_content: "funil_quiz_clube", src: "quiz_cdv" },
 
-    // Botão do Método Primeira Renda → quiz (funil). Para pular o quiz, coloque aqui o link do checkout.
+    // Botão do Método Primeira Venda → quiz (funil). Para pular o quiz, coloque aqui o link do checkout.
     metodoPrimeiraRenda: "quiz",
 
     // Checkout do MPR (botões da oferta no fim do quiz) — Kiwify
@@ -58,8 +60,9 @@ window.SITE_CONFIG = {
 
   /* ── Preço exibido na oferta do Clube Dark Viral (confira com o checkout ao mudar o preço) ── */
   ofertaClube: {
-    precoVista: "R$ 67",
-    parcelas: "12x de R$ 6,93"
+    precoDe: "R$ 297", // ancoragem: aparece primeiro e "cai" para o preço à vista
+    precoVista: "R$ 97",
+    parcelas: "12x de R$ 11,11" // conferido no checkout da NeonPay em 19/11
   },
 
   /* ── Preço exibido na oferta para quem cai na NeonPay no teste de checkout ── */
