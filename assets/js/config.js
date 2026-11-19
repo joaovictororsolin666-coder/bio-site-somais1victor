@@ -30,9 +30,10 @@ window.SITE_CONFIG = {
     // 18/11: em 24h foram 47 cliques no checkout (38 na NeonPay) e só 1 venda.
     // Desde 18/11: teste 50/50 por 3 dias entre NeonPay e Kiwify para quem está no Brasil (exterior sempre na Kiwify).
     // Cada visitante fica sempre no mesmo lado. Compare vendas ÷ cliques de cada lado no painel (Teste de checkout).
+    // 19/11: fim do teste. NeonPay converteu melhor: Brasil volta 100% para a NeonPay, exterior segue na Kiwify.
     testeCheckout: {
       ativo: true,
-      modo: "sorteio",
+      modo: "pais",
       neon: 0.5,
       link: "https://checkout.neonpay.com.br/checkout/cmv6sesvu022k01of5d632afj?offer=VNOV5FS",
       utms: { utm_campaign: "mpr", utm_content: "funil_quiz_neonpay", src: "quiz_mpr" }
