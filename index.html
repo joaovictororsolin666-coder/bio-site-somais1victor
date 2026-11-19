@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Victor Gomes | Marketing Digital e Criação de Conteúdo</title>
-  <meta name="description" content="Aprenda a vender na internet com o Método Primeira Venda ou aplique para a Mentoria de Criação de Conteúdo com Victor Gomes.">
+  <meta name="description" content="Aprenda a vender produtos digitais com o Método Primeira Venda ou a ganhar dinheiro com vídeos curtos no Clube Dark Viral, com Victor Gomes.">
   <meta name="theme-color" content="#080808">
   <meta name="color-scheme" content="dark">
 
@@ -63,57 +63,33 @@
       <p class="hero__sub reveal" style="--i:2">Escolha como posso te ajudar a dar o próximo passo.</p>
     </header>
 
-    <!-- ─────────── Ofertas ─────────── -->
-    <section class="offers" aria-label="Como posso te ajudar">
+    <!-- ─────────── Aprenda comigo: banners clicáveis (o banner inteiro é o botão) ─────────── -->
+    <section class="bn-sec" aria-labelledby="bn-title">
+      <h2 class="ia__title reveal" style="--i:3" id="bn-title">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 9v6"/></svg>
+        Aprenda comigo
+      </h2>
+      <div class="bn-lista">
+        <!-- Clube Dark Viral → quiz /clube (links.clubeQuiz no config.js) -->
+        <a class="bn bn--clube reveal" style="--i:4" href="#" data-link="clubeQuiz" data-track="clubeClick" data-clique="clube" aria-label="Clube Dark Viral: renda com vídeos curtos">
+          <img src="assets/img/clube-banner-1300.webp" srcset="assets/img/clube-banner-650.webp 650w, assets/img/clube-banner-1300.webp 1300w"
+               sizes="(min-width: 900px) 520px, calc(100vw - 34px)" alt="" width="1300" height="588" fetchpriority="high" decoding="async">
+          <span class="bn__tag">Renda com vídeos curtos</span>
+          <span class="bn__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </a>
 
-      <!-- Card 01 — Método Primeira Venda -->
-      <article class="card card--featured reveal" style="--i:4" data-card>
-        <div class="card__media">
-          <!-- Banner: proporção 1200×504. Para trocar, substitua mpr-800.webp e mpr-1200.webp -->
-          <img src="assets/img/mpv-1200.webp"
-               srcset="assets/img/mpv-800.webp 800w, assets/img/mpv-1200.webp 1200w"
-               sizes="(min-width: 900px) 520px, calc(100vw - 34px)"
-               alt="Método Primeira Venda: aprenda a vender produtos na internet usando vídeos simples, sem precisar aparecer"
-               width="1200" height="504" fetchpriority="high" decoding="async">
-        </div>
+        <!-- Método Primeira Venda → quiz /quiz (links.metodoPrimeiraRenda no config.js) -->
+        <a class="bn bn--mpv reveal" style="--i:5" href="#" data-link="metodoPrimeiraRenda" data-track="mprClick" data-clique="mpr" aria-label="Método Primeira Venda: venda de produtos digitais">
+          <img src="assets/img/mpv-1200.webp" srcset="assets/img/mpv-800.webp 800w, assets/img/mpv-1200.webp 1200w"
+               sizes="(min-width: 900px) 520px, calc(100vw - 34px)" alt="" width="1200" height="504" decoding="async">
+          <span class="bn__tag">Venda de produtos digitais</span>
+          <span class="bn__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </a>
+      </div>
+    </section>
 
-        <div class="card__body">
-          <h2 class="card__title">Método Primeira Venda</h2>
-          <p class="card__desc">Aprenda a vender produtos digitais pela internet usando vídeos simples, sem precisar aparecer.</p>
-          <div class="card__cta">
-            <!-- O link é definido em assets/js/config.js → links.metodoPrimeiraRenda -->
-            <a class="btn btn--primary" href="#" data-link="metodoPrimeiraRenda" data-track="mprClick" data-clique="mpr" data-card-action>
-              <span class="btn__label">QUERO APRENDER A VENDER</span>
-              <svg class="btn__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </a>
-          </div>
-        </div>
-      </article>
-
-      <!-- Card 02 — Clube Dark Viral -->
-      <!-- Fora da bio desde 16/11: para voltar, tire o atributo hidden -->
-      <article class="card card--dark reveal" style="--i:5" data-card hidden>
-        <div class="card__media">
-          <!-- Banner: proporção 2:1 (1200×600). Para trocar, substitua clube-gta-800.webp e clube-gta-1200.webp -->
-          <img src="assets/img/clube-gta-1200.webp"
-               srcset="assets/img/clube-gta-800.webp 800w, assets/img/clube-gta-1200.webp 1200w"
-               sizes="(min-width: 900px) 970px, calc(100vw - 34px)"
-               alt="Clube Dark Viral: em breve, grupo de lançamento"
-               width="1200" height="600" decoding="async">
-        </div>
-
-        <div class="card__body">
-          <h2 class="card__title">Clube Dark Viral</h2>
-          <p class="card__desc">Aprenda a criar, editar e viralizar cortes de conteúdos como o GTA 6 e outros assuntos em alta, e monetizar nas redes sociais, sem precisar aparecer.</p>
-          <div class="card__cta">
-            <!-- O link é definido em assets/js/config.js → links.clubeDarkViral -->
-            <a class="btn btn--dark" href="#" data-link="clubeDarkViral" data-track="clubeClick" data-clique="clube" data-card-action>
-              <span class="btn__label">QUERO ENTRAR NO GRUPO VIP</span>
-              <svg class="btn__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </a>
-          </div>
-        </div>
-      </article>
+    <!-- ─────────── Ofertas antigas (mentoria em stand-by) ─────────── -->
+    <section class="offers" aria-label="Mentoria">
 
       <!-- Card 03 — Mentoria de Criação de Conteúdo -->
       <!-- Em stand-by: para voltar, tire o atributo hidden -->
@@ -148,7 +124,7 @@
 
     <!-- ─────────── Indicação de sites de IA ───────────
          Para indicar outro site, copie o bloco <a class="ia-card"> abaixo, dentro de .ia-lista -->
-    <section class="ia reveal" style="--i:7" aria-labelledby="ia-title">
+    <section class="ia reveal" style="--i:6" aria-labelledby="ia-title">
       <h2 class="ia__title" id="ia-title">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v3"/><circle cx="12" cy="2.5" r="1"/><rect x="4" y="6" width="16" height="13" rx="4"/><path d="M1.5 11.5v4M22.5 11.5v4"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><path d="M9.5 16h5"/></svg>
         Indicação de sites de IA

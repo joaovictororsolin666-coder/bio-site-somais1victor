@@ -62,3 +62,59 @@
 @media (min-width: 900px) {
   .ia { max-width: 520px; margin: 48px auto 0; }
 }
+
+/* ───────────── Bio: banners clicáveis "Aprenda comigo" (19/11) ───────────── */
+.bn-sec { margin-top: 30px; }
+.bn-lista { display: grid; gap: 14px; margin-top: 16px; }
+.bn {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(var(--green-rgb), .45);
+  background: #000;
+  box-shadow: 0 18px 40px -22px rgba(var(--green-rgb), .6);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .25s var(--ease), box-shadow .25s;
+}
+.bn img { display: block; width: 100%; height: auto; }
+.bn--clube { border-color: rgba(192, 132, 252, .55); box-shadow: 0 18px 40px -22px rgba(168, 85, 247, .8); }
+.bn:active { transform: scale(.985); }
+.bn__tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--green);
+  color: var(--green-ink);
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, .8);
+}
+/* MPV: etiqueta embaixo à esquerda (em cima ficaria sobre o logo do banner) */
+.bn--mpv .bn__tag { top: auto; bottom: 10px; }
+.bn--clube .bn__tag { left: auto; right: 10px; background: linear-gradient(90deg, #a855f7, #ec4899 60%, #f97316); color: #fff; }
+.bn__go {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .65);
+  color: #fff;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.bn__go svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) {
+  .bn:hover { transform: translateY(-3px); }
+}
+@media (min-width: 900px) {
+  .bn-sec { max-width: 520px; margin-left: auto; margin-right: auto; }
+}
