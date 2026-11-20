@@ -749,3 +749,7 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(var(--green-rgb), 
 .qz-proofbox { flex: none; margin: 0 12px 0 0; text-align: center; }
 .qz-proofbox .qz-proof-card { margin-right: 0; }
 .qz-proofbox figcaption { margin-top: 8px; color: var(--green); font-size: 14px; font-weight: 800; letter-spacing: .02em; }
+
+/* Resumo: itens "incluso" (sem riscado) e linha "Hoje: R$ 67 no Pix" */
+.qz-stack__list .qz-stack__inc { color: var(--green); font-weight: 800; text-decoration: none; }
+.qz-price__pix { margin: 6px 0 0; color: #fff; font-size: 15px; font-weight: 800; }

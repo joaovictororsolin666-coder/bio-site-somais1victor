@@ -883,6 +883,7 @@
         (s.priceAnim && price.precoDe ?
           '<p class="qz-price__main" data-price-anim data-de="' + toNum(price.precoDe) + '" data-por="' + toNum(price.precoVista) + '"><small>R$</small><span>' + vista + "</span></p>" :
           '<p class="qz-price__main"><small>R$</small>' + vista + "</p>") +
+        (s.priceSuffix ? '<p class="qz-price__pix">' + (s.priceToday ? s.priceToday + " " : "") + (price.precoVista || "") + " " + s.priceSuffix + "</p>" : "") +
         (price.parcelas ? '<p class="qz-price__alt">ou <strong>' + price.parcelas + "</strong></p>" : "") +
         priceNotes(s) +
         "</div>" : "";
@@ -925,7 +926,8 @@
         '<ul class="qz-stack__list">' + s.stack.map(function (it) {
           return "<li>" + (it.image ? '<img src="' + it.image + '" alt="" width="48" height="60" loading="lazy" decoding="async">' : '<span class="qz-stack__check" aria-hidden="true">✓</span>') +
             "<div><strong>" + it.title + "</strong>" + (it.text ? "<span>" + it.text + "</span>" : "") + "</div>" +
-            (it.de ? '<s class="qz-stack__de">' + it.de + "</s>" : "") + "</li>";
+            (it.de ? '<s class="qz-stack__de">' + it.de + "</s>" : "") +
+            (it.inc ? '<span class="qz-stack__de qz-stack__inc">' + it.inc + "</span>" : "") + "</li>";
         }).join("") + "</ul>" +
         priceHtml +
         countdownHtml() +

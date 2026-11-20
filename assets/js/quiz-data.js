@@ -310,7 +310,7 @@ window.QUIZ_DATA = {
         },
         {
           tag: 'Bônus especial 02', title: 'Robô de Vendas no Automático', image: 'assets/img/quiz/robo-vendas.webp',
-          text: 'Sendo meu sócio, eu vou liberar pra você o meu robô de vendas criado por inteligência artificial, que vai vender pra você todos os dias no automático.'
+          text: 'Como aluno do MPV, você ativa o meu robô de vendas criado por inteligência artificial, que vai vender pra você todos os dias no automático.'
         }
       ]
     },
@@ -327,10 +327,10 @@ window.QUIZ_DATA = {
     stackTitle: '🎁 Tudo o que você recebe hoje',
     stack: [
       { title: 'Método Primeira Venda', de: 'R$ 97' },
-      { title: 'Bônus 01 · Estrutura de Vendas', de: 'R$ 97' },
-      { title: 'Bônus 02 · +2.500 Vídeos Prontos', de: 'R$ 37' },
-      { title: 'Bônus especial · Grupo VIP no WhatsApp', de: 'R$ 147' },
-      { title: 'Bônus especial · Robô de Vendas no Automático', de: 'R$ 297' },
+      { title: 'Estrutura de Vendas', de: 'R$ 103' },
+      { title: '+2.500 Vídeos Prontos', de: 'R$ 97' },
+      { title: 'Grupo VIP no WhatsApp', inc: 'incluso' },
+      { title: 'Robô de Vendas', inc: 'incluso' },
       { title: 'Garantia de 7 dias' }
     ],
     // Carrossel de arrastar: módulos em destaque com tópicos + card final com os demais (antes da garantia)
@@ -352,21 +352,31 @@ window.QUIZ_DATA = {
     // Antes: 'SIM! QUERO COMPRAR POR {preco}' (quebrava em 2 linhas no celular)
     cta: 'QUERO COMEÇAR AGORA',
     // Deixa claro que é uma compra (muita gente achava que era grátis)
-    payNote: 'Você vai para o pagamento seguro (Pix ou cartão). O acesso é liberado após a confirmação do pagamento.',
-    trust: '🔒 Pagamento 100% seguro · 🔓 Acesso imediato',
-    // Linha abaixo do preço pela objeção (objectionNotes: { comeco, medo, tempo, tentou }) removida em 18/11 a pedido
+    payNote: 'Leva 1 minuto: preencha seus dados, pague no Pix e o acesso chega no seu e-mail na hora.',
+    trust: '🔒 Pagamento seguro · 🛡️ 7 dias de garantia',
+    // Preço à vista: "Hoje: R$ 67 no Pix"
+    priceToday: 'Hoje:', priceSuffix: 'no Pix',
+    // Linha abaixo do preço pela resposta da pergunta "objecao" (voltou em 20/11)
+    objectionNotes: {
+      comeco: '🧭 A aula 1 já te mostra o que fazer nos primeiros 7 dias.',
+      medo: '🛡️ Se não gostar em 7 dias, devolvo 100%.',
+      tempo: '⏳ Dá pra aplicar em 30 minutos por dia.',
+      tentou: '🔁 Aqui você segue o que já está vendendo, sem teste.'
+    },
     guarantee: {
       image: { src: 'assets/img/quiz/garantia.webp', w: 480, h: 320, alt: 'Selo de garantia de 7 dias' },
       title: 'Garantia incondicional de 7 dias',
       text: 'Você terá <strong>7 dias inteiros</strong> para acessar o Método Primeira Venda, assistir às aulas, conhecer as estratégias e colocar o passo a passo em prática.',
       list: ['Acesse o conteúdo imediatamente', 'Teste o método durante 7 dias', 'Se não gostar, peça seu dinheiro de volta'],
-      footer: 'Sem complicação e sem burocracia!',
+      footer: 'Um e-mail e o dinheiro volta. Sem perguntas.',
       cta: 'COMPRAR COM GARANTIA DE 7 DIAS'
     },
     faq: [
       { q: 'Funciona mesmo para quem está começando do zero?', a: '<strong>Sim! 🚀</strong> O Método Primeira Venda foi desenvolvido para iniciantes. Você vai aprender o passo a passo para criar sua estrutura, produzir conteúdos e começar a vender produtos digitais, mesmo sem experiência.' },
       { q: 'Preciso aparecer ou ter muitos seguidores?', a: '<strong>Não! ✅</strong> Você vai aprender estratégias utilizando perfis dark, cortes de vídeos e produtos digitais, sem precisar mostrar o rosto ou já ter uma audiência grande.' },
       { q: 'Quando vou receber meu acesso?', a: '<strong>Imediatamente! 🔓</strong> Após a confirmação do pagamento, você receberá as instruções para acessar a plataforma com as aulas, materiais e bônus.' },
+      { q: 'Pago no Pix, quando recebo o acesso?', a: '<strong>Na hora! ⚡</strong> Assim que o Pix cai, o acesso chega no seu e-mail. Leva segundos.' },
+      { q: 'Por que o checkout pede CPF e telefone?', a: 'São exigidos para emitir o Pix e enviar o seu acesso. <strong>Seus dados ficam protegidos.</strong>' },
       { q: 'E se eu comprar e não gostar?', a: '<strong>Você tem 7 dias de garantia! 🛡️</strong> Acesse as aulas, conheça o método e teste as estratégias. Se perceber que não é para você, basta solicitar o reembolso dentro do prazo e receber 100% do valor pago de volta.' }
     ]
   }
