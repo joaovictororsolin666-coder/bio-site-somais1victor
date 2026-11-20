@@ -372,6 +372,14 @@
       "</div>";
   }
 
+  // Print de resultado na faixa de provas; com "name", o primeiro nome do aluno aparece embaixo
+  function proofCard(p, i, copia) {
+    var im = '<img class="qz-proof-card" src="' + p.src + '" width="' + p.w + '" height="' + p.h + '" alt="' +
+      (copia ? "" : "Resultado de " + (p.name || "aluno " + (i + 1))) + '"' + (copia ? ' aria-hidden="true"' : "") + ' decoding="async">';
+    if (!p.name) return im;
+    return '<figure class="qz-proofbox"' + (copia ? ' aria-hidden="true"' : "") + ">" + im + "<figcaption>" + p.name + "</figcaption></figure>";
+  }
+
   // Black November: faixa fixa no topo da oferta, título do resumo e contagem até offer.black.ate (depois some sozinha)
   function blackAtiva() {
     var b = D.offer && D.offer.black;
@@ -904,12 +912,8 @@
         (s.proofs && s.proofs.length ? '<h2 class="qz-h2 qz-center qz-gap">' + s.proofTitle + "</h2>" +
         // Provas em loop automático (a lista vai duas vezes; a segunda é só visual)
         '<div class="qz-marquee qz-marquee--proof" aria-label="Resultados de alunos"><div class="qz-marquee__track">' +
-        s.proofs.map(function (p, i) {
-          return '<img class="qz-proof-card" src="' + p.src + '" width="' + p.w + '" height="' + p.h + '" alt="Resultado de aluno ' + (i + 1) + '" decoding="async">';
-        }).join("") +
-        s.proofs.map(function (p) {
-          return '<img class="qz-proof-card" src="' + p.src + '" width="' + p.w + '" height="' + p.h + '" alt="" aria-hidden="true" decoding="async">';
-        }).join("") +
+        s.proofs.map(function (p, i) { return proofCard(p, i, false); }).join("") +
+        s.proofs.map(function (p, i) { return proofCard(p, i, true); }).join("") +
         "</div></div>" : "") +
 
         tourHtml(s.tour) +

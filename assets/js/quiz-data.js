@@ -263,12 +263,12 @@ window.QUIZ_DATA = {
     ],
     proofTitle: 'Veja os resultados de quem decidiu colocar o método em prática! 🚀',
     proofs: [
-      { src: 'assets/img/quiz/resultado-a.webp', w: 540, h: 957 },
-      { src: 'assets/img/quiz/resultado-b.webp', w: 540, h: 776 },
-      { src: 'assets/img/quiz/resultado-c.webp', w: 540, h: 1005 },
-      { src: 'assets/img/quiz/resultado-d.webp', w: 540, h: 749 },
-      { src: 'assets/img/quiz/resultado-e.webp', w: 540, h: 865 },
-      { src: 'assets/img/quiz/resultado-f.webp', w: 540, h: 803 }
+      { src: 'assets/img/quiz/resultado-a.webp', w: 540, h: 957, name: 'Poliana' },
+      { src: 'assets/img/quiz/resultado-b.webp', w: 540, h: 776, name: 'Xande' },
+      { src: 'assets/img/quiz/resultado-c.webp', w: 540, h: 1005, name: 'Maurício' },
+      { src: 'assets/img/quiz/resultado-d.webp', w: 540, h: 749, name: 'Gabriel' },
+      { src: 'assets/img/quiz/resultado-e.webp', w: 540, h: 865, name: 'Paulo' },
+      { src: 'assets/img/quiz/resultado-f.webp', w: 540, h: 803, name: 'Alan' }
     ],
     // Depois das provas: mini vídeo animado da área de membros (capas dos módulos) + cards de destaque (não clicáveis).
     // Substitui o carrossel "O que vou aprender?" que ficava depois do preço.

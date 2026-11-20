@@ -744,3 +744,8 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(var(--green-rgb), 
 @keyframes cb-shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
 @keyframes cb-pop { 0% { transform: scale(.85); } 60% { transform: scale(1.12); text-shadow: 0 0 28px rgba(var(--green-rgb), .9); } 100% { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .qz-price__main.is-drop, .qz-price__main.is-done { animation: none; } }
+
+/* Print de resultado com o primeiro nome do aluno embaixo */
+.qz-proofbox { flex: none; margin: 0 12px 0 0; text-align: center; }
+.qz-proofbox .qz-proof-card { margin-right: 0; }
+.qz-proofbox figcaption { margin-top: 8px; color: var(--green); font-size: 14px; font-weight: 800; letter-spacing: .02em; }
