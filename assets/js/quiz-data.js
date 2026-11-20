@@ -321,8 +321,8 @@ window.QUIZ_DATA = {
       ate: '2026-11-30T23:59:59-03:00',
       stackTitle: 'Oferta de <span class="hl">Black November</span>'
     },
-    // Preço cheio aparece primeiro e "cai" para o à vista quando a pessoa rola até ele
-    priceAnim: true,
+    // Preço fixo (R$ 67 sempre visível) com um brilho pulsando; a animação de queda saiu em 20/11
+    priceGlow: true,
     // Resumo da oferta logo acima do preço: títulos + valor de referência riscado ("de")
     stackTitle: '🎁 Tudo o que você recebe hoje',
     stack: [

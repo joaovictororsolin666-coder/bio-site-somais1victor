@@ -882,7 +882,7 @@
           (off > 0 ? ' <span class="qz-price__off">' + off + "% OFF</span>" : "") + "</p>" : "") +
         (s.priceAnim && price.precoDe ?
           '<p class="qz-price__main" data-price-anim data-de="' + toNum(price.precoDe) + '" data-por="' + toNum(price.precoVista) + '"><small>R$</small><span>' + vista + "</span></p>" :
-          '<p class="qz-price__main"><small>R$</small>' + vista + "</p>") +
+          '<p class="qz-price__main' + (s.priceGlow ? " qz-price__main--glow" : "") + '"><small>R$</small>' + vista + "</p>") +
         (s.priceSuffix ? '<p class="qz-price__pix">' + (s.priceToday ? s.priceToday + " " : "") + (price.precoVista || "") + " " + s.priceSuffix + "</p>" : "") +
         (price.parcelas ? '<p class="qz-price__alt">ou <strong>' + price.parcelas + "</strong></p>" : "") +
         priceNotes(s) +
