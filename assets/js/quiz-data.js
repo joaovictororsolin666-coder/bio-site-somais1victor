@@ -121,7 +121,7 @@ window.QUIZ_DATA = {
           '❌ Não precisa ter muitos seguidores',
           '❌ Não precisa aparecer nos vídeos',
           '❌ Não precisa investir em anúncios',
-          '✅ Precisa de um passo a passo e do seu celular'
+          '✅ Só precisa do celular e de um passo a passo que mostra o que postar e onde vender'
         ],
         cta: 'FAZ SENTIDO, CONTINUAR'
       },
