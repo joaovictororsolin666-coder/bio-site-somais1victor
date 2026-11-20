@@ -136,7 +136,7 @@ window.QUIZ_DATA = {
         audio: { src: 'assets/img/quiz/depoimento.mp3', duration: '0:18' },
         audioHint: '🔊 Toque para ouvir o depoimento dela',
         casePrint: { src: 'assets/img/quiz/resultado-a.webp', w: 540, h: 957, alt: 'Print da conversa com a Poliana mostrando o resultado dela' },
-        proof: 'Esse é apenas um dos milhares de resultados de quem coloca o método em prática! 🔥',
+        proof: 'Esse é um dos resultados de mais de 3.000 pessoas que já conheceram o método!',
         cta: 'IR PARA A ÚLTIMA PERGUNTA'
       }
     },
