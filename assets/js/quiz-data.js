@@ -244,7 +244,7 @@ window.QUIZ_DATA = {
   offer: {
     banner: { src: 'assets/img/mpv-800.webp', w: 800, h: 336, alt: 'Método Primeira Venda' },
     eyebrow: 'MPV · Método Primeira Venda',
-    title: 'Aprenda a faturar até <span class="hl">R$300 por dia</span> vendendo produtos digitais sem precisar aparecer!',
+    title: 'Aprenda a faturar <span class="hl">R$300 ou mais por dia</span> vendendo produtos digitais sem precisar aparecer!',
     subtitle: 'Mesmo que você esteja começando do absoluto zero.',
     // Resumo das respostas logo abaixo do título (continua a conversa do quiz)
     plan: {
