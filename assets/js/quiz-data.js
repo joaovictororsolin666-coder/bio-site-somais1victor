@@ -354,8 +354,6 @@ window.QUIZ_DATA = {
     // Deixa claro que é uma compra (muita gente achava que era grátis)
     payNote: 'Leva 1 minuto: preencha seus dados, pague no Pix e o acesso chega no seu e-mail na hora.',
     trust: '🔒 Pagamento seguro · 🛡️ 7 dias de garantia',
-    // Preço à vista: "Hoje: R$ 67 no Pix"
-    priceToday: 'Hoje:', priceSuffix: 'no Pix',
     // Linha abaixo do preço pela resposta da pergunta "objecao" (voltou em 20/11)
     objectionNotes: {
       comeco: '🧭 A aula 1 já te mostra o que fazer nos primeiros 7 dias.',
