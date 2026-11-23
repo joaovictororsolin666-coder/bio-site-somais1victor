@@ -50,13 +50,13 @@
 .ia-card__text strong { font-size: 16px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; }
 .ia-card__text span { color: #c9c9c9; font-size: 13.5px; line-height: 1.35; }
 
-/* Kooko AI: tons neutros (logo preto e branco) */
-.ia-card--kooko { border-color: rgba(255, 255, 255, .2); background: linear-gradient(120deg, #1c1c1f, #0b0b0c 70%); }
+/* Kooko AI e ViceScale: mesmo card neutro (padronizados em 23/11) */
+.ia-card--kooko, .ia-card--vicescale { border-color: rgba(255, 255, 255, .2); background: linear-gradient(120deg, #1c1c1f, #0b0b0c 70%); }
 .ia-card--kooko img { background: #fff; }
 
 @media (hover: hover) {
   .ia-card:hover { transform: translateY(-2px); border-color: rgba(239, 68, 68, .6); }
-  .ia-card--kooko:hover { border-color: rgba(255, 255, 255, .5); }
+  .ia-card--kooko:hover, .ia-card--vicescale:hover { border-color: rgba(255, 255, 255, .5); }
 }
 
 @media (min-width: 900px) {
