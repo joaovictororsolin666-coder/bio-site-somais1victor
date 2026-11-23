@@ -190,3 +190,9 @@ body.ef {
 /* prova (vídeo feito pelo próprio EditFlow) + requisito no primeiro botão */
 .ef .ef-prova{margin:0 auto 22px;max-width:520px;padding:12px 16px;border-radius:14px;background:rgba(139,92,246,.12);border:1px solid rgba(167,139,250,.35);font-size:15px;line-height:1.45;text-align:center}
 .ef .ef-micro__req{opacity:.7;font-size:.92em}
+
+/* aviso de requisitos (âmbar) logo acima do botão de compra */
+.ef .ef-aviso{display:flex;align-items:flex-start;gap:10px;max-width:440px;margin:18px auto 18px;padding:12px 16px;border-radius:16px;
+  background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);color:#f5b544;font-size:15px;line-height:1.4;text-align:left}
+.ef .ef-aviso strong{color:#fff;font-weight:700}
+.ef .ef-aviso svg{flex:none;width:20px;height:20px;margin-top:1px;fill:none;stroke:#f5b544;stroke-width:2;stroke-linecap:round}
