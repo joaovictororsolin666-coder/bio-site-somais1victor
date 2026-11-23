@@ -196,3 +196,5 @@ body.ef {
   background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);color:#f5b544;font-size:15px;line-height:1.4;text-align:left}
 .ef .ef-aviso strong{color:#fff;font-weight:700}
 .ef .ef-aviso svg{flex:none;width:20px;height:20px;margin-top:1px;fill:none;stroke:#f5b544;stroke-width:2;stroke-linecap:round}
+
+.ef .ef-nq{white-space:nowrap}
