@@ -14,6 +14,10 @@ window.SITE_CONFIG = {
     checkoutClube: "https://checkout.neonpay.com.br/checkout/cmwnbs44i059g01q11e6klnhn?offer=41EWR8C", // NeonPay · Oferta de Lançamento R$ 97
     checkoutUtmsClube: { utm_campaign: "cdv", utm_content: "funil_quiz_clube", src: "quiz_cdv" },
 
+    // Checkout do Plugin Play (página /plugin-play). Vazio = o botão avisa "Link disponível em breve".
+    // Cole aqui o link do checkout da Cakto quando o produto estiver criado.
+    checkoutPluginPlay: "",
+
     // Botão do Método Primeira Venda → quiz (funil). Para pular o quiz, coloque aqui o link do checkout.
     metodoPrimeiraRenda: "quiz",
 

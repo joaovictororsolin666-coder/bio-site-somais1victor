@@ -1,0 +1,115 @@
+/* ───────────── Plugin Play: página de vendas (/plugin-play) ───────────── */
+body.pp {
+  --pp-bg: #07080b; --pp-card: #10131a; --pp-borda: rgba(255, 255, 255, .09);
+  --pp-verde: #39e58c; --pp-roxo: #a855f7; --pp-texto: #f4f5f7; --pp-suave: #a3a8b5;
+  margin: 0; background: var(--pp-bg); color: var(--pp-texto); font-family: 'Manrope', system-ui, sans-serif;
+  background-image: radial-gradient(60% 40% at 50% -5%, rgba(168, 85, 247, .22), transparent 70%),
+                    radial-gradient(50% 30% at 50% 30%, rgba(57, 229, 140, .07), transparent 70%);
+  background-repeat: no-repeat; padding-bottom: 86px;
+}
+.pp * { box-sizing: border-box; }
+.pp h1, .pp h2, .pp h3 { font-family: 'Space Grotesk', 'Manrope', sans-serif; letter-spacing: -.02em; margin: 0; }
+
+.pp-hero { max-width: 640px; margin: 0 auto; padding: 44px 16px 20px; text-align: center; }
+.pp-tag { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 18px; padding: 7px 14px; border-radius: 999px;
+  border: 1px solid var(--pp-borda); background: rgba(255, 255, 255, .04); color: var(--pp-suave); font-size: 13px; font-weight: 700; }
+.pp-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pp-verde); box-shadow: 0 0 10px var(--pp-verde); }
+.pp-hero h1 { font-size: clamp(32px, 8.6vw, 52px); line-height: 1.05; }
+.pp-hero h1 em { font-style: normal; background: linear-gradient(90deg, var(--pp-verde), #a3e635); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.pp-sub { margin: 16px auto 0; max-width: 520px; color: var(--pp-suave); font-size: 17px; line-height: 1.55; }
+
+.pp-demo { position: relative; width: min(300px, 72vw); margin: 28px auto 26px; border-radius: 28px; overflow: hidden;
+  border: 1px solid rgba(168, 85, 247, .45); box-shadow: 0 30px 80px -30px rgba(168, 85, 247, .75); aspect-ratio: 9 / 16; background: #000; }
+.pp-demo video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pp-demo__selo { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); white-space: nowrap; padding: 6px 12px;
+  border-radius: 999px; background: rgba(0, 0, 0, .7); font-size: 12px; font-weight: 700; color: #fff; backdrop-filter: blur(6px); }
+
+.pp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 460px; padding: 19px 22px;
+  border-radius: 16px; background: var(--pp-verde); color: #04140b; font-weight: 800; font-size: 17px; text-decoration: none;
+  box-shadow: 0 14px 40px -12px rgba(57, 229, 140, .7); transition: transform .2s; animation: pp-pulso 2.6s ease-in-out infinite; }
+.pp-btn:active { transform: scale(.98); }
+@keyframes pp-pulso { 50% { box-shadow: 0 14px 50px -6px rgba(57, 229, 140, .95); } }
+@media (prefers-reduced-motion: reduce) { .pp-btn { animation: none; } }
+.pp-mini { margin: 10px 0 0; color: var(--pp-suave); font-size: 14px; }
+.pp-selos { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
+.pp-selos li { padding: 6px 12px; border-radius: 999px; background: rgba(57, 229, 140, .1); color: var(--pp-verde); font-size: 13px; font-weight: 700; }
+
+.pp-sec { max-width: 760px; margin: 0 auto; padding: 46px 16px 10px; }
+.pp-h2, .pp-carta h2, .pp-fim h2 { font-size: clamp(26px, 6.6vw, 36px); text-align: center; margin-bottom: 22px; }
+.pp-centro { text-align: center; }
+.pp-suave { color: var(--pp-suave); margin-top: -8px; }
+
+.pp-grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pp-grid4 article, .pp-modos article { padding: 18px 16px; border-radius: 18px; background: var(--pp-card); border: 1px solid var(--pp-borda); }
+.pp-grid4 b { font-size: 26px; }
+.pp-grid4 h3 { margin-top: 8px; font-size: 17px; }
+.pp-grid4 p, .pp-modos p { margin: 6px 0 0; color: var(--pp-suave); font-size: 14px; line-height: 1.5; }
+
+.pp-carta { font-size: 17px; line-height: 1.65; color: #d7d9df; }
+.pp-carta p { margin: 0 0 14px; }
+.pp-carta strong { color: var(--pp-verde); }
+
+.pp-chat { display: flex; flex-direction: column; gap: 10px; max-width: 480px; margin: 0 auto; padding: 18px; border-radius: 22px; background: var(--pp-card); border: 1px solid var(--pp-borda); }
+.pp-msg { max-width: 86%; padding: 11px 14px; border-radius: 16px 16px 16px 4px; background: #1b1f29; font-size: 14.5px; line-height: 1.45; }
+.pp-msg--eu { align-self: flex-end; border-radius: 16px 16px 4px 16px; background: var(--pp-roxo); color: #fff; }
+.pp-msg--ok { background: rgba(57, 229, 140, .14); color: var(--pp-verde); font-weight: 800; }
+.pp-passos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 22px 0 12px; padding: 0; list-style: none; }
+.pp-passos li { text-align: center; font-size: 12.5px; color: var(--pp-suave); line-height: 1.35; }
+.pp-passos b { display: grid; place-items: center; width: 34px; height: 34px; margin: 0 auto 6px; border-radius: 50%; background: rgba(168, 85, 247, .18); color: #d8b4fe; }
+
+.pp-modos { display: grid; gap: 12px; }
+.pp-modos span { font-size: 26px; }
+.pp-modos h3 { margin-top: 6px; font-size: 19px; }
+
+.pp-estilos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pp-estilos figure { margin: 0; }
+.pp-estilos img { display: block; width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--pp-borda); }
+.pp-estilos figcaption { margin-top: 6px; font-size: 12.5px; font-weight: 700; text-align: center; color: var(--pp-suave); }
+
+.pp-lista { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.pp-lista li { padding: 14px 16px 14px 46px; position: relative; border-radius: 14px; background: var(--pp-card); border: 1px solid var(--pp-borda); color: var(--pp-suave); font-size: 15px; line-height: 1.45; }
+.pp-lista li::before { content: '✓'; position: absolute; left: 16px; top: 13px; color: var(--pp-verde); font-weight: 900; }
+.pp-lista b { color: var(--pp-texto); }
+.pp-lista .pp-bonus { border-color: rgba(250, 204, 21, .5); background: rgba(250, 204, 21, .06); }
+.pp-lista .pp-bonus::before { content: '🎁'; }
+
+.pp-preco { text-align: center; margin-top: 30px; padding: 34px 18px 28px; max-width: 520px; border-radius: 26px; background: var(--pp-card);
+  border: 1px solid rgba(57, 229, 140, .4); box-shadow: 0 30px 80px -40px rgba(57, 229, 140, .6); }
+.pp-de { margin: 0; color: var(--pp-suave); font-size: 16px; }
+.pp-valor { margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 88px; font-weight: 700; line-height: 1; color: var(--pp-verde);
+  text-shadow: 0 0 34px rgba(57, 229, 140, .45); }
+.pp-valor small { font-size: 32px; margin-right: 4px; vertical-align: 38px; }
+.pp-preco .pp-btn { margin-top: 20px; }
+.pp-pag { margin: 10px 0 0; color: var(--pp-suave); font-size: 13px; }
+.pp-req { margin-top: 22px; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, .04); text-align: left; font-size: 14px; line-height: 1.5; }
+.pp-req ul { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; color: var(--pp-suave); }
+.pp-req strong { color: var(--pp-texto); }
+
+.pp-garantia { display: flex; gap: 18px; align-items: center; }
+.pp-selo7 { flex: none; display: grid; place-items: center; width: 92px; height: 92px; border-radius: 50%; border: 3px solid var(--pp-verde);
+  font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; color: var(--pp-verde); line-height: .9; text-align: center; }
+.pp-selo7 small { display: block; font-size: 13px; }
+.pp-garantia h2 { font-size: 22px; }
+.pp-garantia p { margin: 6px 0 0; color: var(--pp-suave); line-height: 1.5; }
+
+.pp-faq { display: grid; gap: 10px; }
+.pp-faq details { border-radius: 14px; background: var(--pp-card); border: 1px solid var(--pp-borda); padding: 0 16px; }
+.pp-faq summary { cursor: pointer; padding: 16px 0; font-weight: 800; list-style: none; position: relative; padding-right: 26px; }
+.pp-faq summary::-webkit-details-marker { display: none; }
+.pp-faq summary::after { content: '+'; position: absolute; right: 0; top: 13px; font-size: 22px; color: var(--pp-verde); }
+.pp-faq details[open] summary::after { content: '–'; }
+.pp-faq p { margin: 0 0 16px; color: var(--pp-suave); line-height: 1.55; }
+
+.pp-fim { text-align: center; }
+.pp-ps { margin: 20px auto 0; max-width: 520px; color: var(--pp-suave); line-height: 1.55; }
+.pp-rodape { max-width: 640px; margin: 40px auto 0; padding: 20px 16px; text-align: center; color: #6b7080; font-size: 12.5px; line-height: 1.5; }
+.pp-rodape a { color: inherit; }
+
+.pp-fixo { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 20; display: block; max-width: 460px; margin: 0 auto; padding: 16px; border-radius: 14px;
+  background: var(--pp-verde); color: #04140b; text-align: center; font-weight: 800; text-decoration: none; box-shadow: 0 10px 30px -8px rgba(0, 0, 0, .8); }
+
+@media (min-width: 760px) {
+  .pp-grid4 { grid-template-columns: repeat(4, 1fr); }
+  .pp-modos { grid-template-columns: 1fr 1fr; }
+  .pp-estilos { grid-template-columns: repeat(4, 1fr); }
+}
