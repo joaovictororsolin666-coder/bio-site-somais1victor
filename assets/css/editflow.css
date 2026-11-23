@@ -17,10 +17,8 @@ body.ef {
 .ef-r.ef-on { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .ef-r { opacity: 1; transform: none; transition: none; } }
 
-.ef-barra { position: sticky; top: 0; z-index: 30; padding: 9px 16px; text-align: center; font-size: 13.5px; font-weight: 700;
-  background: var(--grad); color: #0b0716; }
 
-.ef-hero { max-width: 660px; margin: 0 auto; padding: 34px 16px 10px; text-align: center; }
+.ef-hero { max-width: 660px; margin: 0 auto; padding: 40px 16px 10px; text-align: center; }
 .ef-marca { display: inline-flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
 .ef-marca b { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .ef-logo { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: var(--grad); box-shadow: 0 8px 24px -8px var(--roxo); }
@@ -61,7 +59,8 @@ body.ef {
 
 .ef-sec { max-width: 780px; margin: 0 auto; padding: 52px 16px 6px; }
 .ef-sec--larga { max-width: none; padding-left: 0; padding-right: 0; }
-.ef-h2 { font-size: clamp(27px, 7vw, 40px); text-align: center; margin-bottom: 24px; line-height: 1.1; }
+/* .ef h2 zera a margem (especificidade maior), por isso o seletor duplo aqui */
+.ef .ef-h2 { font-size: clamp(27px, 7vw, 40px); text-align: center; margin: 0 0 28px; line-height: 1.1; }
 .ef-h2 span { color: var(--rosa); }
 .ef-centro { text-align: center; }
 .ef-suave { color: var(--suave); }
@@ -113,7 +112,8 @@ body.ef {
 .ef-comp { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .ef-comp__lado { padding: 18px 14px; border-radius: 18px; background: var(--card); border: 1px solid var(--borda); }
 .ef-comp__lado h3 { font-size: 16px; color: var(--suave); }
-.ef-comp__preco { margin: 6px 0 10px; font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; }
+.ef-comp__preco { margin: 6px 0 10px; font-family: 'Space Grotesk', sans-serif; font-size: clamp(22px, 6.4vw, 28px); font-weight: 700; white-space: nowrap; }
+.ef-comp__preco small { display: block; white-space: normal; }
 .ef-comp__preco small { font-size: 13px; color: var(--suave); font-weight: 600; }
 .ef-comp ul { margin: 0; padding: 0 0 0 16px; color: var(--suave); font-size: 13.5px; line-height: 1.5; display: grid; gap: 6px; }
 .ef-comp__lado--ef { border-color: rgba(139, 92, 246, .6); background: linear-gradient(180deg, rgba(139, 92, 246, .16), var(--card)); }
