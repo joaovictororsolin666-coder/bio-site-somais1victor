@@ -250,6 +250,9 @@ a { color: inherit; }
 .card--featured .card__title,
 .card--dark .card__title { font-size: 25px; }
 .card__desc { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
+/* Card sem título visível: o texto vira a chamada principal */
+.card__desc--lead { margin-top: 0; color: #e9ede9; font-size: 17px; line-height: 1.45; }
+.card__desc--lead strong { color: var(--green); font-weight: 800; }
 .card__cta { margin-top: auto; padding-top: 22px; }
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
