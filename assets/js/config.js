@@ -16,7 +16,7 @@ window.SITE_CONFIG = {
 
     // Checkout do Plugin Play (página /plugin-play). Vazio = o botão avisa "Link disponível em breve".
     // Cole aqui o link do checkout da Cakto quando o produto estiver criado.
-    checkoutPluginPlay: "",
+    checkoutPluginPlay: "https://pay.cakto.com.br/m4egs9m_1361064", // Cakto · Plugin Play R$ 47 (criado em 23/11)
 
     // Botão do Método Primeira Venda → quiz (funil). Para pular o quiz, coloque aqui o link do checkout.
     metodoPrimeiraRenda: "quiz",
