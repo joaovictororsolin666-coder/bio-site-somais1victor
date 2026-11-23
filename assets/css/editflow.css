@@ -1,0 +1,181 @@
+/* ───────────── EditFlow AI: página de vendas (/editflow) ───────────── */
+body.ef {
+  --bg: #07060d; --card: #100e1a; --borda: rgba(255, 255, 255, .08);
+  --roxo: #8b5cf6; --ciano: #22d3ee; --rosa: #ec4899; --verde: #4ade80;
+  --texto: #f5f4fa; --suave: #a8a5bb;
+  --grad: linear-gradient(100deg, var(--roxo), var(--ciano));
+  margin: 0; background: var(--bg); color: var(--texto); font-family: 'Manrope', system-ui, sans-serif; padding-bottom: 90px;
+  background-image: radial-gradient(70% 45% at 50% -8%, rgba(139, 92, 246, .32), transparent 70%),
+                    radial-gradient(40% 30% at 90% 25%, rgba(34, 211, 238, .12), transparent 70%);
+  background-repeat: no-repeat; overflow-x: hidden;
+}
+.ef * { box-sizing: border-box; }
+.ef h1, .ef h2, .ef h3 { font-family: 'Space Grotesk', 'Manrope', sans-serif; letter-spacing: -.025em; margin: 0; }
+
+/* Aparecer ao rolar */
+.ef-r { opacity: 0; transform: translateY(26px); transition: opacity .7s cubic-bezier(.2, .7, .2, 1), transform .7s cubic-bezier(.2, .7, .2, 1); }
+.ef-r.ef-on { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .ef-r { opacity: 1; transform: none; transition: none; } }
+
+.ef-barra { position: sticky; top: 0; z-index: 30; padding: 9px 16px; text-align: center; font-size: 13.5px; font-weight: 700;
+  background: var(--grad); color: #0b0716; }
+
+.ef-hero { max-width: 660px; margin: 0 auto; padding: 34px 16px 10px; text-align: center; }
+.ef-marca { display: inline-flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
+.ef-marca b { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ef-logo { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: var(--grad); box-shadow: 0 8px 24px -8px var(--roxo); }
+.ef-logo svg { width: 22px; height: 22px; fill: none; stroke: #0b0716; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ef-logo svg path:last-child { fill: #0b0716; }
+.ef-tag { display: inline-flex; align-items: center; gap: 8px; margin: 18px 0 16px; padding: 7px 14px; border-radius: 999px;
+  border: 1px solid var(--borda); background: rgba(255, 255, 255, .04); color: var(--suave); font-size: 13px; font-weight: 700; }
+.ef-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--verde); box-shadow: 0 0 10px var(--verde); animation: ef-pisca 1.6s infinite; }
+@keyframes ef-pisca { 50% { opacity: .35; } }
+.ef-hero h1 { font-size: clamp(34px, 9vw, 56px); line-height: 1.03; }
+.ef-hero h1 em { font-style: normal; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ef-sub { margin: 16px auto 0; max-width: 540px; color: var(--suave); font-size: 17px; line-height: 1.55; }
+.ef-sub strong { color: var(--texto); }
+
+.ef-vsl { position: relative; width: min(330px, 80vw); margin: 28px auto 26px; border-radius: 30px; overflow: hidden; aspect-ratio: 9 / 16; background: #000;
+  border: 1px solid rgba(139, 92, 246, .5); box-shadow: 0 0 0 6px rgba(139, 92, 246, .08), 0 40px 90px -30px rgba(139, 92, 246, .9); }
+.ef-vsl video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ef-som { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 14px 20px; border: 0; border-radius: 999px; cursor: pointer;
+  background: rgba(10, 7, 20, .78); color: #fff; font: 800 15px 'Manrope', sans-serif; backdrop-filter: blur(8px);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .25); animation: ef-pulso 2s infinite; }
+.ef-som[hidden] { display: none; }
+@keyframes ef-pulso { 50% { box-shadow: 0 0 0 8px rgba(255, 255, 255, .06); } }
+.ef-vsl__selo { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); white-space: nowrap; padding: 6px 12px; border-radius: 999px;
+  background: rgba(0, 0, 0, .65); font-size: 12px; font-weight: 700; }
+
+.ef-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 470px; padding: 19px 22px;
+  border-radius: 16px; background: var(--grad); color: #0b0716; font-weight: 800; font-size: 17px; text-decoration: none; overflow: hidden;
+  box-shadow: 0 16px 44px -14px rgba(139, 92, 246, .9); }
+.ef-btn::after { content: ''; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%; transform: skewX(-20deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent); animation: ef-brilho 3.2s infinite; }
+@keyframes ef-brilho { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+.ef-btn:active { transform: scale(.98); }
+.ef-btn--grande { padding: 21px 22px; font-size: 18px; }
+@media (prefers-reduced-motion: reduce) { .ef-btn::after, .ef-som, .ef-dot { animation: none; } }
+.ef-micro { margin: 10px 0 0; color: var(--suave); font-size: 13.5px; }
+.ef-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
+.ef-chips li { padding: 6px 12px; border-radius: 999px; background: rgba(139, 92, 246, .14); color: #c4b5fd; font-size: 13px; font-weight: 700; }
+
+.ef-sec { max-width: 780px; margin: 0 auto; padding: 52px 16px 6px; }
+.ef-sec--larga { max-width: none; padding-left: 0; padding-right: 0; }
+.ef-h2 { font-size: clamp(27px, 7vw, 40px); text-align: center; margin-bottom: 24px; line-height: 1.1; }
+.ef-h2 span { color: var(--rosa); }
+.ef-centro { text-align: center; }
+.ef-suave { color: var(--suave); }
+.ef-sec--larga .ef-suave { margin: -10px 16px 22px; }
+
+.ef-abertura { text-align: center; font-size: 19px; line-height: 1.6; color: #d9d6e8; }
+.ef-abertura p { margin: 0 0 10px; }
+.ef-abertura strong { color: var(--ciano); }
+
+.ef-dor { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.ef-dor li { position: relative; padding: 15px 16px 15px 48px; border-radius: 14px; background: var(--card); border: 1px solid var(--borda); line-height: 1.45; }
+.ef-dor li::before { content: '✕'; position: absolute; left: 16px; top: 14px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(236, 72, 153, .16); color: var(--rosa); font-size: 12px; font-weight: 900; }
+.ef-virada { margin: 22px 0 0; text-align: center; font-size: 20px; }
+.ef-virada strong { color: var(--rosa); }
+
+.ef-chat { display: flex; flex-direction: column; gap: 10px; max-width: 480px; margin: 0 auto; padding: 18px; border-radius: 24px; background: var(--card); border: 1px solid var(--borda); min-height: 360px; }
+.ef-msg { max-width: 86%; padding: 11px 14px; border-radius: 16px 16px 16px 4px; background: #1d1930; font-size: 14.5px; line-height: 1.45; }
+.ef-msg--eu { align-self: flex-end; border-radius: 16px 16px 4px 16px; background: var(--roxo); color: #fff; }
+.ef-msg--ok { background: rgba(74, 222, 128, .14); color: var(--verde); font-weight: 800; }
+.ef-chat.ef-anima .ef-msg { opacity: 0; transform: translateY(10px) scale(.97); transition: opacity .35s, transform .35s; }
+.ef-chat.ef-anima .ef-msg.ef-vis { opacity: 1; transform: none; }
+.ef-passos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 24px 0 0; padding: 0; list-style: none; }
+.ef-passos li { text-align: center; font-size: 13px; color: var(--suave); line-height: 1.35; }
+.ef-passos b { display: grid; place-items: center; width: 38px; height: 38px; margin: 0 auto 8px; border-radius: 50%; background: var(--grad); color: #0b0716; font-weight: 900; }
+
+.ef-modos { display: grid; gap: 12px; }
+.ef-modos article, .ef-obj article { padding: 18px; border-radius: 18px; background: var(--card); border: 1px solid var(--borda); }
+.ef-modos span { font-size: 26px; }
+.ef-modos h3 { margin-top: 6px; font-size: 19px; }
+.ef-modos p, .ef-obj p { margin: 6px 0 0; color: var(--suave); font-size: 14.5px; line-height: 1.5; }
+
+/* Carrossel infinito dos estilos */
+.ef-carrossel { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.ef-trilho { display: flex; gap: 14px; width: max-content; animation: ef-rolar 60s linear infinite; padding: 6px 0 10px; }
+.ef-carrossel:hover .ef-trilho { animation-play-state: paused; }
+@keyframes ef-rolar { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .ef-trilho { animation: none; overflow-x: auto; } }
+.ef-estilo { flex: none; width: 170px; margin: 0; }
+.ef-estilo video, .ef-estilo img { display: block; width: 170px; height: 302px; object-fit: cover; border-radius: 18px; border: 1px solid var(--borda); background: #000; }
+.ef-estilo figcaption { margin-top: 8px; text-align: center; font-size: 13px; font-weight: 800; color: #d9d6e8; }
+
+.ef-ben { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.ef-ben li { position: relative; padding: 15px 16px 15px 48px; border-radius: 14px; background: var(--card); border: 1px solid var(--borda); color: var(--suave); line-height: 1.5; }
+.ef-ben li::before { content: '✓'; position: absolute; left: 16px; top: 14px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(74, 222, 128, .16); color: var(--verde); font-size: 13px; font-weight: 900; }
+.ef-ben b { color: var(--texto); }
+
+.ef-comp { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ef-comp__lado { padding: 18px 14px; border-radius: 18px; background: var(--card); border: 1px solid var(--borda); }
+.ef-comp__lado h3 { font-size: 16px; color: var(--suave); }
+.ef-comp__preco { margin: 6px 0 10px; font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; }
+.ef-comp__preco small { font-size: 13px; color: var(--suave); font-weight: 600; }
+.ef-comp ul { margin: 0; padding: 0 0 0 16px; color: var(--suave); font-size: 13.5px; line-height: 1.5; display: grid; gap: 6px; }
+.ef-comp__lado--ef { border-color: rgba(139, 92, 246, .6); background: linear-gradient(180deg, rgba(139, 92, 246, .16), var(--card)); }
+.ef-comp__lado--ef h3 { color: #c4b5fd; }
+.ef-comp__lado--ef .ef-comp__preco { color: var(--verde); }
+
+.ef-oferta { margin-top: 30px; max-width: 560px; padding: 36px 18px 28px; border-radius: 28px; background: var(--card); text-align: center;
+  border: 1px solid rgba(139, 92, 246, .45); box-shadow: 0 40px 100px -50px rgba(139, 92, 246, .9); }
+.ef-oferta .ef-tag { margin-top: 0; }
+.ef-stack { margin: 0; padding: 0; list-style: none; text-align: left; display: grid; gap: 8px; }
+.ef-stack li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 14px; border-radius: 12px;
+  background: rgba(255, 255, 255, .03); border: 1px solid var(--borda); font-size: 14.5px; font-weight: 600; }
+.ef-stack li span::before { content: '✓ '; color: var(--verde); font-weight: 900; }
+.ef-stack__bonus span::before { content: '' !important; }
+.ef-stack s { flex: none; color: var(--suave); font-size: 13.5px; }
+.ef-stack__bonus { border-color: rgba(250, 204, 21, .45) !important; background: rgba(250, 204, 21, .06) !important; }
+.ef-total { margin: 22px 0 18px; }
+.ef-total p { margin: 0; color: var(--suave); }
+.ef-total__de { margin-top: 6px !important; }
+.ef-total__valor { margin: 2px 0 !important; font-family: 'Space Grotesk', sans-serif; font-size: 92px; font-weight: 700; line-height: 1; color: var(--texto) !important;
+  text-shadow: 0 0 40px rgba(139, 92, 246, .7); }
+.ef-total__valor small { font-size: 32px; vertical-align: 40px; margin-right: 4px; }
+.ef-total__parc { font-size: 14px; }
+.ef-seguro { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
+.ef-seguro li { padding: 10px; border-radius: 12px; background: rgba(255, 255, 255, .04); font-size: 13px; font-weight: 700; color: #d9d6e8; }
+.ef-req { margin-top: 18px; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, .04); text-align: left; font-size: 14px; line-height: 1.5; }
+.ef-req ul { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; color: var(--suave); }
+.ef-req strong { color: var(--texto); }
+
+.ef-obj { display: grid; gap: 12px; }
+.ef-obj h3 { font-size: 17px; }
+
+.ef-garantia { display: flex; gap: 18px; align-items: center; }
+.ef-selo7 { flex: none; display: grid; place-items: center; width: 96px; height: 96px; border-radius: 50%; border: 3px solid var(--verde);
+  font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 700; color: var(--verde); line-height: .9; text-align: center; box-shadow: 0 0 30px -6px var(--verde); }
+.ef-selo7 small { display: block; font-size: 13px; }
+.ef-garantia h2 { font-size: 23px; }
+.ef-garantia p { margin: 6px 0 0; color: var(--suave); line-height: 1.55; }
+
+.ef-faq { display: grid; gap: 10px; }
+.ef-faq details { border-radius: 14px; background: var(--card); border: 1px solid var(--borda); padding: 0 16px; }
+.ef-faq summary { cursor: pointer; padding: 16px 26px 16px 0; font-weight: 800; list-style: none; position: relative; }
+.ef-faq summary::-webkit-details-marker { display: none; }
+.ef-faq summary::after { content: '+'; position: absolute; right: 0; top: 13px; font-size: 22px; color: var(--ciano); transition: transform .25s; }
+.ef-faq details[open] summary::after { transform: rotate(45deg); }
+.ef-faq p { margin: 0 0 16px; color: var(--suave); line-height: 1.55; }
+
+.ef-fim { text-align: center; }
+.ef-fim h2 { font-size: clamp(28px, 7.5vw, 42px); line-height: 1.1; }
+.ef-fim h2 em { font-style: normal; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ef-fim .ef-btn { margin-top: 22px; }
+.ef-ps { margin: 22px auto 0; max-width: 540px; color: var(--suave); line-height: 1.55; }
+.ef-rodape { max-width: 660px; margin: 44px auto 0; padding: 20px 16px; text-align: center; color: #6e6a82; font-size: 12.5px; line-height: 1.5; }
+.ef-rodape a { color: inherit; }
+
+.ef-fixo { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 20; display: block; max-width: 470px; margin: 0 auto; padding: 16px; border-radius: 14px;
+  background: var(--grad); color: #0b0716; text-align: center; font-weight: 800; text-decoration: none; box-shadow: 0 10px 30px -8px rgba(0, 0, 0, .8);
+  transform: translateY(140%); transition: transform .35s; }
+.ef-fixo.ef-mostra { transform: none; }
+
+@media (min-width: 760px) {
+  .ef-modos, .ef-obj { grid-template-columns: 1fr 1fr; }
+  .ef-estilo { width: 200px; }
+  .ef-estilo video, .ef-estilo img { width: 200px; height: 356px; }
+}

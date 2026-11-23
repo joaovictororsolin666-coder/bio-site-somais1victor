@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>EditFlow AI | Transforme o Claude numa máquina de edição</title>
+  <meta name="description" content="Plugin plug and play para o Claude: você pede o vídeo em português e recebe roteiro, cortes, legenda palavra por palavra, animações em 12 estilos e som. Sem saber editar.">
+  <meta name="theme-color" content="#07060d">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://www.ovictorgomes.com.br/editflow">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Victor Gomes">
+  <meta property="og:title" content="EditFlow AI: transforme o Claude numa máquina de edição">
+  <meta property="og:description" content="Vídeos que prendem até o fim, sem você saber editar. Roteiro, cortes, legenda, animação e som: você só aprova.">
+  <meta property="og:url" content="https://www.ovictorgomes.com.br/editflow">
+  <meta property="og:image" content="https://www.ovictorgomes.com.br/assets/img/editflow/vsl-poster.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/editflow.css">
+  <link rel="preload" as="image" href="assets/img/editflow/vsl-poster.webp" fetchpriority="high">
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/editflow.js" defer></script>
+</head>
+<body class="ef">
+  <div class="ef-barra">🚀 Preço de lançamento: <strong>R$ 47</strong> · pagamento único</div>
+
+  <!-- ─────────── 1-4 · Topo ─────────── -->
+  <header class="ef-hero">
+    <div class="ef-marca ef-r">
+      <span class="ef-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 5h11M4 12h8M4 19h11"/><path d="M16 9l5 3-5 3z"/></svg>
+      </span>
+      <span>EditFlow <b>AI</b></span>
+    </div>
+    <p class="ef-tag ef-r"><span class="ef-dot"></span> Plugin plug and play para o Claude</p>
+    <h1 class="ef-r">Transforme o Claude numa <em>máquina de edição.</em></h1>
+    <p class="ef-sub ef-r">Você pede o vídeo em português. O EditFlow AI faz roteiro, cortes, legenda palavra por palavra, animação e som. <strong>Você só aprova.</strong></p>
+
+    <div class="ef-vsl ef-r">
+      <video id="ef-vsl" src="assets/img/editflow/vsl.mp4" poster="assets/img/editflow/vsl-poster.webp" autoplay muted loop playsinline preload="metadata" aria-label="Vídeo de apresentação do EditFlow AI"></video>
+      <button class="ef-som" id="ef-som" type="button">🔊 Toque para ouvir</button>
+      <span class="ef-vsl__selo">feito 100% pelo EditFlow AI</span>
+    </div>
+
+    <a class="ef-btn ef-r" href="#oferta">Quero editar com IA por R$ 47 <span aria-hidden="true">→</span></a>
+    <p class="ef-micro ef-r">Pagamento único · Acesso imediato · 7 dias de garantia</p>
+    <ul class="ef-chips ef-r">
+      <li>12 estilos</li><li>Corte automático</li><li>Legenda dinâmica</li><li>Você só aprova</li>
+    </ul>
+  </header>
+
+  <main>
+    <!-- ─────────── 3 · Abertura ─────────── -->
+    <section class="ef-sec ef-abertura ef-r">
+      <p>Você não precisa virar editor para ter vídeos que prendem.</p>
+      <p>Precisa de alguém que edite <strong>por você</strong>, no seu estilo, em minutos, toda vez que você tiver uma ideia.</p>
+      <p>O EditFlow AI coloca esse editor dentro do Claude.</p>
+    </section>
+
+    <!-- ─────────── 5 · Dor ─────────── -->
+    <section class="ef-sec">
+      <h2 class="ef-h2 ef-r">Você grava. <span>E aí trava.</span></h2>
+      <ul class="ef-dor">
+        <li class="ef-r">Passa horas no editor para entregar um vídeo de 30 segundos.</li>
+        <li class="ef-r">Posta e o vídeo morre nos primeiros 3 segundos.</li>
+        <li class="ef-r">Vê vídeos com animação e legenda dinâmica e pensa: "nunca vou conseguir fazer isso".</li>
+        <li class="ef-r">Já pensou em pagar um editor, mas R$ 100 por vídeo não fecha a conta.</li>
+        <li class="ef-r">Tem ideia de conteúdo todo dia, mas não tem tempo de editar todo dia.</li>
+      </ul>
+      <p class="ef-virada ef-r">O problema nunca foi a sua ideia. <strong>É a edição.</strong></p>
+    </section>
+
+    <!-- ─────────── 6 · Solução / como funciona ─────────── -->
+    <section class="ef-sec">
+      <h2 class="ef-h2 ef-r">Como o EditFlow AI funciona</h2>
+      <div class="ef-chat ef-r" id="ef-chat" aria-label="Exemplo de conversa">
+        <div class="ef-msg ef-msg--eu">Faz um reel de 25s sobre 3 sites de IA grátis, estilo neon, termina com link na bio</div>
+        <div class="ef-msg">Roteiro pronto: gancho "3 sites que parecem ilegais", uma cena por site, contador e CTA. Posso montar?</div>
+        <div class="ef-msg ef-msg--eu">Pode!</div>
+        <div class="ef-msg">Prévia com as 8 cenas pronta 👇 Gravo?</div>
+        <div class="ef-msg ef-msg--eu">Grava 🚀</div>
+        <div class="ef-msg ef-msg--ok">✅ sites-ia.mp4 pronto · 25s · 1080×1920</div>
+      </div>
+      <ol class="ef-passos">
+        <li class="ef-r"><b>1</b><span>Você pede<br>em uma frase</span></li>
+        <li class="ef-r"><b>2</b><span>Aprova<br>o roteiro</span></li>
+        <li class="ef-r"><b>3</b><span>Aprova<br>a prévia</span></li>
+        <li class="ef-r"><b>4</b><span>Recebe<br>o MP4</span></li>
+      </ol>
+    </section>
+
+    <!-- ─────────── Modos ─────────── -->
+    <section class="ef-sec">
+      <h2 class="ef-h2 ef-r">4 jeitos de criar</h2>
+      <div class="ef-modos">
+        <article class="ef-r"><span>🎙️</span><h3>Editar meu vídeo</h3><p>Manda sua gravação. Ele tira silêncios, "éé" e erros, dá zoom no seu rosto a cada frase, legenda e anima as palavras-chave.</p></article>
+        <article class="ef-r"><span>✨</span><h3>Do zero</h3><p>Só o assunto. Roteiro e animação completos, com efeitos sonoros ou sem som.</p></article>
+        <article class="ef-r"><span>🔊</span><h3>Só voz</h3><p>Manda um áudio e cada frase vira uma cena animada, no tempo exato da sua fala.</p></article>
+        <article class="ef-r"><span>💡</span><h3>Me dá ideias</h3><p>Diga seu nicho e receba 3 roteiros com gancho pronto. Escolha um e ele faz.</p></article>
+      </div>
+    </section>
+
+    <!-- ─────────── Estilos (carrossel infinito) ─────────── -->
+    <section class="ef-sec ef-sec--larga">
+      <h2 class="ef-h2 ef-r">12 estilos. Todos com a sua marca.</h2>
+      <p class="ef-centro ef-suave ef-r">Sua cor, sua fonte e seu @ salvos uma vez e usados em todo vídeo.</p>
+      <div class="ef-carrossel" aria-label="Exemplos dos 12 estilos">
+        <div class="ef-trilho" id="ef-trilho">
+          <!-- preenchido pelo editflow.js (12 estilos, duplicados para o loop) -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── 7 · Benefícios ─────────── -->
+    <section class="ef-sec">
+      <h2 class="ef-h2 ef-r">O que muda no seu conteúdo</h2>
+      <ul class="ef-ben">
+        <li class="ef-r"><b>Vídeos que prendem até o fim.</b> Algo muda na tela a cada 3 segundos: é isso que segura o dedo.</li>
+        <li class="ef-r"><b>Horas viram minutos.</b> O vídeo que levava a tarde inteira sai enquanto você toma um café.</li>
+        <li class="ef-r"><b>Constância sem esforço.</b> Teve ideia? Em minutos ela vira um vídeo pronto para postar.</li>
+        <li class="ef-r"><b>Cara de profissional.</b> Animações e legenda que parecem feitas por editor, não por template.</li>
+        <li class="ef-r"><b>Zero curva de aprendizado.</b> Nada de linha do tempo ou keyframe. Você conversa em português.</li>
+        <li class="ef-r"><b>Seu estilo, sempre.</b> Sua marca em todo vídeo, sem configurar de novo.</li>
+        <li class="ef-r"><b>Os vídeos são seus.</b> Poste, venda e use em anúncios.</li>
+      </ul>
+    </section>
+
+    <!-- ─────────── Comparação ─────────── -->
+    <section class="ef-sec">
+      <h2 class="ef-h2 ef-r">Faça as contas</h2>
+      <div class="ef-comp ef-r">
+        <div class="ef-comp__lado">
+          <h3>Editor freelancer</h3>
+          <p class="ef-comp__preco">R$ 100+<small>/vídeo</small></p>
+          <ul><li>Espera dias pela entrega</li><li>Cada ajuste é uma nova conversa</li><li>4 vídeos por mês: R$ 400+</li></ul>
+        </div>
+        <div class="ef-comp__lado ef-comp__lado--ef">
+          <h3>EditFlow AI</h3>
+          <p class="ef-comp__preco">R$ 47<small> uma vez</small></p>
+          <ul><li>Vídeo pronto em minutos</li><li>Ajusta na hora, quantas vezes quiser</li><li>Vídeos ilimitados</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── 9 · Oferta ─────────── -->
+    <section class="ef-sec ef-oferta" id="oferta">
+      <p class="ef-tag ef-r">Preço de lançamento</p>
+      <h2 class="ef-h2 ef-r">Tudo o que você recebe</h2>
+      <ul class="ef-stack">
+        <li class="ef-r"><span>EditFlow AI: plugin com 4 modos de criação</span><s>R$ 97</s></li>
+        <li class="ef-r"><span>12 estilos de animação com a sua marca</span><s>R$ 67</s></li>
+        <li class="ef-r"><span>Corte automático + legenda palavra por palavra</span><s>R$ 47</s></li>
+        <li class="ef-r"><span>Carrosséis no mesmo visual dos vídeos</span><s>R$ 27</s></li>
+        <li class="ef-r"><span>Área de membros + guia passo a passo</span><s>R$ 27</s></li>
+        <li class="ef-r ef-stack__bonus"><span>🎁 Bônus: Pack de Ganchos Virais (30 ganchos + 5 roteiros)</span><s>R$ 37</s></li>
+      </ul>
+      <div class="ef-total ef-r">
+        <p>Valor total: <s>R$ 302</s></p>
+        <p class="ef-total__de">de <s>R$ 97</s> por apenas</p>
+        <p class="ef-total__valor"><small>R$</small><span data-conta="47">47</span></p>
+        <p class="ef-total__parc">ou 11x de R$ 5,24 no cartão</p>
+      </div>
+      <a class="ef-btn ef-btn--grande ef-r" href="#" data-link="checkoutPluginPlay" data-track="checkoutClick" data-clique="pluginplay">Quero o EditFlow AI agora <span aria-hidden="true">→</span></a>
+      <ul class="ef-seguro ef-r">
+        <li>⚡ Acesso imediato</li><li>💠 Pix ou cartão</li><li>🔒 Compra segura</li><li>🛡️ 7 dias de garantia</li>
+      </ul>
+      <div class="ef-req ef-r">
+        <b>Antes de comprar, confira:</b>
+        <ul>
+          <li>💻 Precisa de <strong>computador</strong> (Windows ou Mac). Não roda só no celular.</li>
+          <li>🤖 Precisa do <strong>app do Claude para computador</strong> no plano <strong>Pro</strong> ou superior (assinado à parte, direto na Anthropic).</li>
+          <li>✅ Não precisa saber programar nem editar vídeo.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ─────────── 10 · Objeções ─────────── -->
+    <section class="ef-sec">
+      <h2 class="ef-h2 ef-r">"Mas…"</h2>
+      <div class="ef-obj">
+        <article class="ef-r"><h3>"Mas eu tenho que pagar o Claude Pro."</h3><p>Tem, e ele já vale por si: você ganha um assistente que escreve, pesquisa e agora edita os seus vídeos. Um único vídeo encomendado a um editor custa mais que um mês de Claude.</p></article>
+        <article class="ef-r"><h3>"Mas eu não sei instalar nada."</h3><p>Você envia um arquivo no app e escreve "instala pra mim". O próprio Claude instala o resto. Tem guia passo a passo e aula de instalação.</p></article>
+        <article class="ef-r"><h3>"Mas vai ficar com cara de IA."</h3><p>Você escolhe o estilo, a cor e a fonte, aprova o roteiro e a prévia, e pede ajustes à vontade. O resultado é do seu jeito.</p></article>
+        <article class="ef-r"><h3>"Mas eu só tenho celular."</h3><p>Aí ainda não é para você: a edição roda no computador. Depois é só mandar o MP4 para o celular e postar.</p></article>
+      </div>
+    </section>
+
+    <!-- ─────────── 11 · Garantia ─────────── -->
+    <section class="ef-sec ef-garantia ef-r">
+      <div class="ef-selo7">7<small>dias</small></div>
+      <div>
+        <h2>Teste por 7 dias. O risco é meu.</h2>
+        <p>Instale, faça seus vídeos e veja com os próprios olhos. Se não gostar, peça o reembolso em até 7 dias e você recebe 100% do valor de volta. Sem perguntas.</p>
+      </div>
+    </section>
+
+    <!-- ─────────── 13 · FAQ ─────────── -->
+    <section class="ef-sec">
+      <h2 class="ef-h2 ef-r">Perguntas frequentes</h2>
+      <div class="ef-faq">
+        <details class="ef-r"><summary>Quanto tempo leva para fazer um vídeo?</summary><p>Você gasta 2 a 3 minutos pedindo e aprovando. O computador grava o vídeo em 1 a 3 minutos para cada 30 segundos de vídeo.</p></details>
+        <details class="ef-r"><summary>Serve para quem nunca editou nada?</summary><p>Foi feito para isso. Você conversa em português; o EditFlow AI faz toda a parte técnica.</p></details>
+        <details class="ef-r"><summary>Funciona no celular?</summary><p>Não. Ele roda no app do Claude para computador (Windows ou Mac). Depois você manda o vídeo pronto para o celular e posta.</p></details>
+        <details class="ef-r"><summary>Preciso de algum plano do Claude?</summary><p>Sim, o Claude Pro ou superior, assinado direto na Anthropic. O plano grátis não roda plugins.</p></details>
+        <details class="ef-r"><summary>Como recebo e instalo?</summary><p>O acesso chega no seu e-mail na hora. Na área de membros você baixa o arquivo, envia em Configurações → Plugins no app do Claude e escreve "instala pra mim". Leva uns 10 minutos.</p></details>
+        <details class="ef-r"><summary>E se eu travar na instalação?</summary><p>Tem guia em PDF com a página de problemas comuns e suporte por e-mail pela área de membros.</p></details>
+        <details class="ef-r"><summary>Posso usar os vídeos comercialmente?</summary><p>Sim. Os vídeos que você cria são seus: pode postar, vender e usar em anúncios.</p></details>
+        <details class="ef-r"><summary>E se eu não gostar?</summary><p>Você tem 7 dias de garantia. Pede o reembolso e recebe 100% de volta.</p></details>
+        <details class="ef-r"><summary>Posso pagar no Pix?</summary><p>Sim: Pix com acesso na hora, ou cartão em até 11x.</p></details>
+      </div>
+    </section>
+
+    <!-- ─────────── 14-15 · Fechamento ─────────── -->
+    <section class="ef-sec ef-fim">
+      <h2 class="ef-r">Sua próxima ideia pode virar vídeo <em>ainda hoje.</em></h2>
+      <p class="ef-r ef-suave">Sem editar. Sem programar. Você pede, aprova e posta.</p>
+      <a class="ef-btn ef-btn--grande ef-r" href="#oferta">Quero o EditFlow AI por R$ 47 <span aria-hidden="true">→</span></a>
+      <p class="ef-ps ef-r"><strong>P.S.:</strong> um único vídeo animado encomendado custa mais que o EditFlow AI inteiro. E você ainda tem 7 dias para testar sem risco nenhum.</p>
+    </section>
+  </main>
+
+  <footer class="ef-rodape">
+    <p>© 2026 Victor Gomes. Claude é um produto da Anthropic. O EditFlow AI é um produto independente, sem vínculo com a Anthropic.</p>
+    <p><a href="termos">Termos de uso</a> · <a href="privacidade">Privacidade</a></p>
+  </footer>
+
+  <a class="ef-fixo" href="#oferta" id="ef-fixo">Quero o EditFlow AI · R$ 47</a>
+</body>
+</html>
