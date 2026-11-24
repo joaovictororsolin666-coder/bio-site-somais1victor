@@ -507,3 +507,15 @@
   if ("IntersectionObserver" in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; }, { threshold: .3 }).observe(rec);
   setInterval(function () { if (!mexeu && vis) escolhe(sel % itens.length + 1); }, 3200);
 })();
+
+/* Oferta: alterna à vista / parcelado */
+(function () {
+  "use strict";
+  var bts = document.querySelectorAll(".ef-of__modo button"), precos = document.querySelectorAll(".ef-of__preco");
+  bts.forEach(function (b) {
+    b.addEventListener("click", function () {
+      bts.forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      precos.forEach(function (p) { p.hidden = p.dataset.mostra !== b.dataset.pag; });
+    });
+  });
+})();
