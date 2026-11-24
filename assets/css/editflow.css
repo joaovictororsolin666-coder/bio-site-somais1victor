@@ -198,3 +198,96 @@ body.ef {
 .ef .ef-aviso svg{flex:none;width:20px;height:20px;margin-top:1px;fill:none;stroke:#f5b544;stroke-width:2;stroke-linecap:round}
 
 .ef .ef-nq{white-space:nowrap}
+
+/* ───────────── Demo "Veja funcionando": chat instalando o zip + editor Bruto/Pronto (fundo cinza neutro) ───────────── */
+.ef-demo { --cz0: #0f0f11; --cz1: #18181b; --cz2: #232327; --cz3: #2e2e33; --czt: #a1a1aa; }
+.ef .ef-demo__sub { margin: -14px auto 26px; text-align: center; color: var(--suave); font-size: 16px; }
+.ef-demo svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.ef-ia { max-width: 380px; margin: 0 auto; border-radius: 28px; background: var(--cz1); border: 1px solid rgba(255, 255, 255, .07);
+  box-shadow: 0 0 0 8px var(--cz0), 0 30px 70px -30px rgba(0, 0, 0, .9); overflow: hidden; }
+.ef-ia__topo { display: flex; align-items: center; gap: 12px; padding: 16px 16px 14px; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+.ef-ia__icone, .ef-ia__bt { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--cz2); color: #e4e4e7; flex: none; }
+.ef-ia__icone svg, .ef-ia__bt svg { width: 18px; height: 18px; }
+.ef-ia__bt { border: 0; cursor: pointer; }
+.ef-ia__bt:hover { background: var(--cz3); }
+.ef-ia__nome { display: flex; flex-direction: column; flex: 1; line-height: 1.2; }
+.ef-ia__nome b { font-size: 16px; }
+.ef-ia__nome small { color: var(--czt); font-size: 13px; }
+.ef-ia__msgs { display: flex; flex-direction: column; gap: 9px; height: 300px; padding: 16px; overflow: hidden; justify-content: flex-end; }
+.ef-ia__m { max-width: 78%; padding: 11px 14px; border-radius: 16px; background: var(--cz2); font-size: 15px; line-height: 1.4; animation: ef-msg-in .35s cubic-bezier(.2, .7, .2, 1) both; flex: none; }
+.ef-ia__m--eu { align-self: flex-end; background: #f4f4f5; color: #18181b; }
+.ef-ia__m--arq { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+.ef-ia__m--arq svg { width: 30px; height: 30px; stroke: #3f3f46; flex: none; }
+.ef-ia__m--arq b { display: block; font-size: 16px; }
+.ef-ia__m--arq small { color: #71717a; font-size: 13px; }
+.ef-ia__m--vid { display: flex; align-items: center; gap: 10px; }
+.ef-ia__m--vid i { width: 34px; height: 46px; border-radius: 8px; flex: none; background: url(../img/victor.webp) center / cover; }
+.ef-ia__m--ok { background: rgba(74, 222, 128, .13); color: var(--verde); font-weight: 700; }
+.ef-ia__pontos { display: inline-flex; gap: 4px; padding: 14px 16px; }
+.ef-ia__pontos i { width: 7px; height: 7px; border-radius: 50%; background: var(--czt); animation: ef-pontos 1s infinite; }
+.ef-ia__pontos i:nth-child(2) { animation-delay: .15s; }
+.ef-ia__pontos i:nth-child(3) { animation-delay: .3s; }
+@keyframes ef-pontos { 50% { opacity: .25; transform: translateY(-2px); } }
+@keyframes ef-msg-in { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+.ef .ef-ia__passo { margin: 0; padding: 4px 18px 10px; color: var(--czt); font-size: 13.5px; }
+.ef-ia__passo b { color: #d4d4d8; }
+.ef-ia__campo { display: flex; align-items: center; gap: 10px; margin: 0 12px 14px; padding: 8px 8px 8px 12px; border-radius: 18px; background: var(--cz2); min-height: 58px; }
+.ef-ia__thumb { width: 0; height: 42px; border-radius: 7px; flex: none; background: url(../img/victor.webp) center / cover; opacity: 0; transition: opacity .3s, width .3s; }
+.ef-ia__campo.ef-com-thumb .ef-ia__thumb { width: 32px; opacity: 1; }
+.ef-ia__digita { flex: 1; min-width: 0; font-size: 15px; color: #f4f4f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ef-ia__digita:empty::before { content: "Escreva para o Claude…"; color: #71717a; }
+.ef-ia__digita.ef-cursor::after { content: ""; display: inline-block; width: 2px; height: 1.05em; margin-left: 1px; vertical-align: -2px; background: var(--roxo); animation: ef-pisca .9s steps(1) infinite; }
+.ef-ia__enviar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; flex: none; background: var(--cz3); color: #71717a; transition: background .25s, color .25s, transform .15s; }
+.ef-ia__enviar svg { width: 18px; height: 18px; stroke-width: 2.4; }
+.ef-ia__campo.ef-pronto-enviar .ef-ia__enviar { background: var(--roxo); color: #fff; }
+.ef-ia__enviar.ef-clica { transform: scale(.86); }
+
+.ef-ed { max-width: 440px; margin: 34px auto 0; padding: 22px 18px 18px; border-radius: 28px; background: var(--cz1); border: 1px solid rgba(255, 255, 255, .07);
+  box-shadow: 0 0 0 8px var(--cz0), 0 30px 70px -30px rgba(0, 0, 0, .9); text-align: center; }
+.ef-ed__tela { position: relative; width: 132px; height: 132px; margin: 0 auto; border-radius: 22px; overflow: hidden; background: var(--cz2); }
+.ef-ed__tela img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s; }
+.ef-ed.ef-modo-pronto .ef-ed__tela img { transform: scale(1.12); }
+.ef-ed__leg { position: absolute; left: 6px; right: 6px; bottom: 8px; font: 800 12px/1.15 'Manrope', sans-serif; color: #fff; text-shadow: 0 2px 6px rgba(0, 0, 0, .9); opacity: 0; transition: opacity .2s; }
+.ef-ed__leg b { color: #fde047; }
+.ef-ed.ef-modo-pronto .ef-ed__leg.ef-tem { opacity: 1; }
+.ef .ef-ed__rot { margin: 12px 0 2px; color: var(--czt); font-size: 14px; }
+.ef .ef-ed__tit { margin: 0 0 18px; font-size: clamp(22px, 6vw, 27px); }
+.ef-ed__trilhas { position: relative; display: grid; grid-template-columns: 1fr; gap: 6px; text-align: left; }
+.ef-ed__nome { display: flex; align-items: center; gap: 6px; margin-top: 4px; color: var(--czt); font-size: 13px; }
+.ef-ed__nome svg { width: 15px; height: 15px; }
+.ef-ed__faixa { display: flex; gap: 2px; height: 40px; border-radius: 8px; overflow: hidden; background: var(--cz0); }
+.ef-ed__faixa--fala { height: 36px; }
+.ef-ed__faixa--leg { height: 26px; }
+.ef-ed__seg { position: relative; display: flex; align-items: center; justify-content: center; gap: 2px; min-width: 0; overflow: hidden;
+  transition: flex-grow .7s cubic-bezier(.6, 0, .2, 1), opacity .5s, margin .7s; }
+.ef-ed.ef-modo-pronto .ef-ed__seg--fora { flex-grow: 0 !important; opacity: 0; margin-left: -2px; }
+.ef-ed__faixa--video .ef-ed__seg { background: url(../img/victor.webp) left center / auto 100% repeat-x; }
+.ef-ed__faixa--video .ef-ed__seg::after { content: ""; position: absolute; inset: 0; background: rgba(34, 197, 94, .42); mix-blend-mode: multiply; }
+.ef-ed__faixa--video .ef-ed__seg--fora::after { background: rgba(239, 68, 68, .6); }
+.ef-ed.ef-modo-pronto .ef-ed__faixa--video .ef-ed__seg::after { background: rgba(139, 92, 246, .28); }
+.ef-ed__faixa--fala .ef-ed__seg--fora { background: rgba(239, 68, 68, .14); }
+.ef-ed__barra { width: 2px; flex: none; border-radius: 2px; background: #d4d4d8; }
+.ef-ed__seg--fora .ef-ed__barra { background: #ef4444; }
+.ef-ed__pausa { flex: 1; height: 0; border-top: 2px dotted #ef4444; margin: 0 4px; opacity: .8; }
+.ef-ed__chip { max-width: calc(100% - 4px); overflow: hidden; text-overflow: ellipsis; padding: 3px 6px; border-radius: 6px; background: rgba(139, 92, 246, .35); color: #fff; font-size: 11px; font-weight: 700; white-space: nowrap;
+  opacity: 0; transform: translateY(4px); transition: opacity .4s .5s, transform .4s .5s; }
+.ef-ed.ef-modo-pronto .ef-ed__chip { opacity: 1; transform: none; }
+.ef-ed__cabeca { position: absolute; top: 18px; bottom: 0; left: 0; width: 2px; background: #f97316; pointer-events: none; }
+.ef-ed.ef-modo-pronto .ef-ed__cabeca { background: var(--ciano); }
+.ef-ed__cabeca::before { content: ""; position: absolute; top: -7px; left: -5px; width: 12px; height: 12px; border-radius: 4px 4px 50% 50%; background: inherit; }
+.ef-ed__info { display: flex; justify-content: space-between; min-height: 20px; margin: 8px 0 14px; font-size: 13px; }
+.ef-ed__motivo { color: #f87171; font-weight: 600; }
+.ef-ed__total { color: var(--czt); font-variant-numeric: tabular-nums; }
+.ef-ed__ctrl { display: flex; align-items: center; gap: 10px; }
+.ef-ed__play, .ef-ed__repete { display: grid; place-items: center; width: 46px; height: 46px; border: 0; border-radius: 50%; background: var(--cz2); color: #fff; cursor: pointer; flex: none; }
+.ef-ed__play svg, .ef-ed__repete svg { width: 18px; height: 18px; }
+.ef-ed__play:hover, .ef-ed__repete:hover { background: var(--cz3); }
+.ef-ed__tempo { width: 34px; color: #e4e4e7; font-size: 14px; font-variant-numeric: tabular-nums; text-align: left; }
+.ef-ed__modo { display: flex; flex: 1; padding: 4px; border-radius: 14px; background: var(--cz0); }
+.ef-ed__modo button { flex: 1; padding: 10px 0; border: 0; border-radius: 10px; background: none; color: var(--czt); font: 700 15px 'Manrope', sans-serif; cursor: pointer; transition: background .25s, color .25s; }
+.ef-ed__modo button[aria-pressed="true"] { background: var(--cz3); color: #fff; }
+.ef-ed.ef-modo-pronto .ef-ed__modo button[aria-pressed="true"] { background: var(--roxo); }
+.ef .ef-demo__btn { display: flex; margin: 30px auto 0; }
+
+@media (max-width: 420px) { .ef-ed__chip { padding: 2px 4px; font-size: 10px; letter-spacing: -.01em; } .ef-ed { padding-left: 14px; padding-right: 14px; } }

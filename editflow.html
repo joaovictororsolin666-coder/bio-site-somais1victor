@@ -74,6 +74,57 @@
       <p class="ef-virada ef-r">O problema nunca foi a sua ideia. <strong>É a edição.</strong></p>
     </section>
 
+    <!-- ─────────── Demo: instala o zip e edita a gravação ─────────── -->
+    <section class="ef-sec ef-demo">
+      <h2 class="ef-h2 ef-r">Veja funcionando</h2>
+      <p class="ef-demo__sub ef-r">Você manda o arquivo uma vez. Depois é só mandar a gravação.</p>
+
+      <div class="ef-ia ef-r" id="ef-ia" aria-label="Exemplo: instalando o EditFlow AI no Claude">
+        <div class="ef-ia__topo">
+          <span class="ef-ia__icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg></span>
+          <span class="ef-ia__nome"><b>Claude</b><small>app no computador</small></span>
+          <button class="ef-ia__bt" type="button" data-acao="pausa" aria-label="Pausar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
+          <button class="ef-ia__bt" type="button" data-acao="repete" aria-label="Recomeçar"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg></button>
+        </div>
+        <div class="ef-ia__msgs" aria-live="polite"></div>
+        <p class="ef-ia__passo"><b>Passo 1 de 3</b> · Mande o arquivo</p>
+        <div class="ef-ia__campo">
+          <span class="ef-ia__thumb" aria-hidden="true"></span>
+          <span class="ef-ia__digita"></span>
+          <span class="ef-ia__enviar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span>
+        </div>
+      </div>
+
+      <div class="ef-ed ef-r" id="ef-ed" aria-label="Exemplo: a gravação antes e depois do EditFlow AI">
+        <div class="ef-ed__tela">
+          <img src="assets/img/victor.webp" alt="" width="160" height="160" loading="lazy">
+          <span class="ef-ed__leg" aria-hidden="true"></span>
+        </div>
+        <p class="ef-ed__rot">Gravação bruta</p>
+        <h3 class="ef-ed__tit">Assim a gravação chegou.</h3>
+        <div class="ef-ed__trilhas">
+          <span class="ef-ed__nome"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4-2.5z"/></svg>Vídeo</span>
+          <div class="ef-ed__faixa ef-ed__faixa--video"></div>
+          <span class="ef-ed__nome"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>Fala</span>
+          <div class="ef-ed__faixa ef-ed__faixa--fala"></div>
+          <span class="ef-ed__nome"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 11h4M13 11h4M7 15h10"/></svg>Legenda</span>
+          <div class="ef-ed__faixa ef-ed__faixa--leg"></div>
+          <span class="ef-ed__cabeca" aria-hidden="true"></span>
+        </div>
+        <div class="ef-ed__info"><span class="ef-ed__motivo"></span><span class="ef-ed__total">0:21</span></div>
+        <div class="ef-ed__ctrl">
+          <button class="ef-ed__play" type="button" aria-label="Pausar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
+          <span class="ef-ed__tempo">0:00</span>
+          <div class="ef-ed__modo" role="group" aria-label="Ver gravação">
+            <button type="button" data-modo="bruto" aria-pressed="true">Bruto</button>
+            <button type="button" data-modo="pronto" aria-pressed="false">Pronto</button>
+          </div>
+          <button class="ef-ed__repete" type="button" aria-label="Recomeçar"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg></button>
+        </div>
+      </div>
+      <a class="ef-btn ef-demo__btn ef-r" href="#oferta">Quero o EditFlow <span aria-hidden="true">→</span></a>
+    </section>
+
     <!-- ─────────── 6 · Solução / como funciona ─────────── -->
     <section class="ef-sec">
       <h2 class="ef-h2 ef-r">Como o EditFlow AI funciona</h2>
