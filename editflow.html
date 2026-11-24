@@ -41,16 +41,68 @@
     <p class="ef-sub ef-r">Transforme o Claude numa máquina de edição: você pede o vídeo em português e o EditFlow AI faz roteiro, cortes, legenda palavra por palavra, animação e som. <strong>Você só aprova.</strong></p>
 
     <div class="ef-vsl ef-r">
-      <video id="ef-vsl" src="assets/img/editflow/vsl.mp4?v=2" poster="assets/img/editflow/vsl-poster.webp?v=2" autoplay muted loop playsinline preload="metadata" aria-label="Vídeo de apresentação do EditFlow AI"></video>
+      <video id="ef-vsl" src="assets/img/editflow/vsl.mp4?v=3" poster="assets/img/editflow/vsl-poster.webp?v=3" autoplay muted loop playsinline preload="metadata" aria-label="Vídeo de apresentação do EditFlow AI"></video>
       <button class="ef-som" id="ef-som" type="button">🔊 Toque para ouvir</button>
       <span class="ef-vsl__selo">feito 100% pelo EditFlow AI</span>
+    </div>
+
+    <div class="ef-tl ef-r" id="ef-tl" aria-label="Linha do tempo real deste vídeo, montada pelo EditFlow AI">
+      <p class="ef-tl__rot">Montado pelo EditFlow AI</p>
+      <h2 class="ef-tl__tit">Assim ele montou esse vídeo.</h2>
+      <div class="ef-tl__area">
+        <div class="ef-tl__nomes" aria-hidden="true">
+          <span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4-2.5z"/></svg>Vídeo</span>
+          <span><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>Fala</span>
+          <span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 11h4M13 11h4M7 15h10"/></svg>Legenda</span>
+        </div>
+        <div class="ef-tl__janela" title="Arraste para navegar no vídeo">
+          <div class="ef-tl__rolo">
+            <div class="ef-tl__faixa ef-tl__faixa--video"></div>
+            <canvas class="ef-tl__faixa ef-tl__faixa--fala"></canvas>
+            <div class="ef-tl__faixa ef-tl__faixa--leg"></div>
+          </div>
+          <span class="ef-tl__cabeca" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="ef-tl__info">
+        <button class="ef-tl__play" type="button" aria-label="Pausar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
+        <span class="ef-tl__cena">Cena 1 de 20</span>
+        <span class="ef-tl__tempo">0:00 / 1:12</span>
+      </div>
+      <p class="ef-tl__dica">Arraste a linha do tempo para navegar no vídeo</p>
     </div>
 
     <a class="ef-btn ef-r" href="#oferta">Quero o EditFlow <span aria-hidden="true">→</span></a>
     <p class="ef-micro ef-r">R$ 47 · Pagamento único · 7 dias de garantia<br><span class="ef-micro__req">Requer computador e Claude Pro</span></p>
     <ul class="ef-chips ef-r">
-      <li>12 estilos</li><li>Corte automático</li><li>Legenda dinâmica</li><li>Você só aprova</li>
+      <li>🙈 Sem aparecer</li><li>12 estilos</li><li>Corte automático</li><li>Legenda dinâmica</li><li>Você só aprova</li>
     </ul>
+
+    <section class="ef-conv ef-demo">
+      <h2 class="ef-h2 ef-r">Editar virou <span class="ef-h2__roxo">conversa.</span></h2>
+      <p class="ef-demo__sub ef-r">Você escreve pro Claude como escreveria pra uma pessoa. Ele cuida da edição, e você não precisa aparecer.</p>
+      <ol class="ef-conv__passos ef-r" id="ef-conv-passos">
+        <li data-passo="1"><b>1</b>Solte o arquivo na conversa.</li>
+        <li data-passo="2"><b>2</b>Peça o vídeo, sem aparecer.</li>
+        <li data-passo="3"><b>3</b>O vídeo volta pronto.</li>
+      </ol>
+        <div class="ef-ia ef-r" id="ef-ia" aria-label="Exemplo de conversa: instalando o EditFlow AI e pedindo um vídeo">
+        <div class="ef-ia__topo">
+          <span class="ef-ia__icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg></span>
+          <span class="ef-ia__nome"><b>Claude</b><small>app no computador</small></span>
+          <button class="ef-ia__bt" type="button" data-acao="pausa" aria-label="Pausar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
+          <button class="ef-ia__bt" type="button" data-acao="repete" aria-label="Recomeçar"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg></button>
+        </div>
+        <div class="ef-ia__msgs" aria-live="polite"></div>
+        <p class="ef-ia__passo"><b>Passo 1 de 3</b> · Mande o arquivo</p>
+        <div class="ef-ia__campo">
+          <span class="ef-ia__thumb" aria-hidden="true"></span>
+          <span class="ef-ia__digita"></span>
+          <span class="ef-ia__enviar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span>
+        </div>
+      </div>
+
+    </section>
   </header>
 
   <main>
@@ -74,26 +126,24 @@
       <p class="ef-virada ef-r">O problema nunca foi a sua ideia. <strong>É a edição.</strong></p>
     </section>
 
-    <!-- ─────────── Demo: instala o zip e edita a gravação ─────────── -->
-    <section class="ef-sec ef-demo">
-      <h2 class="ef-h2 ef-r">Veja funcionando</h2>
-      <p class="ef-demo__sub ef-r">Você manda o arquivo uma vez. Depois é só mandar a gravação.</p>
-
-      <div class="ef-ia ef-r" id="ef-ia" aria-label="Exemplo: instalando o EditFlow AI no Claude">
-        <div class="ef-ia__topo">
-          <span class="ef-ia__icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg></span>
-          <span class="ef-ia__nome"><b>Claude</b><small>app no computador</small></span>
-          <button class="ef-ia__bt" type="button" data-acao="pausa" aria-label="Pausar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
-          <button class="ef-ia__bt" type="button" data-acao="repete" aria-label="Recomeçar"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg></button>
-        </div>
-        <div class="ef-ia__msgs" aria-live="polite"></div>
-        <p class="ef-ia__passo"><b>Passo 1 de 3</b> · Mande o arquivo</p>
-        <div class="ef-ia__campo">
-          <span class="ef-ia__thumb" aria-hidden="true"></span>
-          <span class="ef-ia__digita"></span>
-          <span class="ef-ia__enviar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span>
-        </div>
+    <!-- ─────────── Sem aparecer ─────────── -->
+    <section class="ef-sec ef-anon">
+      <div class="ef-anon__box ef-r">
+        <span class="ef-anon__selo">🙈 Pra quem não quer mostrar o rosto</span>
+        <h2 class="ef-h2">Você <span>não precisa aparecer.</span><br>Nem gravar, se não quiser.</h2>
+        <p class="ef-anon__sub">O vídeo do topo desta página não tem ninguém na câmera. Escolha como você quer começar:</p>
+        <ul class="ef-anon__lista">
+          <li><b>✍️ Só um texto</b><span>Diga o assunto. Ele cria roteiro, animação, legenda e som, sem rosto nenhum.</span></li>
+          <li><b>🎙️ Só a sua voz</b><span>Grave um áudio no celular. Cada frase vira uma cena animada no tempo da sua fala.</span></li>
+          <li><b>🎥 Seu vídeo, se quiser</b><span>Se um dia quiser aparecer, ele corta, legenda e anima a sua gravação também.</span></li>
+        </ul>
       </div>
+    </section>
+
+    <!-- ─────────── Demo: editor Bruto/Pronto ─────────── -->
+    <section class="ef-sec ef-demo">
+      <h2 class="ef-h2 ef-r">Gravou? <span class="ef-h2__roxo">Ele limpa tudo.</span></h2>
+      <p class="ef-demo__sub ef-r">Se você gravar algo (tela, voz ou você mesmo), as pausas, os “éé” e as tomadas repetidas saem sozinhos.</p>
 
       <div class="ef-ed ef-r" id="ef-ed" aria-label="Exemplo: a gravação antes e depois do EditFlow AI">
         <div class="ef-ed__tela">
@@ -125,25 +175,6 @@
       <a class="ef-btn ef-demo__btn ef-r" href="#oferta">Quero o EditFlow <span aria-hidden="true">→</span></a>
     </section>
 
-    <!-- ─────────── 6 · Solução / como funciona ─────────── -->
-    <section class="ef-sec">
-      <h2 class="ef-h2 ef-r">Como o EditFlow AI funciona</h2>
-      <div class="ef-chat ef-r" id="ef-chat" aria-label="Exemplo de conversa">
-        <div class="ef-msg ef-msg--eu">Faz um reel de 25s sobre 3 sites de IA grátis, estilo neon, termina com link na bio</div>
-        <div class="ef-msg">Roteiro pronto: gancho "3 sites que parecem ilegais", uma cena por site, contador e CTA. Posso montar?</div>
-        <div class="ef-msg ef-msg--eu">Pode!</div>
-        <div class="ef-msg">Prévia com as 8 cenas pronta 👇 Gravo?</div>
-        <div class="ef-msg ef-msg--eu">Grava 🚀</div>
-        <div class="ef-msg ef-msg--ok">✅ sites-ia.mp4 pronto · 25s · 1080×1920</div>
-      </div>
-      <ol class="ef-passos">
-        <li class="ef-r"><b>1</b><span>Você pede<br>em uma frase</span></li>
-        <li class="ef-r"><b>2</b><span>Aprova<br>o roteiro</span></li>
-        <li class="ef-r"><b>3</b><span>Aprova<br>a prévia</span></li>
-        <li class="ef-r"><b>4</b><span>Recebe<br>o MP4</span></li>
-      </ol>
-    </section>
-
     <!-- ─────────── Modos ─────────── -->
     <section class="ef-sec">
       <h2 class="ef-h2 ef-r">4 jeitos de criar</h2>
@@ -159,11 +190,16 @@
     <section class="ef-sec ef-sec--larga">
       <h2 class="ef-h2 ef-r">12 estilos. Todos com a sua marca.</h2>
       <p class="ef-centro ef-suave ef-r">Sua cor, sua fonte e seu @ salvos uma vez e usados em todo vídeo.</p>
-      <div class="ef-carrossel" aria-label="Exemplos dos 12 estilos">
-        <div class="ef-trilho" id="ef-trilho">
-          <!-- preenchido pelo editflow.js (12 estilos, duplicados para o loop) -->
+      <div class="ef-carrossel-box">
+        <div class="ef-carrossel" id="ef-carrossel" aria-label="Exemplos dos 12 estilos. Arraste para ver mais.">
+          <div class="ef-trilho" id="ef-trilho">
+            <!-- preenchido pelo editflow.js (12 estilos, duplicados para o loop) -->
+          </div>
         </div>
+        <button class="ef-seta ef-seta--esq" type="button" data-dir="-1" aria-label="Estilo anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button class="ef-seta ef-seta--dir" type="button" data-dir="1" aria-label="Próximo estilo"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
       </div>
+      <p class="ef-carrossel-dica ef-r">Arraste para o lado para ver os estilos</p>
     </section>
 
     <!-- ─────────── 7 · Benefícios ─────────── -->
@@ -178,6 +214,27 @@
         <li class="ef-r"><b>Seu estilo, sempre.</b> Sua marca em todo vídeo, sem configurar de novo.</li>
         <li class="ef-r"><b>Os vídeos são seus.</b> Poste, venda e use em anúncios.</li>
       </ul>
+    </section>
+
+    <!-- ─────────── O que você recebe (clicável) ─────────── -->
+    <section class="ef-sec ef-rec" id="ef-rec">
+      <h2 class="ef-h2 ef-r">O que você recebe.</h2>
+      <p class="ef-demo__sub ef-r">Quatro peças. O acesso chega no seu e-mail, na hora.</p>
+      <div class="ef-rec__chip ef-r" aria-hidden="true">
+        <div class="ef-rec__peca">
+          <span class="ef-rec__ico" data-ico="1"><svg viewBox="0 0 24 24"><path d="M4 5h11M4 12h8M4 19h11"/><path d="M16 9l5 3-5 3z"/></svg></span>
+          <span class="ef-rec__ico" data-ico="2"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M11 9h1M11 12h1M11 15h1"/></svg></span>
+          <span class="ef-rec__ico" data-ico="3"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M10 8.5v5l4-2.5z"/><path d="M8 21h8"/></svg></span>
+          <span class="ef-rec__ico" data-ico="4"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg></span>
+          <i class="ef-rec__pinos"></i>
+        </div>
+      </div>
+      <div class="ef-rec__lista" role="tablist" aria-label="O que vem no EditFlow AI">
+        <button class="ef-rec__item ef-r" type="button" role="tab" aria-selected="true" data-item="1"><b>EditFlow AI</b><span>A inteligência de edição dentro do Claude. Corta, legenda palavra por palavra, anima e põe som. 4 modos e 12 estilos com a sua marca.</span></button>
+        <button class="ef-rec__item ef-r" type="button" role="tab" aria-selected="false" data-item="2"><b>Arquivo .zip</b><span>Tudo que o Claude precisa pra editar de forma profissional. Você envia no app e ele se instala sozinho.</span></button>
+        <button class="ef-rec__item ef-r" type="button" role="tab" aria-selected="false" data-item="3"><b>Área de membros + guia</b><span>Aula de instalação, guia em PDF com os problemas comuns e pedidos prontos pra copiar e colar.</span></button>
+        <button class="ef-rec__item ef-r" type="button" role="tab" aria-selected="false" data-item="4"><b>🎁 Bônus: Pack de Ganchos Virais</b><span>30 ganchos e 5 roteiros prontos pra você fazer o primeiro vídeo hoje.</span></button>
+      </div>
     </section>
 
     <!-- ─────────── Comparação ─────────── -->

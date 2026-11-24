@@ -121,36 +121,49 @@
       var p = msg("<i></i><i></i><i></i>", "ef-ia__pontos");
       return esperar(950, r).then(function () { p.remove(); msg(texto, cls); return esperar(650, r); });
     };
-    var setPasso = function (n, t) { passo.innerHTML = "<b>Passo " + n + " de 3</b> · " + t; };
+    var passosLista = document.querySelectorAll("#ef-conv-passos li");
+    var setPasso = function (n, t) {
+      passo.innerHTML = "<b>Passo " + n + " de 3</b> · " + t;
+      passosLista.forEach(function (li) { li.classList.toggle("ef-ativo", +li.dataset.passo === n); li.classList.toggle("ef-feito", +li.dataset.passo < n); });
+    };
+    var icPausa = '<svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg>', icPlay = '<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>';
+    var balaoVideo = function () {
+      var d = msg('<video src="assets/img/editflow/chat-video.mp4" poster="assets/img/editflow/chat-video.webp" muted loop playsinline autoplay></video>' +
+        '<span class="ef-ia__vt">0:00</span><button type="button" class="ef-ia__vp" aria-label="Pausar">' + icPausa + "</button>", "ef-ia__m--video");
+      var v = d.querySelector("video"), bt = d.querySelector("button"), vt = d.querySelector(".ef-ia__vt");
+      var q = v.play(); if (q && q.catch) q.catch(function () {});
+      v.addEventListener("timeupdate", function () { var x = Math.floor(v.currentTime); vt.textContent = "0:" + (x < 10 ? "0" : "") + x; });
+      bt.addEventListener("click", function () {
+        if (v.paused) { v.play(); bt.innerHTML = icPausa; } else { v.pause(); bt.innerHTML = icPlay; }
+      });
+    };
     var roteiro = function (r) {
       caixa.innerHTML = ""; digita.textContent = ""; campo.className = "ef-ia__campo"; digita.classList.remove("ef-cursor");
-      setPasso(1, "Mande o arquivo");
+      setPasso(1, "Solte o arquivo");
       return esperar(700, r)
         .then(function () { msg(svgArq + "<span><b>editflow-ai.zip</b><small>Arquivo zip</small></span>", "ef-ia__m--eu ef-ia__m--arq"); return esperar(500, r); })
         .then(function () { return ia_diz("Recebi. Vou instalar o EditFlow AI aqui.", r); })
-        .then(function () { return ia_diz("Conferindo se ficou tudo no lugar.", r); })
-        .then(function () { return ia_diz("Instalado ✅ Pode mandar a sua gravação.", r); })
+        .then(function () { return ia_diz("Instalado ✅ Me diz qual vídeo você quer.", r); })
         .then(function () {
-          setPasso(2, "Mande a gravação");
-          campo.classList.add("ef-com-thumb"); digita.classList.add("ef-cursor");
-          var frase = "Corta as pausas e fica com a última tomada", i = 0;
+          setPasso(2, "Peça o vídeo");
+          digita.classList.add("ef-cursor");
+          var frase = "Faz um reel sobre IA que vende. Não quero aparecer.", i = 0;
           var letra = function () {
             if (i >= frase.length) return esperar(400, r);
             digita.textContent = frase.slice(0, ++i);
             if (i === 1) campo.classList.add("ef-pronto-enviar");
-            return esperar(38, r).then(letra);
+            return esperar(36, r).then(letra);
           };
           return letra();
         })
         .then(function () { enviar.classList.add("ef-clica"); return esperar(160, r); })
         .then(function () {
           enviar.classList.remove("ef-clica");
-          msg("<i></i><span>" + digita.textContent + "</span>", "ef-ia__m--eu ef-ia__m--vid");
+          msg(digita.textContent, "ef-ia__m--eu");
           digita.textContent = ""; digita.classList.remove("ef-cursor"); campo.className = "ef-ia__campo";
-          return ia_diz("Cortando as pausas, os “éé” e a tomada repetida…", r);
+          return ia_diz("Fiz roteiro, animação, legenda e som. Ninguém aparece. Ficou assim 👇", r);
         })
-        .then(function () { return ia_diz("✅ gravacao-pronta.mp4 · 21s → 13s, com legenda", r, "ef-ia__m--ok"); })
-        .then(function () { setPasso(3, "Aprove e poste"); return esperar(4200, r); });
+        .then(function () { setPasso(3, "O vídeo volta pronto"); balaoVideo(); return esperar(11500, r); });
     };
     var iniciar = function () {
       var r = ++rodada; rodando = true;
@@ -165,9 +178,9 @@
     ia.querySelector('[data-acao="repete"]').addEventListener("click", function () { setPausado(false); visivel = true; iniciar(); });
     if (semMov) {
       msg(svgArq + "<span><b>editflow-ai.zip</b><small>Arquivo zip</small></span>", "ef-ia__m--eu ef-ia__m--arq");
-      msg("Recebi. Vou instalar o EditFlow AI aqui.");
-      msg("Instalado ✅ Pode mandar a sua gravação.");
-      setPasso(2, "Mande a gravação");
+      msg("Instalado ✅ Me diz qual vídeo você quer.");
+      msg("Faz um reel sobre IA que vende. Não quero aparecer.", "ef-ia__m--eu");
+      setPasso(3, "O vídeo volta pronto"); balaoVideo();
     } else {
       naTela(ia, function (v) { visivel = v; if (v && !rodando) iniciar(); });
     }
@@ -253,4 +266,174 @@
   setModo("bruto"); setTocando(!semMov);
   naTela(ed, function (v) { visEd = v; });
   requestAnimationFrame(quadro);
+})();
+
+/* Linha do tempo real da VSL: quadros, onda da fala e legenda do próprio vídeo, sincronizadas com o player.
+   Arrastar a linha do tempo navega no vídeo. */
+(function () {
+  "use strict";
+  var tl = document.getElementById("ef-tl"), vid = document.getElementById("ef-vsl");
+  if (!tl || !vid || !window.fetch) return;
+  var janela = tl.querySelector(".ef-tl__janela"), rolo = tl.querySelector(".ef-tl__rolo"), fv = tl.querySelector(".ef-tl__faixa--video"),
+      cv = tl.querySelector(".ef-tl__faixa--fala"), fl = tl.querySelector(".ef-tl__faixa--leg"), cena = tl.querySelector(".ef-tl__cena"),
+      tempo = tl.querySelector(".ef-tl__tempo"), play = tl.querySelector(".ef-tl__play");
+  var mmss = function (x) { x = Math.max(0, Math.floor(x)); return Math.floor(x / 60) + ":" + (x % 60 < 10 ? "0" : "") + (x % 60); };
+  fetch("assets/img/editflow/vsl-trilhas.json?v=1").then(function (r) { return r.json(); }).then(function (D) {
+    var PX = parseFloat(getComputedStyle(tl).getPropertyValue("--px")) || 62, L = D.dur * PX;
+    rolo.style.width = L + "px";
+    // vídeo: um quadro por segundo + marca de corte em cada cena
+    fv.style.width = L + "px";
+    fv.style.backgroundImage = "url(assets/img/editflow/vsl-quadros.webp?v=1)";
+    fv.style.backgroundSize = (D.n * PX) + "px auto";
+    D.cenas.forEach(function (c) { if (c > 0) fv.insertAdjacentHTML("beforeend", '<span class="ef-tl__corte" style="left:' + (c * PX) + 'px"></span>'); });
+    // fala: onda real da narração
+    var dpr = Math.min(2, window.devicePixelRatio || 1), H = 40;
+    cv.width = Math.round(L * dpr); cv.height = H * dpr; cv.style.width = L + "px";
+    var g = cv.getContext("2d"); g.scale(dpr, dpr); g.fillStyle = "#d4d4d8";
+    var passo = PX / 20;
+    for (var i = 0; i < D.onda.length; i++) {
+      var h = Math.max(2, (+D.onda[i] / 9) * (H - 6));
+      g.fillRect(i * passo, (H - h) / 2, Math.max(1, passo - 1.2), h);
+    }
+    // legenda: blocos de até 3 palavras, como aparecem no vídeo
+    var chips = [], grupo = [];
+    var fecha = function () { if (grupo.length) { chips.push({ t: grupo.map(function (p) { return p[0]; }).join(" "), s: grupo[0][1], e: grupo[grupo.length - 1][2] }); grupo = []; } };
+    D.palavras.forEach(function (p, k) {
+      if (grupo.length && (p[1] - grupo[grupo.length - 1][2] > 0.35 || grupo.length === 3)) fecha();
+      grupo.push(p);
+      if (/[.!?,]$/.test(p[0])) fecha();
+    });
+    fecha();
+    fl.style.width = L + "px";
+    chips.forEach(function (c) {
+      var el = document.createElement("span");
+      el.className = "ef-tl__chip"; el.textContent = c.t.replace(/[.,]$/, "");
+      el.style.left = (c.s * PX + 1) + "px"; el.style.width = Math.max(14, (c.e - c.s) * PX - 3) + "px";
+      fl.appendChild(el); c.el = el;
+    });
+    var atual = null, arrasto = null;
+    var desenhar = function (t) {
+      rolo.style.transform = "translateX(" + (janela.clientWidth / 2 - t * PX) + "px)";
+      tempo.textContent = mmss(t) + " / " + mmss(D.dur);
+      var n = 1; for (var k = 0; k < D.cenas.length; k++) if (t >= D.cenas[k]) n = k + 1;
+      cena.textContent = "Cena " + n + " de " + D.cenas.length;
+      var c = null; for (var j = 0; j < chips.length; j++) if (t >= chips[j].s && t <= chips[j].e + 0.15) { c = chips[j]; break; }
+      if (c !== atual) { if (atual) atual.el.classList.remove("ef-agora"); if (c) c.el.classList.add("ef-agora"); atual = c; }
+    };
+    var setIcone = function () {
+      var p = vid.paused;
+      play.setAttribute("aria-label", p ? "Tocar" : "Pausar");
+      play.innerHTML = p ? '<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg>';
+    };
+    vid.addEventListener("play", setIcone); vid.addEventListener("pause", setIcone); setIcone();
+    play.addEventListener("click", function () { if (vid.paused) { var q = vid.play(); if (q && q.catch) q.catch(function () {}); } else vid.pause(); });
+    (function quadro() { if (!arrasto) desenhar(vid.currentTime || 0); requestAnimationFrame(quadro); })();
+    // arrastar para navegar
+    janela.addEventListener("pointerdown", function (e) {
+      arrasto = { x: e.clientX, t: vid.currentTime || 0, tocava: !vid.paused, moveu: false };
+      janela.setPointerCapture(e.pointerId); janela.classList.add("ef-arrastando");
+    });
+    janela.addEventListener("pointermove", function (e) {
+      if (!arrasto) return;
+      var dx = e.clientX - arrasto.x;
+      if (Math.abs(dx) > 3 && !arrasto.moveu) { arrasto.moveu = true; vid.pause(); }
+      if (!arrasto.moveu) return;
+      var t = Math.max(0, Math.min(D.dur - 0.05, arrasto.t - dx / PX));
+      arrasto.alvo = t; desenhar(t);
+      if (vid.fastSeek) vid.fastSeek(t); else vid.currentTime = t;
+    });
+    var solta = function (e) {
+      if (!arrasto) return;
+      var a = arrasto; arrasto = null; janela.classList.remove("ef-arrastando");
+      if (!a.moveu) {  // toque simples: pula para o ponto tocado
+        var r = janela.getBoundingClientRect(), t = Math.max(0, Math.min(D.dur - 0.05, a.t + (e.clientX - (r.left + r.width / 2)) / PX));
+        vid.currentTime = t;
+      } else if (a.alvo != null) vid.currentTime = a.alvo;
+      if (a.tocava) { var q = vid.play(); if (q && q.catch) q.catch(function () {}); }
+    };
+    janela.addEventListener("pointerup", solta); janela.addEventListener("pointercancel", solta);
+  }).catch(function () { tl.hidden = true; });
+})();
+
+/* Carrossel dos estilos interativo: anda sozinho devagar, para quando a pessoa mexe, aceita arrastar (mouse e dedo),
+   setas para passar um a um, loop infinito e o estilo do centro fica em destaque. */
+(function () {
+  "use strict";
+  var box = document.getElementById("ef-carrossel"), trilho = document.getElementById("ef-trilho");
+  if (!box || !trilho) return;
+  var semMov = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var cards = trilho.querySelectorAll(".ef-estilo");
+  if (!cards.length) return;
+  var VEL = 28, parado = 0, arrasto = null, ult = 0, pos = 0, emTela = false;
+  var metade = function () { return trilho.scrollWidth / 2; };
+  var normaliza = function () {
+    var m = metade();
+    if (box.scrollLeft >= m) box.scrollLeft -= m;
+    else if (box.scrollLeft <= 0) box.scrollLeft += m;
+    pos = box.scrollLeft;
+  };
+  var foco = function () {
+    var c = box.scrollLeft + box.clientWidth / 2, melhor = null, dist = 1e9;
+    cards.forEach(function (el) {
+      var d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - c);
+      if (d < dist) { dist = d; melhor = el; }
+    });
+    cards.forEach(function (el) { el.classList.toggle("ef-foco", el === melhor); });
+  };
+  var pausa = function (ms) { parado = Date.now() + (ms || 2500); };
+  requestAnimationFrame(function () { box.scrollLeft = pos = metade() * 0.5; foco(); });
+  (function quadro(agora) {
+    var dt = ult ? Math.min(.05, (agora - ult) / 1000) : 0; ult = agora;
+    if (!semMov && emTela && !arrasto && Date.now() > parado) { pos += VEL * dt; box.scrollLeft = pos; normaliza(); }
+    else pos = box.scrollLeft;
+    foco();
+    requestAnimationFrame(quadro);
+  })(0);
+  if ("IntersectionObserver" in window) new IntersectionObserver(function (es) { emTela = es[0].isIntersecting; }).observe(box);
+  else emTela = true;
+  box.addEventListener("scroll", function () { if (!arrasto && Date.now() < parado) normaliza(); }, { passive: true });
+  box.addEventListener("touchstart", function () { pausa(3000); }, { passive: true });
+  box.addEventListener("touchmove", function () { pausa(3000); }, { passive: true });
+  box.addEventListener("wheel", function () { pausa(3000); }, { passive: true });
+  box.addEventListener("mouseenter", function () { pausa(1e9); });
+  box.addEventListener("mouseleave", function () { pausa(800); });
+  // arrastar com o mouse (no celular o dedo já rola nativamente)
+  box.addEventListener("pointerdown", function (e) {
+    if (e.pointerType !== "mouse") return;
+    arrasto = { x: e.clientX, s: box.scrollLeft, moveu: false };
+    box.setPointerCapture(e.pointerId);
+  });
+  box.addEventListener("pointermove", function (e) {
+    if (!arrasto) return;
+    var dx = e.clientX - arrasto.x;
+    if (Math.abs(dx) > 4) { arrasto.moveu = true; box.classList.add("ef-arrastando"); }
+    box.scrollLeft = arrasto.s - dx; normaliza(); arrasto.s = box.scrollLeft + dx;
+  });
+  var solta = function () { if (!arrasto) return; arrasto = null; box.classList.remove("ef-arrastando"); pausa(2500); };
+  box.addEventListener("pointerup", solta); box.addEventListener("pointercancel", solta);
+  // setas: passa um estilo por vez
+  document.querySelectorAll(".ef-seta").forEach(function (b) {
+    b.addEventListener("click", function () {
+      pausa(4000);
+      var passo = cards[0].offsetWidth + 14;
+      normaliza();
+      box.scrollBy({ left: +b.dataset.dir * passo, behavior: "smooth" });
+    });
+  });
+})();
+
+/* "O que você recebe": clicar num item troca o ícone do chip; anda sozinho até a pessoa clicar */
+(function () {
+  "use strict";
+  var rec = document.getElementById("ef-rec");
+  if (!rec) return;
+  var itens = rec.querySelectorAll(".ef-rec__item"), sel = 1, mexeu = false, vis = false;
+  var escolhe = function (n) {
+    sel = n; rec.setAttribute("data-sel", n);
+    itens.forEach(function (b) { b.setAttribute("aria-selected", String(+b.dataset.item === n)); });
+  };
+  itens.forEach(function (b) { b.addEventListener("click", function () { mexeu = true; escolhe(+b.dataset.item); }); });
+  escolhe(1);
+  if ("IntersectionObserver" in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; }, { threshold: .3 }).observe(rec);
+  setInterval(function () { if (!mexeu && vis) escolhe(sel % itens.length + 1); }, 3200);
 })();
