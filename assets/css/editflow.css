@@ -394,3 +394,54 @@ body.ef {
 .ef-hero { width: 100%; }
 .ef-tl__janela { width: 0; contain: inline-size; }
 .ef-ia { text-align: left; }
+
+/* ── Linha do tempo da VSL: Bruto / Pronto ── */
+.ef-tl__faixa--video, .ef-tl__faixa--fala, .ef-tl__faixa--leg { display: flex; width: max-content; background: none; border-radius: 0; }
+.ef-tl__faixa--fala { height: 40px; }
+.ef-tl__seg { position: relative; flex: none; height: 100%; overflow: hidden; margin-right: 0;
+  transition: width .8s cubic-bezier(.6, 0, .2, 1), opacity .5s; }
+.ef-tl__faixa--video .ef-tl__seg { background-repeat: no-repeat; border-right: 2px solid var(--cz0); }
+.ef-tl__faixa--video .ef-tl__seg::after { content: ""; position: absolute; inset: 0; background: transparent; transition: background .4s; }
+.ef-tl__faixa--fala .ef-tl__seg { display: flex; align-items: center; }
+.ef-tl__faixa--fala canvas { display: block; flex: none; }
+.ef-tl__pausa { flex: 1; height: 0; margin: 0 6px; border-top: 2px dotted #ef4444; }
+.ef-tl__seg--fora { width: 0 !important; opacity: 0; border-right-width: 0 !important; }
+.ef-tl.ef-modo-bruto .ef-tl__seg--fora { width: var(--w) !important; opacity: 1; border-right-width: 2px !important; }
+.ef-tl.ef-modo-bruto .ef-tl__faixa--fala .ef-tl__seg--fora { background: rgba(239, 68, 68, .12); }
+/* no bruto ainda não existe vídeo: a trilha fica cinza listrada (só tem a voz) */
+.ef-tl.ef-modo-bruto .ef-tl__faixa--video .ef-tl__seg { background-image: repeating-linear-gradient(135deg, #1d1d21 0 8px, #232327 8px 16px) !important; }
+.ef-tl.ef-modo-bruto .ef-tl__faixa--video .ef-tl__seg--fora::after { background: rgba(239, 68, 68, .35); }
+.ef-tl.ef-modo-bruto .ef-tl__chip { opacity: 0; }
+.ef-tl__chip { transition: opacity .4s .4s, background .2s, color .2s; }
+.ef-tl.ef-modo-bruto .ef-tl__cabeca { background: #f97316; box-shadow: 0 0 10px #f97316; }
+.ef-tl.ef-modo-bruto .ef-tl__cabeca::before { background: #f97316; }
+.ef-tl__info { justify-content: space-between; margin-top: 8px; min-height: 20px; }
+.ef-tl__motivo { color: #f87171; font-weight: 700; }
+.ef-tl__motivo.ef-ok { color: #c4b5fd; }
+.ef-tl__total { font-variant-numeric: tabular-nums; }
+.ef-tl__ctrl { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.ef-tl__play, .ef-tl__repete { display: grid; place-items: center; width: 46px; height: 46px; border: 0; border-radius: 50%; background: var(--cz2); color: #fff; cursor: pointer; flex: none; }
+.ef-tl__play svg, .ef-tl__repete svg { width: 18px; height: 18px; }
+.ef-tl__tempo { width: 38px; color: #e4e4e7; font-size: 14px; font-variant-numeric: tabular-nums; text-align: left; }
+.ef-tl__modo { display: flex; flex: 1; padding: 4px; border-radius: 14px; background: var(--cz0); border: 1px solid rgba(255, 255, 255, .06); }
+.ef-tl__modo button { flex: 1; padding: 11px 0; border: 0; border-radius: 10px; background: none; color: var(--czt); font: 700 15px 'Manrope', sans-serif; cursor: pointer; transition: background .25s, color .25s; }
+.ef-tl__modo button[aria-pressed="true"] { background: var(--roxo); color: #fff; }
+.ef-tl.ef-modo-bruto .ef-tl__modo button[aria-pressed="true"] { background: #3f3f46; }
+.ef-tl__modo button[data-modo="bruto"][aria-pressed="false"] { animation: ef-chama 2.4s ease-in-out 3; }
+@keyframes ef-chama { 50% { color: #fff; background: rgba(249, 115, 22, .25); } }
+.ef .ef-tl__dica b { color: #d4d4d8; }
+/* capa da VSL no modo bruto */
+.ef-vsl__bruto { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px;
+  background: radial-gradient(60% 40% at 50% 45%, rgba(249, 115, 22, .14), transparent 70%), #0f0f11; color: #fff; text-align: center; }
+.ef-vsl__bruto[hidden] { display: none; }
+.ef-vsl__mic { display: grid; place-items: center; width: 70px; height: 70px; margin-bottom: 6px; border-radius: 50%; background: #232327; color: #fb923c; }
+.ef-vsl__mic svg { width: 32px; height: 32px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ef-vsl__bruto b { font-size: 20px; }
+.ef-vsl__bruto small { color: #a1a1aa; font-size: 14px; }
+.ef-vsl__eq { display: flex; align-items: center; gap: 4px; height: 40px; margin-top: 10px; }
+.ef-vsl__eq i { width: 5px; height: 30%; border-radius: 3px; background: #fb923c; animation: ef-eq 1s ease-in-out infinite; }
+.ef-vsl__eq i:nth-child(2) { animation-delay: -.2s; } .ef-vsl__eq i:nth-child(3) { animation-delay: -.5s; } .ef-vsl__eq i:nth-child(4) { animation-delay: -.1s; }
+.ef-vsl__eq i:nth-child(5) { animation-delay: -.7s; } .ef-vsl__eq i:nth-child(6) { animation-delay: -.3s; } .ef-vsl__eq i:nth-child(7) { animation-delay: -.6s; }
+@keyframes ef-eq { 50% { height: 100%; } }
+.ef-vsl--bruto { border-color: rgba(249, 115, 22, .45); box-shadow: 0 0 0 6px rgba(249, 115, 22, .06), 0 40px 90px -30px rgba(249, 115, 22, .5); }
+.ef-vsl--bruto .ef-vsl__selo { display: none; }

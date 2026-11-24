@@ -44,32 +44,44 @@
       <video id="ef-vsl" src="assets/img/editflow/vsl.mp4?v=3" poster="assets/img/editflow/vsl-poster.webp?v=3" autoplay muted loop playsinline preload="metadata" aria-label="Vídeo de apresentação do EditFlow AI"></video>
       <button class="ef-som" id="ef-som" type="button">🔊 Toque para ouvir</button>
       <span class="ef-vsl__selo">feito 100% pelo EditFlow AI</span>
+      <div class="ef-vsl__bruto" id="ef-vsl-bruto" hidden>
+        <span class="ef-vsl__mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
+        <b>Gravação bruta</b>
+        <small>só a voz, sem editar, com pausas e erros</small>
+        <span class="ef-vsl__eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      </div>
+      <audio id="ef-bruto-audio" src="assets/img/editflow/vsl-bruto.mp3?v=1" preload="none"></audio>
     </div>
 
-    <div class="ef-tl ef-r" id="ef-tl" aria-label="Linha do tempo real deste vídeo, montada pelo EditFlow AI">
-      <p class="ef-tl__rot">Montado pelo EditFlow AI</p>
-      <h2 class="ef-tl__tit">Assim ele montou esse vídeo.</h2>
+    <div class="ef-tl ef-r" id="ef-tl" aria-label="Linha do tempo deste vídeo: a gravação bruta e o vídeo pronto">
+      <p class="ef-tl__rot">Pronto para postar</p>
+      <h2 class="ef-tl__tit">Assim o EditFlow entregou.</h2>
       <div class="ef-tl__area">
         <div class="ef-tl__nomes" aria-hidden="true">
           <span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4-2.5z"/></svg>Vídeo</span>
           <span><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>Fala</span>
           <span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 11h4M13 11h4M7 15h10"/></svg>Legenda</span>
         </div>
-        <div class="ef-tl__janela" title="Arraste para navegar no vídeo">
+        <div class="ef-tl__janela" title="Arraste para navegar">
           <div class="ef-tl__rolo">
             <div class="ef-tl__faixa ef-tl__faixa--video"></div>
-            <canvas class="ef-tl__faixa ef-tl__faixa--fala"></canvas>
+            <div class="ef-tl__faixa ef-tl__faixa--fala"></div>
             <div class="ef-tl__faixa ef-tl__faixa--leg"></div>
           </div>
           <span class="ef-tl__cabeca" aria-hidden="true"></span>
         </div>
       </div>
-      <div class="ef-tl__info">
+      <div class="ef-tl__info"><span class="ef-tl__motivo"></span><span class="ef-tl__total">1:12</span></div>
+      <div class="ef-tl__ctrl">
         <button class="ef-tl__play" type="button" aria-label="Pausar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
-        <span class="ef-tl__cena">Cena 1 de 20</span>
-        <span class="ef-tl__tempo">0:00 / 1:12</span>
+        <span class="ef-tl__tempo">0:00</span>
+        <div class="ef-tl__modo" role="group" aria-label="Ver a gravação">
+          <button type="button" data-modo="bruto" aria-pressed="false">Bruto</button>
+          <button type="button" data-modo="pronto" aria-pressed="true">Pronto</button>
+        </div>
+        <button class="ef-tl__repete" type="button" aria-label="Recomeçar"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg></button>
       </div>
-      <p class="ef-tl__dica">Arraste a linha do tempo para navegar no vídeo</p>
+      <p class="ef-tl__dica">Toque em <b>Bruto</b> pra ver como a gravação chegou</p>
     </div>
 
     <a class="ef-btn ef-r" href="#oferta">Quero o EditFlow <span aria-hidden="true">→</span></a>
@@ -138,41 +150,6 @@
           <li><b>🎥 Seu vídeo, se quiser</b><span>Se um dia quiser aparecer, ele corta, legenda e anima a sua gravação também.</span></li>
         </ul>
       </div>
-    </section>
-
-    <!-- ─────────── Demo: editor Bruto/Pronto ─────────── -->
-    <section class="ef-sec ef-demo">
-      <h2 class="ef-h2 ef-r">Gravou? <span class="ef-h2__roxo">Ele limpa tudo.</span></h2>
-      <p class="ef-demo__sub ef-r">Se você gravar algo (tela, voz ou você mesmo), as pausas, os “éé” e as tomadas repetidas saem sozinhos.</p>
-
-      <div class="ef-ed ef-r" id="ef-ed" aria-label="Exemplo: a gravação antes e depois do EditFlow AI">
-        <div class="ef-ed__tela">
-          <img src="assets/img/victor.webp" alt="" width="160" height="160" loading="lazy">
-          <span class="ef-ed__leg" aria-hidden="true"></span>
-        </div>
-        <p class="ef-ed__rot">Gravação bruta</p>
-        <h3 class="ef-ed__tit">Assim a gravação chegou.</h3>
-        <div class="ef-ed__trilhas">
-          <span class="ef-ed__nome"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4-2.5z"/></svg>Vídeo</span>
-          <div class="ef-ed__faixa ef-ed__faixa--video"></div>
-          <span class="ef-ed__nome"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>Fala</span>
-          <div class="ef-ed__faixa ef-ed__faixa--fala"></div>
-          <span class="ef-ed__nome"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 11h4M13 11h4M7 15h10"/></svg>Legenda</span>
-          <div class="ef-ed__faixa ef-ed__faixa--leg"></div>
-          <span class="ef-ed__cabeca" aria-hidden="true"></span>
-        </div>
-        <div class="ef-ed__info"><span class="ef-ed__motivo"></span><span class="ef-ed__total">0:21</span></div>
-        <div class="ef-ed__ctrl">
-          <button class="ef-ed__play" type="button" aria-label="Pausar"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
-          <span class="ef-ed__tempo">0:00</span>
-          <div class="ef-ed__modo" role="group" aria-label="Ver gravação">
-            <button type="button" data-modo="bruto" aria-pressed="true">Bruto</button>
-            <button type="button" data-modo="pronto" aria-pressed="false">Pronto</button>
-          </div>
-          <button class="ef-ed__repete" type="button" aria-label="Recomeçar"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg></button>
-        </div>
-      </div>
-      <a class="ef-btn ef-demo__btn ef-r" href="#oferta">Quero o EditFlow <span aria-hidden="true">→</span></a>
     </section>
 
     <!-- ─────────── Modos ─────────── -->

@@ -268,88 +268,158 @@
   requestAnimationFrame(quadro);
 })();
 
-/* Linha do tempo real da VSL: quadros, onda da fala e legenda do próprio vídeo, sincronizadas com o player.
-   Arrastar a linha do tempo navega no vídeo. */
+/* Linha do tempo da VSL com Bruto/Pronto.
+   Pronto: a VSL de verdade tocando, com quadros, onda da fala e legenda sincronizados.
+   Bruto: a gravação que chegou (só a voz, com pausas e tomadas repetidas, sem vídeo); os trechos vermelhos
+   encolhem até sumir quando volta para Pronto. Arrastar a linha do tempo navega nos dois modos. */
 (function () {
   "use strict";
   var tl = document.getElementById("ef-tl"), vid = document.getElementById("ef-vsl");
   if (!tl || !vid || !window.fetch) return;
-  var janela = tl.querySelector(".ef-tl__janela"), rolo = tl.querySelector(".ef-tl__rolo"), fv = tl.querySelector(".ef-tl__faixa--video"),
-      cv = tl.querySelector(".ef-tl__faixa--fala"), fl = tl.querySelector(".ef-tl__faixa--leg"), cena = tl.querySelector(".ef-tl__cena"),
-      tempo = tl.querySelector(".ef-tl__tempo"), play = tl.querySelector(".ef-tl__play");
+  var caixaVsl = vid.parentNode, capa = document.getElementById("ef-vsl-bruto"), aud = document.getElementById("ef-bruto-audio"), som = document.getElementById("ef-som");
+  var janela = tl.querySelector(".ef-tl__janela"), rolo = tl.querySelector(".ef-tl__rolo"),
+      fv = tl.querySelector(".ef-tl__faixa--video"), ff = tl.querySelector(".ef-tl__faixa--fala"), fl = tl.querySelector(".ef-tl__faixa--leg"),
+      motivo = tl.querySelector(".ef-tl__motivo"), total = tl.querySelector(".ef-tl__total"), tempo = tl.querySelector(".ef-tl__tempo"),
+      tit = tl.querySelector(".ef-tl__tit"), rot = tl.querySelector(".ef-tl__rot"), play = tl.querySelector(".ef-tl__play"), botoes = tl.querySelectorAll(".ef-tl__modo button");
   var mmss = function (x) { x = Math.max(0, Math.floor(x)); return Math.floor(x / 60) + ":" + (x % 60 < 10 ? "0" : "") + (x % 60); };
-  fetch("assets/img/editflow/vsl-trilhas.json?v=1").then(function (r) { return r.json(); }).then(function (D) {
-    var PX = parseFloat(getComputedStyle(tl).getPropertyValue("--px")) || 62, L = D.dur * PX;
-    rolo.style.width = L + "px";
-    // vídeo: um quadro por segundo + marca de corte em cada cena
-    fv.style.width = L + "px";
-    fv.style.backgroundImage = "url(assets/img/editflow/vsl-quadros.webp?v=1)";
-    fv.style.backgroundSize = (D.n * PX) + "px auto";
-    D.cenas.forEach(function (c) { if (c > 0) fv.insertAdjacentHTML("beforeend", '<span class="ef-tl__corte" style="left:' + (c * PX) + 'px"></span>'); });
-    // fala: onda real da narração
-    var dpr = Math.min(2, window.devicePixelRatio || 1), H = 40;
-    cv.width = Math.round(L * dpr); cv.height = H * dpr; cv.style.width = L + "px";
-    var g = cv.getContext("2d"); g.scale(dpr, dpr); g.fillStyle = "#d4d4d8";
-    var passo = PX / 20;
-    for (var i = 0; i < D.onda.length; i++) {
-      var h = Math.max(2, (+D.onda[i] / 9) * (H - 6));
-      g.fillRect(i * passo, (H - h) / 2, Math.max(1, passo - 1.2), h);
-    }
-    // legenda: blocos de até 3 palavras, como aparecem no vídeo
+  var tocar = function (m) { var q = m.play(); if (q && q.catch) q.catch(function () {}); };
+  var icPausa = '<svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg>', icPlay = '<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>';
+
+  fetch("assets/img/editflow/vsl-trilhas.json?v=2").then(function (r) { return r.json(); }).then(function (D) {
+    var PX = parseFloat(getComputedStyle(tl).getPropertyValue("--px")) || 62;
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    // trechos: tempo no bruto (rs..re) e, quando ficam, tempo no vídeo final (s..e)
+    var rs = 0, segs = D.bruto.map(function (b) {
+      var d = b.t === "ok" ? b.e - b.s : b.d, sg = { t: b.t, s: b.s, e: b.e, d: d, rs: rs, re: rs + d };
+      rs += d; return sg;
+    });
+    // legenda em blocos de até 3 palavras
     var chips = [], grupo = [];
-    var fecha = function () { if (grupo.length) { chips.push({ t: grupo.map(function (p) { return p[0]; }).join(" "), s: grupo[0][1], e: grupo[grupo.length - 1][2] }); grupo = []; } };
-    D.palavras.forEach(function (p, k) {
+    var fecha = function () { if (grupo.length) { chips.push({ t: grupo.map(function (p) { return p[0]; }).join(" ").replace(/[.,]$/, ""), s: grupo[0][1], e: grupo[grupo.length - 1][2] }); grupo = []; } };
+    D.palavras.forEach(function (p) {
       if (grupo.length && (p[1] - grupo[grupo.length - 1][2] > 0.35 || grupo.length === 3)) fecha();
-      grupo.push(p);
-      if (/[.!?,]$/.test(p[0])) fecha();
+      grupo.push(p); if (/[.!?,]$/.test(p[0])) fecha();
     });
     fecha();
-    fl.style.width = L + "px";
-    chips.forEach(function (c) {
-      var el = document.createElement("span");
-      el.className = "ef-tl__chip"; el.textContent = c.t.replace(/[.,]$/, "");
-      el.style.left = (c.s * PX + 1) + "px"; el.style.width = Math.max(14, (c.e - c.s) * PX - 3) + "px";
-      fl.appendChild(el); c.el = el;
+    var onda = function (cv, a, b, cor) {
+      var W = (b - a) * PX, H = 40; cv.width = Math.max(1, Math.round(W * dpr)); cv.height = H * dpr; cv.style.width = W + "px";
+      var g = cv.getContext("2d"); g.scale(dpr, dpr); g.fillStyle = cor;
+      var passo = PX / 20, i0 = Math.floor(a * 20), i1 = Math.ceil(b * 20);
+      for (var i = i0; i < i1 && i < D.onda.length; i++) {
+        var h = Math.max(2, (+D.onda[i] / 9) * (H - 6));
+        g.fillRect((i - i0) * passo, (H - h) / 2, Math.max(1, passo - 1.2), h);
+      }
+    };
+    segs.forEach(function (sg) {
+      var fora = sg.t !== "ok", w = sg.d * PX, cls = "ef-tl__seg" + (fora ? " ef-tl__seg--fora" : "");
+      ["v", "f", "l"].forEach(function (k) {
+        var el = document.createElement("div"); el.className = cls; el.style.width = w + "px"; el.style.setProperty("--w", w + "px");
+        if (k === "v") {
+          if (sg.t !== "pausa") { el.style.backgroundImage = "url(assets/img/editflow/vsl-quadros.webp?v=1)"; el.style.backgroundSize = (D.n * PX) + "px auto"; el.style.backgroundPosition = (-sg.s * PX) + "px 50%"; }
+          fv.appendChild(el); sg.ev = el;
+        } else if (k === "f") {
+          if (sg.t === "pausa") el.innerHTML = '<span class="ef-tl__pausa"></span>';
+          else { var cv = document.createElement("canvas"); onda(cv, sg.s, sg.e, fora ? "#ef4444" : "#d4d4d8"); el.appendChild(cv); }
+          ff.appendChild(el);
+        } else {
+          if (!fora) chips.forEach(function (c) {
+            if (c.s >= sg.s - 0.01 && c.s < sg.e) {
+              var ch = document.createElement("span"); ch.className = "ef-tl__chip"; ch.textContent = c.t;
+              ch.style.left = ((c.s - sg.s) * PX + 1) + "px"; ch.style.width = Math.max(14, (Math.min(c.e, sg.e) - c.s) * PX - 3) + "px";
+              el.appendChild(ch); c.el = ch;
+            }
+          });
+          fl.appendChild(el);
+        }
+      });
     });
-    var atual = null, arrasto = null;
+    var nCortes = segs.filter(function (s) { return s.t !== "ok"; }).length;
+    var modo = "pronto", tr = 0, tocandoB = false, ult = 0, atual = null, arrasto = null;
+    var achaSeg = function (t, bruto) {
+      for (var i = 0; i < segs.length; i++) {
+        var sg = segs[i];
+        if (bruto) { if (t < sg.re || i === segs.length - 1) return { sg: sg, f: Math.min(1, Math.max(0, (t - sg.rs) / sg.d)) }; }
+        else if (sg.t === "ok" && (t < sg.e || i === segs.length - 1)) return { sg: sg, f: Math.min(1, Math.max(0, (t - sg.s) / sg.d)) };
+      }
+    };
+    var finalParaBruto = function (t) { var a = achaSeg(t, false); return a.sg.rs + a.f * a.sg.d; };
+    var brutoParaFinal = function (t) {
+      var a = achaSeg(t, true), sg = a.sg;
+      if (sg.t === "ok") return sg.s + a.f * sg.d;
+      for (var i = segs.indexOf(sg) + 1; i < segs.length; i++) if (segs[i].t === "ok") return segs[i].s;
+      return 0;
+    };
+    var setIcone = function (tocando) { play.innerHTML = tocando ? icPausa : icPlay; play.setAttribute("aria-label", tocando ? "Pausar" : "Tocar"); };
     var desenhar = function (t) {
-      rolo.style.transform = "translateX(" + (janela.clientWidth / 2 - t * PX) + "px)";
-      tempo.textContent = mmss(t) + " / " + mmss(D.dur);
-      var n = 1; for (var k = 0; k < D.cenas.length; k++) if (t >= D.cenas[k]) n = k + 1;
-      cena.textContent = "Cena " + n + " de " + D.cenas.length;
-      var c = null; for (var j = 0; j < chips.length; j++) if (t >= chips[j].s && t <= chips[j].e + 0.15) { c = chips[j]; break; }
-      if (c !== atual) { if (atual) atual.el.classList.remove("ef-agora"); if (c) c.el.classList.add("ef-agora"); atual = c; }
+      var bruto = modo === "bruto", a = achaSeg(t, bruto), el = a.sg.ev;
+      var x = el.offsetLeft + a.f * el.offsetWidth;
+      rolo.style.transform = "translateX(" + (janela.clientWidth / 2 - x) + "px)";
+      tempo.textContent = mmss(t);
+      if (bruto) {
+        motivo.textContent = a.sg.t === "pausa" ? "pausa de " + String(a.sg.d).replace(".", ",") + " s" : a.sg.t === "tomada" ? "tomada repetida" : "";
+        motivo.className = "ef-tl__motivo";
+      } else { motivo.textContent = "✂ " + nCortes + " cortes · " + mmss(D.durBruto) + " → " + mmss(D.dur); motivo.className = "ef-tl__motivo ef-ok"; }
+      var c = null;
+      if (!bruto) for (var j = 0; j < chips.length; j++) if (t >= chips[j].s && t <= chips[j].e + 0.15) { c = chips[j]; break; }
+      if (c !== atual) { if (atual && atual.el) atual.el.classList.remove("ef-agora"); if (c && c.el) c.el.classList.add("ef-agora"); atual = c; }
     };
-    var setIcone = function () {
-      var p = vid.paused;
-      play.setAttribute("aria-label", p ? "Tocar" : "Pausar");
-      play.innerHTML = p ? '<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg>';
+    var setModo = function (m, tempoNovo) {
+      var antes = modo; modo = m;
+      tl.classList.toggle("ef-modo-bruto", m === "bruto");
+      botoes.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.modo === m)); });
+      tit.textContent = m === "bruto" ? "Assim a gravação chegou." : "Assim o EditFlow entregou.";
+      rot.textContent = m === "bruto" ? "Gravação bruta · só a voz" : "Pronto para postar";
+      total.textContent = mmss(m === "bruto" ? D.durBruto : D.dur);
+      if (m === "bruto") {
+        tr = tempoNovo != null ? tempoNovo : (antes === "pronto" ? finalParaBruto(vid.currentTime || 0) : tr);
+        vid.pause(); capa.hidden = false; caixaVsl.classList.add("ef-vsl--bruto"); if (som) som.style.visibility = "hidden";
+        tocandoB = true; setIcone(true);
+        if (!vid.muted) { aud.currentTime = tr; tocar(aud); }
+      } else {
+        aud.pause(); capa.hidden = true; caixaVsl.classList.remove("ef-vsl--bruto"); if (som) som.style.visibility = "";
+        vid.currentTime = tempoNovo != null ? tempoNovo : (antes === "bruto" ? brutoParaFinal(tr) : vid.currentTime);
+        tocar(vid); setIcone(true);
+      }
     };
-    vid.addEventListener("play", setIcone); vid.addEventListener("pause", setIcone); setIcone();
-    play.addEventListener("click", function () { if (vid.paused) { var q = vid.play(); if (q && q.catch) q.catch(function () {}); } else vid.pause(); });
-    (function quadro() { if (!arrasto) desenhar(vid.currentTime || 0); requestAnimationFrame(quadro); })();
+    vid.addEventListener("play", function () { if (modo === "pronto") setIcone(true); });
+    vid.addEventListener("pause", function () { if (modo === "pronto") setIcone(false); });
+    botoes.forEach(function (b) { b.addEventListener("click", function () { if (b.dataset.modo !== modo) setModo(b.dataset.modo); }); });
+    tl.querySelector(".ef-tl__repete").addEventListener("click", function () { setModo(modo, 0); });
+    play.addEventListener("click", function () {
+      if (modo === "pronto") { if (vid.paused) tocar(vid); else vid.pause(); return; }
+      tocandoB = !tocandoB; setIcone(tocandoB);
+      if (!vid.muted) { if (tocandoB) { aud.currentTime = tr; tocar(aud); } else aud.pause(); }
+    });
+    (function quadro(agora) {
+      var dt = ult ? Math.min(.1, (agora - ult) / 1000) : 0; ult = agora;
+      if (modo === "bruto" && !arrasto) {
+        if (tocandoB) { if (!aud.paused) tr = aud.currentTime; else tr += dt; }
+        if (tr >= D.durBruto) { setModo("pronto", 0); }
+      }
+      if (!arrasto) desenhar(modo === "bruto" ? tr : (vid.currentTime || 0));
+      requestAnimationFrame(quadro);
+    })(0);
     // arrastar para navegar
     janela.addEventListener("pointerdown", function (e) {
-      arrasto = { x: e.clientX, t: vid.currentTime || 0, tocava: !vid.paused, moveu: false };
+      arrasto = { x: e.clientX, t: modo === "bruto" ? tr : (vid.currentTime || 0), tocava: modo === "bruto" ? tocandoB : !vid.paused, moveu: false };
       janela.setPointerCapture(e.pointerId); janela.classList.add("ef-arrastando");
     });
     janela.addEventListener("pointermove", function (e) {
       if (!arrasto) return;
       var dx = e.clientX - arrasto.x;
-      if (Math.abs(dx) > 3 && !arrasto.moveu) { arrasto.moveu = true; vid.pause(); }
+      if (Math.abs(dx) > 3 && !arrasto.moveu) { arrasto.moveu = true; if (modo === "pronto") vid.pause(); else { aud.pause(); } }
       if (!arrasto.moveu) return;
-      var t = Math.max(0, Math.min(D.dur - 0.05, arrasto.t - dx / PX));
+      var lim = modo === "bruto" ? D.durBruto : D.dur, t = Math.max(0, Math.min(lim - 0.05, arrasto.t - dx / PX));
       arrasto.alvo = t; desenhar(t);
-      if (vid.fastSeek) vid.fastSeek(t); else vid.currentTime = t;
+      if (modo === "pronto") { if (vid.fastSeek) vid.fastSeek(t); else vid.currentTime = t; } else tr = t;
     });
     var solta = function (e) {
       if (!arrasto) return;
       var a = arrasto; arrasto = null; janela.classList.remove("ef-arrastando");
-      if (!a.moveu) {  // toque simples: pula para o ponto tocado
-        var r = janela.getBoundingClientRect(), t = Math.max(0, Math.min(D.dur - 0.05, a.t + (e.clientX - (r.left + r.width / 2)) / PX));
-        vid.currentTime = t;
-      } else if (a.alvo != null) vid.currentTime = a.alvo;
-      if (a.tocava) { var q = vid.play(); if (q && q.catch) q.catch(function () {}); }
+      var lim = modo === "bruto" ? D.durBruto : D.dur, t = a.alvo;
+      if (!a.moveu) { var r = janela.getBoundingClientRect(); t = Math.max(0, Math.min(lim - 0.05, a.t + (e.clientX - (r.left + r.width / 2)) / PX)); }
+      if (modo === "pronto") { vid.currentTime = t; if (a.tocava) tocar(vid); }
+      else { tr = t; if (a.tocava && !vid.muted) { aud.currentTime = t; tocar(aud); } }
     };
     janela.addEventListener("pointerup", solta); janela.addEventListener("pointercancel", solta);
   }).catch(function () { tl.hidden = true; });
