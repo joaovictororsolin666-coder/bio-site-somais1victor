@@ -34,7 +34,8 @@
   /* ───────────── Desenho (prévia e editor usam o mesmo) ───────────── */
 
   function metricas(no, dm) {
-    var m = (dm.fxMet || {})[no.id] || {}, cl = (dm.cliques || {})["fx_" + no.id] || {}, it = [];
+    var m = (dm.fxMet || {})[no.id] || {}, cl = { visitas: 0, checkout: 0 }, it = [];
+    Object.keys(dm.cliques || {}).forEach(function (k) { if (k === "fx_" + no.id || k.indexOf("fx_" + no.id + "_") === 0) { cl.visitas += dm.cliques[k].visitas; cl.checkout += dm.cliques[k].checkout; } });
     if (no.tipo === "gatilho") it.push([m.p, "comentários"]);
     else if (no.tipo === "mensagem") {
       it.push([m.e, "enviadas"]);
@@ -53,9 +54,11 @@
     if (no.tipo === "segue") return '<p class="fe-mini">Confere no Instagram se a pessoa segue o perfil.</p>';
     if (no.tipo === "espera") return '<p class="fe-mini">Continua quando a pessoa responder no Direct (até 24 h).</p>';
     var h = '<p class="fe-bolha">' + esc(no.texto || "") + "</p>";
-    if (no.botao === "link" && no.link) h += '<span class="fe-botao fe-botao--url">' + esc(no.link.titulo) + " ↗</span>";
+    if (no.botao === "link") linksDe(no).forEach(function (l) { h += '<span class="fe-botao fe-botao--url">' + esc(l.titulo) + " ↗</span>"; });
     return h;
   }
+
+  function linksDe(no) { return (no.links && no.links.length) ? no.links : (no.link && no.link.url ? [no.link] : []); }
 
   function htmlNo(no, dm, palavras, editor) {
     var t = TIPOS[no.tipo];
@@ -209,8 +212,13 @@
       h += campo("Texto da mensagem", '<textarea class="vc-input" rows="5" maxlength="900" data-k="texto">' + esc(no.texto || "") + "</textarea>") +
         campo("Botão", '<select class="vc-input" data-k="botao"><option value="nenhum"' + (no.botao === "nenhum" ? " selected" : "") + '>Sem botão</option><option value="link"' + (no.botao === "link" ? " selected" : "") + '>Botão com link</option><option value="respostas"' + (no.botao === "respostas" ? " selected" : "") + ">Botões de resposta</option></select>");
       if (no.botao === "link") {
-        h += campo("Texto do botão", '<input class="vc-input" maxlength="20" data-k="link.titulo" value="' + esc((no.link || {}).titulo || "") + '">', "Até 20 letras.") +
-          campo("Link", '<input class="vc-input" type="url" data-k="link.url" value="' + esc((no.link || {}).url || "") + '">', "Os cliques aparecem no bloco (contados pelo quiz).");
+        no.links = linksDe(no).slice();
+        h += '<div class="fe-campo"><span>Botões de link (até 3)</span>' + no.links.map(function (l, i) {
+          return '<div class="fe-link"><div class="fe-linha"><input class="vc-input" maxlength="20" placeholder="Texto do botão" data-link="' + i + '" data-c="titulo" value="' + esc(l.titulo) + '">' +
+            '<button type="button" class="vc-icone" data-acao="tirar-link" data-i="' + i + '" aria-label="Remover botão">×</button></div>' +
+            '<input class="vc-input" type="url" placeholder="https://..." data-link="' + i + '" data-c="url" value="' + esc(l.url) + '"></div>';
+        }).join("") + (no.links.length < 3 ? '<button type="button" class="vc-btn vc-btn--ghost" data-acao="add-link">+ Adicionar botão de link</button>' : "") +
+          '<small>Texto do botão: até 20 letras. Os cliques nos links do quiz aparecem no bloco.</small></div>';
       } else if (no.botao === "respostas") {
         h += '<div class="fe-campo"><span>Botões (até 3). Cada um ganha uma saída própria.</span>' +
           resp.map(function (r, i) { return '<div class="fe-linha"><input class="vc-input" maxlength="20" data-resp="' + i + '" value="' + esc(r) + '"><button type="button" class="vc-icone" data-acao="tirar-resp" data-i="' + i + '" aria-label="Remover botão">×</button></div>'; }).join("") +
@@ -226,13 +234,14 @@
     var no = acharNo(ed.sel);
     if (!no) return;
     if (el.dataset.resp != null) { no.respostas[+el.dataset.resp] = el.value; }
+    else if (el.dataset.link != null) { no.links[+el.dataset.link][el.dataset.c] = el.value; }
     else {
       var k = el.dataset.k, v = el.dataset.lista ? el.value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean) : el.value;
       if (k === "seg") v = Math.max(0, Math.min(60, parseInt(v, 10) || 0));
       if (k.indexOf("link.") === 0) { no.link = no.link || {}; no.link[k.slice(5)] = v; } else no[k] = v;
       if (k === "botao") {
         if (v === "respostas" && !(no.respostas || []).length) no.respostas = ["Quero"];
-        if (v === "link") no.link = no.link && no.link.url ? no.link : { titulo: "Abrir", url: (dm().link || "") };
+        if (v === "link" && !linksDe(no).length) no.links = [{ titulo: "Abrir", url: (dm().link || "") }];
         limparLigas(no); painel();
       }
     }
@@ -252,7 +261,7 @@
   function novoNo(tipo, x, y) {
     var no = { id: novoId(), tipo: tipo, x: Math.round(x), y: Math.round(y) };
     if (tipo === "atraso") no.seg = 5;
-    if (tipo === "mensagem") { no.texto = "Escreva sua mensagem aqui"; no.botao = "nenhum"; no.respostas = []; no.link = { titulo: "Abrir", url: dm().link || "" }; }
+    if (tipo === "mensagem") { no.texto = "Escreva sua mensagem aqui"; no.botao = "nenhum"; no.respostas = []; no.links = []; }
     ed.f.nos.push(no); mudou(); redesenhar(); selecionar(no.id);
   }
 
@@ -313,7 +322,7 @@
         selecionar(no.dataset.id);
         var obj = acharNo(no.dataset.id), c = aCanvas(e);
         arr = { tipo: "no", el: no, obj: obj, dx: c.x - obj.x, dy: c.y - obj.y, moveu: false };
-        no.setPointerCapture && no.setPointerCapture(e.pointerId);
+        try { no.setPointerCapture(e.pointerId); } catch (x) { /* sem captura */ }
         return;
       }
       ed.sel = ""; ed.liga = -1; $$(".fe-no", camada).forEach(function (n) { n.classList.remove("is-sel"); }); setas(camada, ed.f, true); painel();
@@ -388,7 +397,7 @@
     });
 
     // Painel de propriedades
-    $("#fe-props").addEventListener("input", function (e) { if (e.target.matches("[data-k],[data-resp]") && e.target.tagName !== "SELECT") editarCampo(e.target); });
+    $("#fe-props").addEventListener("input", function (e) { if (e.target.matches("[data-k],[data-resp],[data-link]") && e.target.tagName !== "SELECT") editarCampo(e.target); });
     $("#fe-props").addEventListener("change", function (e) { if (e.target.matches("select[data-k]")) editarCampo(e.target); });
     $("#fe-props").addEventListener("click", function (e) {
       var b = e.target.closest("[data-acao]");
@@ -404,6 +413,8 @@
       } else if (acao === "duplicar") {
         var c = copia(no); c.id = novoId(); c.x += 40; c.y += 40; ed.f.nos.push(c); mudou(); redesenhar(); selecionar(c.id);
       } else if (acao === "add-resp") { no.respostas = (no.respostas || []).concat(["Nova opção"]); mudou(); painel(); redesenhar(); }
+      else if (acao === "add-link") { no.links = linksDe(no).concat([{ titulo: "Novo link", url: "https://" }]); mudou(); painel(); redesenhar(); }
+      else if (acao === "tirar-link") { no.links = linksDe(no); no.links.splice(+b.dataset.i, 1); if (!no.links.length) no.botao = "nenhum"; mudou(); painel(); redesenhar(); }
       else if (acao === "tirar-resp") { no.respostas.splice(+b.dataset.i, 1); if (!no.respostas.length) no.botao = "nenhum"; limparLigas(no); mudou(); painel(); redesenhar(); }
     });
 

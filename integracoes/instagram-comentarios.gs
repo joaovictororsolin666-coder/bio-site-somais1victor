@@ -485,25 +485,24 @@ const IG_FX_TIPOS = ['gatilho', 'atraso', 'segue', 'mensagem', 'espera'];
 
 function igFxPadrao_() {
   const dm = igDm_();
-  const msgLink = function (id, x, y) { return { id: id, tipo: 'mensagem', x: x, y: y, texto: dm.texto, botao: 'link', link: { titulo: dm.botao, url: dm.link }, respostas: [] }; };
   return {
     nos: [
       { id: 'g', tipo: 'gatilho', x: 40, y: 220, respostas: dm.respostas, falhou: dm.falhou },
-      { id: 'a', tipo: 'atraso', x: 340, y: 250, seg: dm.atraso || 0 },
-      { id: 's1', tipo: 'segue', x: 680, y: 230 },
-      msgLink('m1', 1020, 40),
-      { id: 'm2', tipo: 'mensagem', x: 1020, y: 300, texto: dm.seguir, botao: 'respostas', respostas: [dm.seguiBotao] },
-      { id: 'm3', tipo: 'mensagem', x: 1020, y: 560, texto: dm.abrir, botao: 'respostas', respostas: [dm.abrirBotao] },
-      { id: 's2', tipo: 'segue', x: 1380, y: 420 },
-      msgLink('m4', 1740, 260),
-      { id: 'm5', tipo: 'mensagem', x: 1740, y: 560, texto: dm.aindaNao, botao: 'respostas', respostas: [dm.seguiBotao] }
+      { id: 'a', tipo: 'atraso', x: 340, y: 250, seg: 3 },
+      { id: 'm1', tipo: 'mensagem', x: 660, y: 200, texto: 'Opa! Agora é só você clicar no botão abaixo pra receber o material completo ↓', botao: 'respostas', respostas: ['Quero receber ✅'], links: [] },
+      { id: 's1', tipo: 'segue', x: 1000, y: 230 },
+      { id: 'm2', tipo: 'mensagem', x: 1320, y: 360, texto: 'Mas antes, entra no meu perfil e me segue pra você não perder os próximos conteúdos...', botao: 'respostas', respostas: ['Seguindo'], links: [] },
+      { id: 's2', tipo: 'segue', x: 1660, y: 380 },
+      { id: 'm4', tipo: 'mensagem', x: 2000, y: 560, texto: 'Ainda não apareceu que você me segue 😅 Segue o perfil e toca em "Seguindo" de novo ↓', botao: 'respostas', respostas: ['Seguindo'], links: [] },
+      { id: 'm3', tipo: 'mensagem', x: 2000, y: 60, texto: 'Pronto! Aqui estão os links ↓\n\n🎬 Editar com IA: seus vídeos cortados, legendados e animados sozinhos, sem você editar nada.\n\n💰 Renda sem aparecer: venda produto digital ou monte um perfil de cortes ou dark, sem mostrar o rosto.',
+        botao: 'link', respostas: [], links: [{ titulo: '🎬 EDITAR COM IA', url: 'https://www.ovictorgomes.com.br/editflow?utm_source=instagram&utm_medium=direct&utm_campaign=vicchat' }, { titulo: '💰 SEM APARECER', url: 'https://www.ovictorgomes.com.br/quiz?utm_source=instagram&utm_medium=direct&utm_campaign=vicchat' }] }
     ],
     ligas: [
-      { de: 'g', saida: 'prox', para: 'a' }, { de: 'a', saida: 'prox', para: 's1' },
-      { de: 's1', saida: 'sim', para: 'm1' }, { de: 's1', saida: 'nao', para: 'm2' }, { de: 's1', saida: 'talvez', para: 'm3' },
-      { de: 'm2', saida: 'b0', para: 's2' }, { de: 'm3', saida: 'b0', para: 's2' },
-      { de: 's2', saida: 'sim', para: 'm4' }, { de: 's2', saida: 'nao', para: 'm5' }, { de: 's2', saida: 'talvez', para: 'm5' },
-      { de: 'm5', saida: 'b0', para: 's2' }
+      { de: 'g', saida: 'prox', para: 'a' }, { de: 'a', saida: 'prox', para: 'm1' }, { de: 'm1', saida: 'b0', para: 's1' },
+      { de: 's1', saida: 'sim', para: 'm3' }, { de: 's1', saida: 'nao', para: 'm2' }, { de: 's1', saida: 'talvez', para: 'm2' },
+      { de: 'm2', saida: 'b0', para: 's2' },
+      { de: 's2', saida: 'sim', para: 'm3' }, { de: 's2', saida: 'talvez', para: 'm3' }, { de: 's2', saida: 'nao', para: 'm4' },
+      { de: 'm4', saida: 'b0', para: 's2' }
     ]
   };
 }
@@ -535,10 +534,11 @@ function igFxLimpar_(f) {
       if (n.tipo === 'mensagem') {
         o.texto = txt(n.texto, 900) || '…';
         o.botao = ['nenhum', 'link', 'respostas'].indexOf(n.botao) > -1 ? n.botao : 'nenhum';
-        const url = txt(n.link && n.link.url, 400);
-        o.link = { titulo: txt(n.link && n.link.titulo, 20) || 'Abrir', url: /^https:\/\//.test(url) ? url : '' };
+        const brutos = Array.isArray(n.links) && n.links.length ? n.links : (n.link ? [n.link] : []);
+        o.links = brutos.map(function (l) { return { titulo: txt(l && l.titulo, 20) || 'Abrir', url: txt(l && l.url, 400) }; })
+          .filter(function (l) { return /^https:\/\//.test(l.url); }).slice(0, 3);
         o.respostas = (n.respostas || []).map(function (s) { return txt(s, 20); }).filter(Boolean).slice(0, 3);
-        if (o.botao === 'link' && !o.link.url) o.botao = 'nenhum';
+        if (o.botao === 'link' && !o.links.length) o.botao = 'nenhum';
         if (o.botao === 'respostas' && !o.respostas.length) o.botao = 'nenhum';
       }
       return o;
@@ -599,10 +599,12 @@ function igFxMetSoma_(props, dias) {
 }
 
 function igFxMsg_(no) {
-  if (no.botao === 'link' && no.link && no.link.url) {
-    const url = no.link.url + (no.link.url.indexOf('?') > -1 ? '&' : '?') + 'utm_content=fx_' + no.id;
-    return { attachment: { type: 'template', payload: { template_type: 'button', text: no.texto,
-      buttons: [{ type: 'web_url', url: url, title: no.link.titulo }] } } };
+  const links = (no.links && no.links.length) ? no.links : (no.link && no.link.url ? [no.link] : []);
+  if (no.botao === 'link' && links.length) {
+    return { attachment: { type: 'template', payload: { template_type: 'button', text: no.texto.slice(0, 640),
+      buttons: links.map(function (l, i) {
+        return { type: 'web_url', url: l.url + (l.url.indexOf('?') > -1 ? '&' : '?') + 'utm_content=fx_' + no.id + '_' + i, title: l.titulo };
+      }) } } };
   }
   if (no.botao === 'respostas' && no.respostas.length) {
     return { text: no.texto, quick_replies: no.respostas.map(function (t, i) { return { content_type: 'text', title: t, payload: 'B' + i }; }) };

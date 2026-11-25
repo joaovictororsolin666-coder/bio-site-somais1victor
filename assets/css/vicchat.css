@@ -303,3 +303,6 @@ body.fe-aberto { overflow: hidden; }
   .fe-props { max-height: 42vh; border-left: 0; border-top: 1px solid var(--line); }
   .fe-topo { flex-wrap: wrap; gap: 8px; } .fe-zoom button#fe-centro { display: none; }
 }
+.fe-botao + .fe-botao { margin-top: 6px; }
+.fe-link { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; }
+.fe-link + .fe-link { margin-top: 8px; }
