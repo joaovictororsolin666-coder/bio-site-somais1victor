@@ -44,14 +44,27 @@ const IG_DM_PADRAO = {
   desde: 0,                // só manda DM em posts publicados depois que o Direct foi ligado
   porRodada: 2,            // no máximo 2 DMs por minuto
   porDia: 40,              // trava diária de DMs
-  texto: 'Oi! Aqui está o passo a passo que você pediu 👇 Toca no botão pra começar.',
+  texto: 'Aqui está o passo a passo que você pediu 👇 Toca no botão pra começar.',
   botao: 'Ver o passo a passo',
   link: 'https://www.ovictorgomes.com.br/quiz?utm_source=instagram&utm_medium=direct&utm_campaign=vicchat',
-  respostas: [
-    'Te mandei no direct 👀',
-    'Chegou no seu direct, dá uma olhada! 📩',
-    'Acabei de te enviar no direct 👀',
-    'Te chamei no direct! 📩'
+  // 1ª mensagem quando não dá pra saber se a pessoa segue: ela toca no botão e aí a gente confere
+  abrir: 'Oi! Vi seu comentário 😊 Toca no botão aqui embaixo que eu te mando o passo a passo 👇',
+  abrirBotao: 'Quero o passo a passo',
+  // Quem não segue: pede para seguir e confirmar
+  seguir: 'Pra eu te mandar o passo a passo, me segue aqui no perfil 🙏 Depois é só tocar em "Já segui" 👇',
+  aindaNao: 'Ainda não apareceu que você me segue 😅 Segue o perfil e toca em "Já segui" de novo 👇',
+  seguiBotao: 'Já segui ✅',
+  tentativas: 3,           // pedidos para seguir por pessoa
+  respostas: [             // comentário quando a DM saiu
+    'Te mandei no direct 👀 Se não aparecer, olha em Pedidos de mensagem.',
+    'Chegou no seu direct! 📩 Se não achar, confere em Pedidos de mensagem.',
+    'Acabei de te enviar no direct 👀 Pode estar em Pedidos de mensagem.',
+    'Te chamei no direct! 📩 Se não aparecer, olha em Pedidos de mensagem.'
+  ],
+  falhou: [                // comentário quando a DM não pôde ser enviada para essa pessoa
+    'Não consegui te mandar no direct 😕 mas o passo a passo está no link da minha bio, é só acessar por lá! 🔗',
+    'Tentei te mandar no direct e não foi 😕 O passo a passo está no link da minha bio 👆',
+    'O direct não deixou eu te enviar 😅 mas o passo a passo completo está no link da bio do perfil!'
   ]
 };
 function igDm_() {
@@ -90,6 +103,7 @@ function igRodada_(props, token) {
   try {
     const eu = igConta_(token);
     token = eu.token || token; // token da Página, quando houver
+    try { igDmPendentes_(eu, token, props); } catch (e) { props.setProperty('IG_DM_ERRO_SEGUIR', new Date().toISOString() + ' ' + String(e.message || e).slice(0, 200)); }
     const posts = igPosts_(token).filter(function (m) { return contagens[m.id] !== m.comments_count; });
     if (!posts.length) return; // nada novo: a rodada fica em 1 ou 2 chamadas
 
@@ -98,7 +112,7 @@ function igRodada_(props, token) {
     const feitos = igFeitos_(log, props);
     let hoje = feitos.hoje, hora = feitos.hora, enviadas = 0;
     const dm = igDm_();
-    let dmHoje = feitos.dmHoje, dmRodada = 0;
+    let dmRodada = 0;
     const porRodada = Math.min(IG.maxPorRodada, 3); // no máximo 3 por minuto, mesmo que o painel peça mais
     const cheio = function () { return enviadas >= porRodada || hoje >= IG.maxPorDia || hora >= IG.maxPorHora; };
 
@@ -116,17 +130,16 @@ function igRodada_(props, token) {
         // Direct: só em posts publicados depois de ligar, dentro dos limites
         let direct = '';
         const postNovo = m.timestamp && new Date(m.timestamp).getTime() >= Number(dm.desde || 0);
-        if (dm.ativo && postNovo && dmRodada < dm.porRodada && dmHoje < dm.porDia) {
+        if (dm.ativo && postNovo && dmRodada < dm.porRodada && igDmConta_(props) < dm.porDia) {
           try {
-            igDirect_(eu, c.id, dm, token);
-            direct = 'enviado'; dmRodada++; dmHoje++;
+            direct = igDmPrimeira_(eu, c, quem, dm, token, props);
+            dmRodada++; igDmSomar_(props);
           } catch (e) {
             direct = 'erro: ' + String(e.message || e).slice(0, 250);
-            igDmFalhou_(props, direct); // permissão ou bloqueio: desliga o Direct e segue só no comentário
-            dm.ativo = false;
+            if (igErroGeral_(e)) { igDmFalhou_(props, direct); dm.ativo = false; } // token, permissão ou bloqueio: desliga
           }
         }
-        const lista = direct === 'enviado' ? dm.respostas : IG.respostas;
+        const lista = /^erro/.test(direct) ? dm.falhou : direct ? dm.respostas : IG.respostas;
         const texto = lista[Math.floor(Math.random() * lista.length)];
         let status = 'ok';
         try {
@@ -257,7 +270,7 @@ function igResumo_(props) {
   const conta = JSON.parse(props.getProperty('IG_CONTA') || '{}');
   const agora = new Date(), hoje = agora.toDateString(), semana = agora.getTime() - 7 * 86400000;
   const porDia = {}, ultimas = [];
-  let total = 0, hojeOk = 0, semanaOk = 0, erros = 0, dmHoje = 0, dmTotal = 0;
+  let total = 0, hojeOk = 0, semanaOk = 0, erros = 0, dmTotal = 0;
 
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(IG.aba);
   if (sheet && sheet.getLastRow() > 1) {
@@ -266,7 +279,7 @@ function igResumo_(props) {
     rows.forEach(function (v) {
       const d = v[0] instanceof Date ? v[0] : new Date(v[0]);
       if (isNaN(d)) return;
-      if (v[8] === 'enviado') { dmTotal++; if (d.toDateString() === hoje) dmHoje++; }
+      if (v[8] && !/^erro/.test(v[8])) dmTotal++;
       if (v[5] !== 'ok') { if (d.getTime() >= semana) erros++; return; }
       total++;
       if (d.toDateString() === hoje) hojeOk++;
@@ -288,19 +301,127 @@ function igResumo_(props) {
     erro: props.getProperty('IG_ERRO') || '',
     config: { palavras: IG.palavras, ignorar: IG.ignorar, respostas: IG.respostas, postsFixos: IG.postsFixos, maxPorRodada: IG.maxPorRodada, maxPorDia: IG.maxPorDia, postsRecentes: IG.postsRecentes, minutos: IG.minutos },
     stats: { total: total, hoje: hojeOk, semana: semanaOk, erros: erros, porDia: porDia },
-    dm: (function () { const dm = igDm_(); return { ativo: !!dm.ativo, texto: dm.texto, botao: dm.botao, porDia: dm.porDia, hoje: dmHoje, total: dmTotal, erro: props.getProperty('IG_DM_ERRO') || '' }; })(),
+    dm: (function () { const dm = igDm_(); return { ativo: !!dm.ativo, texto: dm.texto, botao: dm.botao, porDia: dm.porDia, hoje: igDmConta_(props), total: dmTotal,
+      esperando: Object.keys(igPendentes_(props)).length, ultimos: JSON.parse(props.getProperty('IG_DM_ULT') || '[]').slice(0, 10), erro: props.getProperty('IG_DM_ERRO') || '' }; })(),
     ultimas: ultimas
   };
 }
 
 /* ───────────── Direct (resposta privada) ───────────── */
 
-// Manda 1 mensagem no Direct de quem comentou (a API permite uma por comentário, em até 7 dias)
-function igDirect_(eu, commentId, dm, token) {
-  const caminho = (eu.token || /graph\.instagram\.com/.test(eu.base)) ? '/me/messages' : '/' + eu.id + '/messages';
-  const msg = { attachment: { type: 'template', payload: { template_type: 'button', text: dm.texto,
+function igMe_(eu, coisa) {
+  return (eu.token || /graph\.instagram\.com/.test(eu.base)) ? '/me/' + coisa : '/' + eu.id + '/' + coisa;
+}
+
+// recipient: { comment_id } (resposta privada, 1 por comentário em até 7 dias) ou { id } (conversa aberta)
+function igMandar_(eu, recipient, msg, token) {
+  return igPost_(igMe_(eu, 'messages'), { recipient: JSON.stringify(recipient), message: JSON.stringify(msg) }, token);
+}
+function igMsgLink_(dm) {
+  return { attachment: { type: 'template', payload: { template_type: 'button', text: dm.texto,
     buttons: [{ type: 'web_url', url: dm.link, title: dm.botao }] } } };
-  return igPost_(caminho, { recipient: JSON.stringify({ comment_id: commentId }), message: JSON.stringify(msg) }, token);
+}
+function igMsgBotao_(texto, botao, payload) {
+  return { text: texto, quick_replies: [{ content_type: 'text', title: botao, payload: payload }] };
+}
+
+// Segue o perfil? true / false / null (a API só responde depois que a pessoa fala com o perfil)
+function igSegue_(igsid, token) {
+  try {
+    const r = igGet_('/' + igsid, { fields: 'is_user_follow_business' }, token);
+    return typeof r.is_user_follow_business === 'boolean' ? r.is_user_follow_business : null;
+  } catch (e) { return null; }
+}
+
+// 1ª DM a partir do comentário: quem segue recebe o link; quem não segue, o pedido para seguir;
+// sem como saber, um botão "Quero o passo a passo" (ao tocar, a conversa abre e a gente confere)
+function igDmPrimeira_(eu, c, quem, dm, token, props) {
+  const igsid = c.from && c.from.id;
+  const segue = igsid ? igSegue_(igsid, token) : null;
+  const rec = { comment_id: c.id };
+  let msg, etapa;
+  if (segue === true) { msg = igMsgLink_(dm); etapa = ''; }
+  else if (segue === false) { msg = igMsgBotao_(dm.seguir, dm.seguiBotao, 'SEGUI'); etapa = 'seguir'; }
+  else { msg = igMsgBotao_(dm.abrir, dm.abrirBotao, 'QUERO'); etapa = 'abrir'; }
+  const r = igMandar_(eu, rec, msg, token);
+  const para = r.recipient_id || igsid;
+  if (etapa && para) igPendente_(props, para, { u: quem, t: Date.now(), n: etapa === 'seguir' ? 1 : 0 });
+  return segue === true ? 'enviado' : etapa === 'seguir' ? 'pediu seguir' : 'enviado botão';
+}
+
+// Pessoas esperando o link: { igsid: { u, t, n } } (some depois de 24 h ou de receber o link)
+function igPendentes_(props) {
+  const lista = JSON.parse(props.getProperty('IG_DM_PEND') || '{}');
+  const limite = Date.now() - 24 * 3600000;
+  Object.keys(lista).forEach(function (k) { if (lista[k].t < limite) delete lista[k]; });
+  return lista;
+}
+function igPendente_(props, igsid, dados) {
+  const lista = igPendentes_(props);
+  if (dados) lista[igsid] = dados; else delete lista[igsid];
+  const chaves = Object.keys(lista).sort(function (a, b) { return lista[b].t - lista[a].t; }).slice(0, 80);
+  const novo = {}; chaves.forEach(function (k) { novo[k] = lista[k]; });
+  props.setProperty('IG_DM_PEND', JSON.stringify(novo));
+}
+
+// A cada rodada: quem respondeu no Direct (tocou no botão ou escreveu) é conferido.
+// Segue → manda o link. Não segue → pede para seguir de novo (até dm.tentativas vezes).
+function igDmPendentes_(eu, token, props) {
+  const dm = igDm_();
+  if (!dm.ativo) return;
+  const lista = igPendentes_(props);
+  const ids = Object.keys(lista).slice(0, 10);
+  for (const igsid of ids) {
+    if (igDmConta_(props) >= dm.porDia) return;
+    const p = lista[igsid];
+    const conv = igGet_(igMe_(eu, 'conversations'), { platform: 'instagram', user_id: igsid,
+      fields: 'messages.limit(5){from,created_time}' }, token).data || [];
+    const msgs = (conv[0] && conv[0].messages && conv[0].messages.data) || [];
+    const respondeu = msgs.some(function (m) {
+      return m.from && m.from.id === igsid && new Date(m.created_time).getTime() > p.t;
+    });
+    if (!respondeu) continue;
+    const segue = igSegue_(igsid, token);
+    try {
+      if (segue === true) {
+        igMandar_(eu, { id: igsid }, igMsgLink_(dm), token);
+        igPendente_(props, igsid, null);
+        igDmRegistrar_(props, p.u, 'link enviado');
+      } else if (p.n < dm.tentativas) {
+        igMandar_(eu, { id: igsid }, igMsgBotao_(p.n ? dm.aindaNao : dm.seguir, dm.seguiBotao, 'SEGUI'), token);
+        igPendente_(props, igsid, { u: p.u, t: Date.now(), n: p.n + 1 });
+        igDmRegistrar_(props, p.u, 'pediu seguir');
+      } else {
+        igPendente_(props, igsid, null); // desistiu depois de N pedidos
+      }
+      igDmSomar_(props);
+    } catch (e) {
+      if (igErroGeral_(e)) { igDmFalhou_(props, 'erro: ' + String(e.message || e).slice(0, 250)); return; }
+      igPendente_(props, igsid, null);
+    }
+    Utilities.sleep(3000 + Math.random() * 4000);
+  }
+}
+
+// Contador de DMs do dia (1ª mensagem + mensagens de seguir/link)
+function igDmConta_(props) {
+  const c = JSON.parse(props.getProperty('IG_DM_CONT') || '{}');
+  return c.d === new Date().toDateString() ? c.n : 0;
+}
+function igDmSomar_(props) {
+  props.setProperty('IG_DM_CONT', JSON.stringify({ d: new Date().toDateString(), n: igDmConta_(props) + 1 }));
+}
+// Últimos acontecimentos do Direct (aparecem no painel)
+function igDmRegistrar_(props, quem, oque) {
+  const ult = JSON.parse(props.getProperty('IG_DM_ULT') || '[]');
+  ult.unshift({ d: new Date().toISOString(), u: quem, o: oque });
+  props.setProperty('IG_DM_ULT', JSON.stringify(ult.slice(0, 30)));
+}
+
+// Erro que vale para todo mundo (token, permissão, limite, bloqueio) × erro só daquela pessoa
+function igErroGeral_(e) {
+  const c = Number(e.code || 0);
+  return c === 190 || c === 10 || (c >= 200 && c < 300) || c === 4 || c === 17 || c === 32 || c === 613 || c === 368 || c === 3;
 }
 
 function igDmFalhou_(props, erro) {
@@ -318,7 +439,7 @@ function testarDirect() {
   let token = props.getProperty('IG_TOKEN');
   const eu = igConta_(token);
   token = eu.token || token;
-  Logger.log(JSON.stringify(igDirect_(eu, commentId, igDm_(), token)));
+  Logger.log(JSON.stringify(igMandar_(eu, { comment_id: commentId }, igMsgLink_(igDm_()), token)));
 }
 
 /* ───────────── Apoio ───────────── */
@@ -523,6 +644,10 @@ function igPost_(path, params, token) {
 
 function igResp_(res) {
   const body = JSON.parse(res.getContentText() || '{}');
-  if (res.getResponseCode() >= 400 || body.error) throw new Error((body.error && body.error.message) || ('HTTP ' + res.getResponseCode()));
+  if (res.getResponseCode() >= 400 || body.error) {
+    const err = new Error((body.error && body.error.message) || ('HTTP ' + res.getResponseCode()));
+    err.code = body.error && body.error.code; err.subcode = body.error && body.error.error_subcode;
+    throw err;
+  }
   return body;
 }

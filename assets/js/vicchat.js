@@ -139,7 +139,10 @@
     $("#dm-texto").textContent = "Mensagem: \u201c" + dm.texto + "\u201d · Botão: " + dm.botao;
     $("#dm-desc").textContent = !dm.ativo ? "Desligado: os comentários recebem só a resposta pública"
       : !ativo ? "Ligado, mas a automação de comentários está pausada"
-      : "Quem comentar a palavra-chave em um post novo recebe uma mensagem com botão para o quiz";
+      : "Quem segue recebe o link na hora; quem não segue recebe um pedido para seguir e o link depois do “Já segui”" +
+        (dm.esperando ? " · " + dm.esperando + " esperando confirmar" : "");
+    var ult = (dm.ultimos || []).slice(0, 5).map(function (x) { return "@" + x.u + ": " + x.o + " (" + quando(x.d) + ")"; });
+    if (ult.length) $("#dm-texto").textContent += " · Últimos: " + ult.join(" · ");
     $("#dm-erro").textContent = dm.erro ? "Desligado por erro: " + dm.erro : "";
     $("#dm-erro").hidden = !dm.erro || dm.ativo;
     $("#inicio-dm").textContent = (dm.ativo ? "Ligado · " : "Desligado · ") + nf.format(dm.total || 0) + " DMs enviadas";
