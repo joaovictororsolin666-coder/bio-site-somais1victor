@@ -55,6 +55,7 @@ const IG_DM_PADRAO = {
   aindaNao: 'Ainda não apareceu que você me segue 😅 Segue o perfil e toca em "Já segui" de novo 👇',
   seguiBotao: 'Já segui ✅',
   tentativas: 3,           // pedidos para seguir por pessoa
+  atraso: 0,               // segundos de espera antes de cada DM (0 a 60)
   respostas: [             // comentário quando a DM saiu
     'Te mandei no direct 👀 Se não aparecer, olha em Pedidos de mensagem.',
     'Chegou no seu direct! 📩 Se não achar, confere em Pedidos de mensagem.',
@@ -130,12 +131,14 @@ function igRodada_(props, token) {
         // Direct: só em posts publicados depois de ligar, dentro dos limites
         let direct = '';
         const postNovo = m.timestamp && new Date(m.timestamp).getTime() >= Number(dm.desde || 0);
+        if (dm.ativo && postNovo) igMet_(props, 'g');
         if (dm.ativo && postNovo && dmRodada < dm.porRodada && igDmConta_(props) < dm.porDia) {
           try {
             direct = igDmPrimeira_(eu, c, quem, dm, token, props);
             dmRodada++; igDmSomar_(props);
           } catch (e) {
             direct = 'erro: ' + String(e.message || e).slice(0, 250);
+            igMet_(props, 'f');
             if (igErroGeral_(e)) { igDmFalhou_(props, direct); dm.ativo = false; } // token, permissão ou bloqueio: desliga
           }
         }
@@ -236,9 +239,25 @@ function vicchat_(p) {
     const dm = igDm_();
     if (p.ativo === '1' && !dm.ativo) { dm.desde = Date.now(); props.deleteProperty('IG_DM_ERRO'); }
     if (p.ativo === '1' || p.ativo === '0') dm.ativo = p.ativo === '1';
-    if (p.texto) dm.texto = String(p.texto).trim().slice(0, 600);
-    if (p.botao) dm.botao = String(p.botao).trim().slice(0, 20);
-    props.setProperty('IG_DM', JSON.stringify({ ativo: dm.ativo, desde: dm.desde, texto: dm.texto, botao: dm.botao }));
+    if (p.config) {
+      let c;
+      try { c = JSON.parse(p.config); } catch (e) { return json_({ ok: false, error: 'config_invalida' }); }
+      const txt = function (k, max) { if (typeof c[k] === 'string' && c[k].trim()) dm[k] = c[k].trim().slice(0, max); };
+      ['texto', 'abrir', 'seguir', 'aindaNao'].forEach(function (k) { txt(k, 600); });
+      ['botao', 'abrirBotao', 'seguiBotao'].forEach(function (k) { txt(k, 20); });
+      if (/^https:\/\//.test(c.link || '')) dm.link = String(c.link).trim().slice(0, 400);
+      if (c.tentativas != null) dm.tentativas = Math.max(1, Math.min(5, parseInt(c.tentativas, 10) || 3));
+      if (c.atraso != null) dm.atraso = Math.max(0, Math.min(60, parseInt(c.atraso, 10) || 0));
+      ['respostas', 'falhou'].forEach(function (k) {
+        if (!Array.isArray(c[k])) return;
+        const l = c[k].map(function (x) { return String(x).trim().slice(0, 300); }).filter(Boolean).slice(0, 10);
+        if (l.length) dm[k] = l;
+      });
+    }
+    const salvar = {};
+    ['ativo', 'desde', 'texto', 'botao', 'link', 'abrir', 'abrirBotao', 'seguir', 'aindaNao', 'seguiBotao', 'tentativas', 'atraso', 'respostas', 'falhou']
+      .forEach(function (k) { salvar[k] = dm[k]; });
+    props.setProperty('IG_DM', JSON.stringify(salvar));
   } else if (p.action === 'vicchat_config') {
     let c;
     try { c = JSON.parse(p.config || '{}'); } catch (e) { return json_({ ok: false, error: 'config_invalida' }); }
@@ -262,10 +281,11 @@ function vicchat_(p) {
     props.setProperty('IG_CONFIG', JSON.stringify(novo));
     igAplicarConfig_();
   }
-  return json_(igResumo_(props));
+  return json_(igResumo_(props, Math.max(1, Math.min(30, parseInt(p.dias, 10) || 7))));
 }
 
-function igResumo_(props) {
+function igResumo_(props, dias) {
+  dias = dias || 7;
   const gatilho = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'responderComentarios'; });
   const conta = JSON.parse(props.getProperty('IG_CONTA') || '{}');
   const agora = new Date(), hoje = agora.toDateString(), semana = agora.getTime() - 7 * 86400000;
@@ -301,8 +321,17 @@ function igResumo_(props) {
     erro: props.getProperty('IG_ERRO') || '',
     config: { palavras: IG.palavras, ignorar: IG.ignorar, respostas: IG.respostas, postsFixos: IG.postsFixos, maxPorRodada: IG.maxPorRodada, maxPorDia: IG.maxPorDia, postsRecentes: IG.postsRecentes, minutos: IG.minutos },
     stats: { total: total, hoje: hojeOk, semana: semanaOk, erros: erros, porDia: porDia },
-    dm: (function () { const dm = igDm_(); return { ativo: !!dm.ativo, texto: dm.texto, botao: dm.botao, porDia: dm.porDia, hoje: igDmConta_(props), total: dmTotal,
-      esperando: Object.keys(igPendentes_(props)).length, ultimos: JSON.parse(props.getProperty('IG_DM_ULT') || '[]').slice(0, 10), erro: props.getProperty('IG_DM_ERRO') || '' }; })(),
+    dm: (function () {
+      const dm = igDm_();
+      let cliques = {};
+      try { cliques = igCliques_(dias); } catch (e) { /* aba Quiz indisponível */ }
+      return { ativo: !!dm.ativo, texto: dm.texto, botao: dm.botao, link: dm.link, abrir: dm.abrir, abrirBotao: dm.abrirBotao,
+        seguir: dm.seguir, aindaNao: dm.aindaNao, seguiBotao: dm.seguiBotao, tentativas: dm.tentativas, atraso: dm.atraso,
+        respostas: dm.respostas, falhou: dm.falhou, porDia: dm.porDia, porRodada: dm.porRodada,
+        hoje: igDmConta_(props), total: dmTotal, dias: dias, met: igMetSoma_(props, dias), cliques: cliques,
+        esperando: Object.keys(igPendentes_(props)).length, ultimos: JSON.parse(props.getProperty('IG_DM_ULT') || '[]').slice(0, 10),
+        erro: props.getProperty('IG_DM_ERRO') || '' };
+    })(),
     ultimas: ultimas
   };
 }
@@ -317,9 +346,57 @@ function igMe_(eu, coisa) {
 function igMandar_(eu, recipient, msg, token) {
   return igPost_(igMe_(eu, 'messages'), { recipient: JSON.stringify(recipient), message: JSON.stringify(msg) }, token);
 }
-function igMsgLink_(dm) {
+function igMsgLink_(dm, etapa) {
+  const url = dm.link + (dm.link.indexOf('?') > -1 ? '&' : '?') + 'utm_content=' + (etapa || 'link_direto');
   return { attachment: { type: 'template', payload: { template_type: 'button', text: dm.texto,
-    buttons: [{ type: 'web_url', url: dm.link, title: dm.botao }] } } };
+    buttons: [{ type: 'web_url', url: url, title: dm.botao }] } } };
+}
+function igEsperar_(dm) {
+  const seg = Math.max(0, Math.min(60, Number(dm.atraso) || 0));
+  if (seg) Utilities.sleep(seg * 1000);
+}
+
+// Métricas do Direct por dia (propriedade IG_DM_MET, guarda 35 dias)
+// g = comentários que dispararam, l = link direto, s = pediu seguir, a = botão de abrir,
+// t = responderam no Direct, ls = link depois de seguir, n = "ainda não segue", f = DM falhou
+function igMet_(props, chave) {
+  const met = JSON.parse(props.getProperty('IG_DM_MET') || '{}');
+  const dia = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  met[dia] = met[dia] || {};
+  met[dia][chave] = (met[dia][chave] || 0) + 1;
+  const dias = Object.keys(met).sort().slice(-35);
+  const novo = {}; dias.forEach(function (d) { novo[d] = met[d]; });
+  props.setProperty('IG_DM_MET', JSON.stringify(novo));
+}
+function igMetSoma_(props, dias) {
+  const met = JSON.parse(props.getProperty('IG_DM_MET') || '{}');
+  const desde = Utilities.formatDate(new Date(Date.now() - (dias - 1) * 86400000), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  const soma = {};
+  Object.keys(met).forEach(function (d) {
+    if (d < desde) return;
+    Object.keys(met[d]).forEach(function (k) { soma[k] = (soma[k] || 0) + met[d][k]; });
+  });
+  return soma;
+}
+// Cliques no link do Direct: visitas do quiz com utm_medium=direct, separadas por utm_content
+function igCliques_(dias) {
+  const out = {};
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(QUIZ_SHEET);
+  if (!sheet || sheet.getLastRow() < 2) return out;
+  const n = Math.min(sheet.getLastRow() - 1, 4000);
+  const col = function (k) { return QUIZ_COLUMNS.indexOf(k); };
+  const desde = Date.now() - dias * 86400000;
+  sheet.getRange(sheet.getLastRow() - n + 1, 1, n, QUIZ_COLUMNS.length).getValues().forEach(function (v) {
+    if (String(v[col('utm_medium')]) !== 'direct' || String(v[col('utm_campaign')]) !== 'vicchat') return;
+    const d = v[col('inicio')] instanceof Date ? v[col('inicio')] : new Date(v[col('inicio')]);
+    if (isNaN(d) || d.getTime() < desde) return;
+    const k = String(v[col('utm_content')] || 'link_direto');
+    out[k] = out[k] || { visitas: 0, quiz: 0, checkout: 0 };
+    out[k].visitas++;
+    if (Number(v[col('etapa_max')]) >= 1) out[k].quiz++;
+    if (String(v[col('checkout')] || '')) out[k].checkout++;
+  });
+  return out;
 }
 function igMsgBotao_(texto, botao, payload) {
   return { text: texto, quick_replies: [{ content_type: 'text', title: botao, payload: payload }] };
@@ -343,7 +420,9 @@ function igDmPrimeira_(eu, c, quem, dm, token, props) {
   if (segue === true) { msg = igMsgLink_(dm); etapa = ''; }
   else if (segue === false) { msg = igMsgBotao_(dm.seguir, dm.seguiBotao, 'SEGUI'); etapa = 'seguir'; }
   else { msg = igMsgBotao_(dm.abrir, dm.abrirBotao, 'QUERO'); etapa = 'abrir'; }
+  igEsperar_(dm);
   const r = igMandar_(eu, rec, msg, token);
+  igMet_(props, segue === true ? 'l' : etapa === 'seguir' ? 's' : 'a');
   const para = r.recipient_id || igsid;
   if (etapa && para) igPendente_(props, para, { u: quem, t: Date.now(), n: etapa === 'seguir' ? 1 : 0 });
   return segue === true ? 'enviado' : etapa === 'seguir' ? 'pediu seguir' : 'enviado botão';
@@ -381,14 +460,18 @@ function igDmPendentes_(eu, token, props) {
       return m.from && m.from.id === igsid && new Date(m.created_time).getTime() > p.t;
     });
     if (!respondeu) continue;
+    igMet_(props, 't');
     const segue = igSegue_(igsid, token);
     try {
+      igEsperar_(dm);
       if (segue === true) {
-        igMandar_(eu, { id: igsid }, igMsgLink_(dm), token);
+        igMandar_(eu, { id: igsid }, igMsgLink_(dm, p.n ? 'link_seguir' : 'link_botao'), token);
+        igMet_(props, 'ls');
         igPendente_(props, igsid, null);
         igDmRegistrar_(props, p.u, 'link enviado');
       } else if (p.n < dm.tentativas) {
         igMandar_(eu, { id: igsid }, igMsgBotao_(p.n ? dm.aindaNao : dm.seguir, dm.seguiBotao, 'SEGUI'), token);
+        igMet_(props, p.n ? 'n' : 's');
         igPendente_(props, igsid, { u: p.u, t: Date.now(), n: p.n + 1 });
         igDmRegistrar_(props, p.u, 'pediu seguir');
       } else {
@@ -439,7 +522,7 @@ function testarDirect() {
   let token = props.getProperty('IG_TOKEN');
   const eu = igConta_(token);
   token = eu.token || token;
-  Logger.log(JSON.stringify(igMandar_(eu, { comment_id: commentId }, igMsgLink_(igDm_()), token)));
+  Logger.log(JSON.stringify(igMandar_(eu, { comment_id: commentId }, igMsgLink_(igDm_(), 'teste'), token)));
 }
 
 /* ───────────── Apoio ───────────── */

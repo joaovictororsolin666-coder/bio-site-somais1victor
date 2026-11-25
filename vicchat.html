@@ -95,7 +95,7 @@
             </div>
           </article>
 
-          <article class="vc-card" id="card-dm">
+          <article class="vc-card vc-card--link" id="card-dm" tabindex="0" role="link" aria-label="Abrir o fluxo do Direct">
             <div class="vc-card__linha">
               <span class="vc-pill" id="dm-pill">—</span>
               <strong class="vc-card__nome">[DIRECT] Link por DM a partir dos comentários</strong>
@@ -110,6 +110,30 @@
             <p class="vc-falha" id="dm-erro" hidden style="margin:8px 0 0;font-size:13px"></p>
           </article>
         </div>
+      </section>
+
+      <!-- Fluxo do Direct: teia clicável -->
+      <section class="vc-view" id="view-fluxo" hidden>
+        <div class="vc-det__topo">
+          <a class="vc-voltar" href="#automacoes">← Automações</a>
+          <div class="vc-det__titulo">
+            <span class="vc-pill" id="fx-pill">—</span>
+            <h2>Link por DM a partir dos comentários</h2>
+            <label class="vc-switch vc-switch--grande" title="Ligar ou desligar o Direct"><input type="checkbox" id="fx-toggle"><span></span></label>
+          </div>
+          <p class="vc-erro" id="fx-erro" hidden></p>
+        </div>
+        <p class="vc-aviso is-erro" id="fx-sem" hidden>Falta publicar a versão nova do Apps Script para ver o fluxo e as métricas.</p>
+        <div class="fx-periodo" id="fx-periodo" role="group" aria-label="Período das métricas">
+          <button type="button" data-dias="1">Hoje</button><button type="button" data-dias="7" class="is-on">7 dias</button><button type="button" data-dias="30">30 dias</button>
+        </div>
+        <div class="vc-tiles fx-tiles" id="fx-tiles"></div>
+        <p class="vc-muted fx-dica">Toque em um bloco para ver ou editar. Arraste o fundo para navegar pela teia.</p>
+        <div class="fx-wrap" id="fx-wrap"><div class="fx-canvas" id="fx-canvas"></div></div>
+        <form class="fx-gaveta" id="fx-gaveta" hidden>
+          <div class="fx-g-topo"><div><span class="fx-tipo" id="fx-g-tipo"></span><h3 id="fx-g-titulo"></h3></div><button type="button" class="vc-icone" id="fx-fechar" aria-label="Fechar">✕</button></div>
+          <div id="fx-g-campos"></div>
+        </form>
       </section>
 
       <!-- Detalhe: automação de comentários -->
