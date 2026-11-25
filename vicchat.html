@@ -39,7 +39,6 @@
       <nav class="vc-nav" aria-label="Menu">
         <a href="#inicio" data-view="inicio"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início</a>
         <a href="#automacoes" data-view="automacoes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>Automação</a>
-        <span class="is-off"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>Direct <em>em breve</em></span>
         <span class="is-off"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Contatos <em>em breve</em></span>
       </nav>
       <div class="vc-side__rodape">
@@ -72,11 +71,11 @@
             <strong>Resposta com link da bio</strong>
             <span class="vc-muted" id="inicio-auto">—</span>
           </a>
-          <div class="vc-atalho is-off">
-            <span class="vc-atalho__tag vc-atalho__tag--cinza">Direct</span>
+          <a class="vc-atalho" href="#automacoes">
+            <span class="vc-atalho__tag">Direct</span>
             <strong>Enviar link por DM a partir dos comentários</strong>
-            <span class="vc-muted">Em breve, quando o direct voltar</span>
-          </div>
+            <span class="vc-muted" id="inicio-dm">—</span>
+          </a>
         </div>
       </section>
 
@@ -96,15 +95,19 @@
             </div>
           </article>
 
-          <article class="vc-card is-off">
+          <article class="vc-card" id="card-dm">
             <div class="vc-card__linha">
-              <span class="vc-pill vc-pill--cinza">EM BREVE</span>
+              <span class="vc-pill" id="dm-pill">—</span>
               <strong class="vc-card__nome">[DIRECT] Link por DM a partir dos comentários</strong>
+              <div class="vc-card__num"><b id="dm-hoje">0</b><span id="dm-limite">DMs hoje</span></div>
             </div>
             <div class="vc-card__gatilho">
               <svg viewBox="0 0 24 24" class="vc-ig"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
-              Liberado quando o direct do Instagram voltar a funcionar
+              <span id="dm-desc">Quem comentar a palavra-chave em um post novo recebe uma mensagem com botão para o quiz</span>
+              <label class="vc-switch" title="Ligar ou desligar o Direct"><input type="checkbox" id="dm-toggle"><span></span></label>
             </div>
+            <p class="vc-muted" id="dm-texto" style="margin:10px 0 0;font-size:13px"></p>
+            <p class="vc-falha" id="dm-erro" hidden style="margin:8px 0 0;font-size:13px"></p>
           </article>
         </div>
       </section>

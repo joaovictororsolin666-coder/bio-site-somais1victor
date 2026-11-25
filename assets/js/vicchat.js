@@ -120,10 +120,38 @@
     $("#det-erro").textContent = d.erro ? "Último erro: " + d.erro : "";
     $("#det-erro").hidden = !d.erro;
 
+    renderDm(d.dm, ativo);
     renderGrafico(s.porDia || {});
     renderFluxo(d.config);
     renderTabela(d.ultimas || []);
     if (!state.config || !state.editando) renderConfig(d.config);
+  }
+
+  function renderDm(dm, ativo) {
+    if (!dm) { $("#card-dm").hidden = true; $("#inicio-dm").textContent = "Atualize o Apps Script"; return; }
+    var on = dm.ativo && ativo;
+    $("#dm-pill").textContent = on ? "ATIVA" : dm.ativo ? "AGUARDANDO" : "DESLIGADA";
+    $("#dm-pill").classList.toggle("is-on", on);
+    $("#dm-toggle").checked = !!dm.ativo;
+    $("#dm-toggle").disabled = false;
+    $("#dm-hoje").textContent = nf.format(dm.hoje || 0);
+    $("#dm-limite").textContent = "de " + dm.porDia + " DMs hoje";
+    $("#dm-texto").textContent = "Mensagem: \u201c" + dm.texto + "\u201d · Botão: " + dm.botao;
+    $("#dm-desc").textContent = !dm.ativo ? "Desligado: os comentários recebem só a resposta pública"
+      : !ativo ? "Ligado, mas a automação de comentários está pausada"
+      : "Quem comentar a palavra-chave em um post novo recebe uma mensagem com botão para o quiz";
+    $("#dm-erro").textContent = dm.erro ? "Desligado por erro: " + dm.erro : "";
+    $("#dm-erro").hidden = !dm.erro || dm.ativo;
+    $("#inicio-dm").textContent = (dm.ativo ? "Ligado · " : "Desligado · ") + nf.format(dm.total || 0) + " DMs enviadas";
+  }
+
+  function alternarDm(e) {
+    var ligar = e.target.checked;
+    e.target.disabled = true;
+    request({ action: "vicchat_dm", senha: state.senha, ativo: ligar ? "1" : "0" }).then(tratar, function () {
+      aviso("Sem conexão: o Direct não mudou.", true);
+      render();
+    });
   }
 
   function renderGrafico(porDia) {
@@ -288,6 +316,7 @@
   window.addEventListener("hashchange", rota);
   $$(".vc-tabs button").forEach(function (b) { b.addEventListener("click", function () { abrirTab(b.dataset.tab); }); });
   $$("#lista-toggle, #det-toggle").forEach(function (t) { t.addEventListener("change", alternar); });
+  $("#dm-toggle").addEventListener("change", alternarDm);
   $("#lista-toggle").addEventListener("click", function (e) { e.stopPropagation(); });
   $("#card-comentarios").addEventListener("click", function (e) { if (!e.target.closest(".vc-switch")) location.hash = "comentarios"; });
   $("#card-comentarios").addEventListener("keydown", function (e) { if (e.key === "Enter") location.hash = "comentarios"; });
@@ -322,9 +351,11 @@
       for (var k = 0; k < 12; k++) ultimas.push({ data: new Date(Date.now() - k * 23 * 60000).toISOString(), post: "https://www.instagram.com/reel/DdJo0VaRsIc/", usuario: nomes[k % nomes.length], comentario: k % 3 ? "Eu quero!!" : "quero o passo a passo 🙏", resposta: "Não consegui te mandar no direct 😕 mas o passo a passo está no link da minha bio, é só acessar por lá! 🔗", status: k === 4 ? "erro: limite de respostas atingido" : "ok" });
       demoDados = { ok: true, ativo: true, gatilho: true, conta: "somais1victor", ultimaRodada: Date.now() - 2 * 60000, erro: "",
         config: { palavras: ["quero", "passo a passo", "link", "como faz", "me manda"], ignorar: ["nao quero"], respostas: ["Não consegui te mandar no direct 😕 mas o passo a passo está no link da minha bio, é só acessar por lá! 🔗", "Te chamei no direct mas não foi 😕 Tá tudo no link da minha bio, corre lá! 👆"], postsFixos: ["DdJo0VaRsIc"], maxPorRodada: 6, maxPorDia: 150, postsRecentes: 12, minutos: 1 },
-        stats: { total: 1284, hoje: porDia[diaKey(new Date())], semana: 196, erros: 1, porDia: porDia }, ultimas: ultimas };
+        stats: { total: 1284, hoje: porDia[diaKey(new Date())], semana: 196, erros: 1, porDia: porDia }, ultimas: ultimas,
+        dm: { ativo: false, texto: "Oi! Aqui está o passo a passo que você pediu 👇 Toca no botão pra começar.", botao: "Ver o passo a passo", porDia: 40, hoje: 0, total: 0, erro: "" } };
     }
     if (params.action === "vicchat_ativar") demoDados.ativo = params.ativo === "1";
+    if (params.action === "vicchat_dm") demoDados.dm.ativo = params.ativo === "1";
     if (params.action === "vicchat_config") { var c = JSON.parse(params.config); c.postsRecentes = 12; c.minutos = 1; demoDados.config = c; }
     return JSON.parse(JSON.stringify(demoDados));
   }

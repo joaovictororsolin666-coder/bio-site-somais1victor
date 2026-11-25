@@ -1,5 +1,6 @@
 /**
- * Resposta automática nos comentários do Instagram (sem DM).
+ * Resposta automática nos comentários do Instagram e, quando o Direct estiver ligado,
+ * uma mensagem privada (resposta privada da API oficial) com um botão para o quiz.
  * Arquivo extra no MESMO projeto do Apps Script da planilha (Arquivo → + → Script).
  *
  * A cada minuto olha os comentários novos dos posts recentes e, quando o comentário
@@ -36,6 +37,26 @@ const IG = {
     'Tentei te mandar no direct e não foi 😕 O passo a passo está no link da minha biografia, é só acessar!'
   ]
 };
+
+// Direct: ligado/desligado e textos ficam na propriedade IG_DM (painel /vicchat). Limites fixos e baixos.
+const IG_DM_PADRAO = {
+  ativo: false,
+  desde: 0,                // só manda DM em posts publicados depois que o Direct foi ligado
+  porRodada: 2,            // no máximo 2 DMs por minuto
+  porDia: 40,              // trava diária de DMs
+  texto: 'Oi! Aqui está o passo a passo que você pediu 👇 Toca no botão pra começar.',
+  botao: 'Ver o passo a passo',
+  link: 'https://www.ovictorgomes.com.br/quiz?utm_source=instagram&utm_medium=direct&utm_campaign=vicchat',
+  respostas: [
+    'Te mandei no direct 👀',
+    'Chegou no seu direct, dá uma olhada! 📩',
+    'Acabei de te enviar no direct 👀',
+    'Te chamei no direct! 📩'
+  ]
+};
+function igDm_() {
+  return Object.assign({}, IG_DM_PADRAO, JSON.parse(PropertiesService.getScriptProperties().getProperty('IG_DM') || '{}'));
+}
 
 /* ───────────── Rodada (gatilho a cada IG.minutos) ───────────── */
 
@@ -76,6 +97,8 @@ function igRodada_(props, token) {
     igGravarPendentes_(log, props);
     const feitos = igFeitos_(log, props);
     let hoje = feitos.hoje, hora = feitos.hora, enviadas = 0;
+    const dm = igDm_();
+    let dmHoje = feitos.dmHoje, dmRodada = 0;
     const porRodada = Math.min(IG.maxPorRodada, 3); // no máximo 3 por minuto, mesmo que o painel peça mais
     const cheio = function () { return enviadas >= porRodada || hoje >= IG.maxPorDia || hora >= IG.maxPorHora; };
 
@@ -90,7 +113,21 @@ function igRodada_(props, token) {
         if (!igTemPalavra_(c.text)) continue;
         if ((c.replies && c.replies.data || []).some(function (r) { return r.username === eu.username; })) continue; // já respondi na mão
 
-        const texto = IG.respostas[Math.floor(Math.random() * IG.respostas.length)];
+        // Direct: só em posts publicados depois de ligar, dentro dos limites
+        let direct = '';
+        const postNovo = m.timestamp && new Date(m.timestamp).getTime() >= Number(dm.desde || 0);
+        if (dm.ativo && postNovo && dmRodada < dm.porRodada && dmHoje < dm.porDia) {
+          try {
+            igDirect_(eu, c.id, dm, token);
+            direct = 'enviado'; dmRodada++; dmHoje++;
+          } catch (e) {
+            direct = 'erro: ' + String(e.message || e).slice(0, 250);
+            igDmFalhou_(props, direct); // permissão ou bloqueio: desliga o Direct e segue só no comentário
+            dm.ativo = false;
+          }
+        }
+        const lista = direct === 'enviado' ? dm.respostas : IG.respostas;
+        const texto = lista[Math.floor(Math.random() * lista.length)];
         let status = 'ok';
         try {
           igPost_('/' + c.id + '/replies', { message: texto }, token);
@@ -98,7 +135,7 @@ function igRodada_(props, token) {
         } catch (e) {
           status = 'erro: ' + String(e.message || e).slice(0, 300);
         }
-        igGravar_(log, props, [new Date(), m.permalink, quem, clean_(c.text), texto, status, c.id, m.id]);
+        igGravar_(log, props, [new Date(), m.permalink, quem, clean_(c.text), texto, status, c.id, m.id, direct]);
         feitos.ids[c.id] = true; feitos.pessoas[m.id + '|' + quem] = true;
         if (status !== 'ok') return; // erro (limite, permissão…): para e tenta na próxima rodada
         Utilities.sleep(10000 + Math.random() * 15000); // pausa humana entre respostas (10 a 25 s)
@@ -182,6 +219,13 @@ function vicchat_(p) {
     const ligar = p.ativo === '1';
     props.setProperty('IG_ATIVO', ligar ? '1' : '0');
     if (ligar) props.setProperty('IG_DESDE', String(Date.now())); // ao religar, não responde o que chegou pausado
+  } else if (p.action === 'vicchat_dm') {
+    const dm = igDm_();
+    if (p.ativo === '1' && !dm.ativo) { dm.desde = Date.now(); props.deleteProperty('IG_DM_ERRO'); }
+    if (p.ativo === '1' || p.ativo === '0') dm.ativo = p.ativo === '1';
+    if (p.texto) dm.texto = String(p.texto).trim().slice(0, 600);
+    if (p.botao) dm.botao = String(p.botao).trim().slice(0, 20);
+    props.setProperty('IG_DM', JSON.stringify({ ativo: dm.ativo, desde: dm.desde, texto: dm.texto, botao: dm.botao }));
   } else if (p.action === 'vicchat_config') {
     let c;
     try { c = JSON.parse(p.config || '{}'); } catch (e) { return json_({ ok: false, error: 'config_invalida' }); }
@@ -213,15 +257,16 @@ function igResumo_(props) {
   const conta = JSON.parse(props.getProperty('IG_CONTA') || '{}');
   const agora = new Date(), hoje = agora.toDateString(), semana = agora.getTime() - 7 * 86400000;
   const porDia = {}, ultimas = [];
-  let total = 0, hojeOk = 0, semanaOk = 0, erros = 0;
+  let total = 0, hojeOk = 0, semanaOk = 0, erros = 0, dmHoje = 0, dmTotal = 0;
 
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(IG.aba);
   if (sheet && sheet.getLastRow() > 1) {
     const n = Math.min(sheet.getLastRow() - 1, 5000);
-    const rows = sheet.getRange(sheet.getLastRow() - n + 1, 1, n, 6).getValues();
+    const rows = sheet.getRange(sheet.getLastRow() - n + 1, 1, n, 9).getValues();
     rows.forEach(function (v) {
       const d = v[0] instanceof Date ? v[0] : new Date(v[0]);
       if (isNaN(d)) return;
+      if (v[8] === 'enviado') { dmTotal++; if (d.toDateString() === hoje) dmHoje++; }
       if (v[5] !== 'ok') { if (d.getTime() >= semana) erros++; return; }
       total++;
       if (d.toDateString() === hoje) hojeOk++;
@@ -230,7 +275,7 @@ function igResumo_(props) {
       porDia[dia] = (porDia[dia] || 0) + 1;
     });
     rows.slice(-60).reverse().forEach(function (v) {
-      ultimas.push({ data: v[0] instanceof Date ? v[0].toISOString() : String(v[0]), post: String(v[1]), usuario: String(v[2]), comentario: String(v[3]), resposta: String(v[4]), status: String(v[5]) });
+      ultimas.push({ data: v[0] instanceof Date ? v[0].toISOString() : String(v[0]), post: String(v[1]), usuario: String(v[2]), comentario: String(v[3]), resposta: String(v[4]), status: String(v[5]), direct: String(v[8] || '') });
     });
   }
 
@@ -243,8 +288,37 @@ function igResumo_(props) {
     erro: props.getProperty('IG_ERRO') || '',
     config: { palavras: IG.palavras, ignorar: IG.ignorar, respostas: IG.respostas, postsFixos: IG.postsFixos, maxPorRodada: IG.maxPorRodada, maxPorDia: IG.maxPorDia, postsRecentes: IG.postsRecentes, minutos: IG.minutos },
     stats: { total: total, hoje: hojeOk, semana: semanaOk, erros: erros, porDia: porDia },
+    dm: (function () { const dm = igDm_(); return { ativo: !!dm.ativo, texto: dm.texto, botao: dm.botao, porDia: dm.porDia, hoje: dmHoje, total: dmTotal, erro: props.getProperty('IG_DM_ERRO') || '' }; })(),
     ultimas: ultimas
   };
+}
+
+/* ───────────── Direct (resposta privada) ───────────── */
+
+// Manda 1 mensagem no Direct de quem comentou (a API permite uma por comentário, em até 7 dias)
+function igDirect_(eu, commentId, dm, token) {
+  const caminho = (eu.token || /graph\.instagram\.com/.test(eu.base)) ? '/me/messages' : '/' + eu.id + '/messages';
+  const msg = { attachment: { type: 'template', payload: { template_type: 'button', text: dm.texto,
+    buttons: [{ type: 'web_url', url: dm.link, title: dm.botao }] } } };
+  return igPost_(caminho, { recipient: JSON.stringify({ comment_id: commentId }), message: JSON.stringify(msg) }, token);
+}
+
+function igDmFalhou_(props, erro) {
+  const dm = JSON.parse(props.getProperty('IG_DM') || '{}');
+  dm.ativo = false;
+  props.setProperty('IG_DM', JSON.stringify(dm));
+  props.setProperty('IG_DM_ERRO', new Date().toISOString() + ' ' + erro);
+}
+
+// Teste manual: coloque o id de um comentário na propriedade IG_DM_TESTE e rode esta função
+function testarDirect() {
+  const props = PropertiesService.getScriptProperties();
+  const commentId = props.getProperty('IG_DM_TESTE');
+  if (!commentId) throw new Error('Coloque o id do comentário na propriedade IG_DM_TESTE');
+  let token = props.getProperty('IG_TOKEN');
+  const eu = igConta_(token);
+  token = eu.token || token;
+  Logger.log(JSON.stringify(igDirect_(eu, commentId, igDm_(), token)));
 }
 
 /* ───────────── Apoio ───────────── */
@@ -277,7 +351,9 @@ function igTemPalavra_(texto) {
 }
 
 function igLog_() {
-  return getSheet_(IG.aba, ['Data', 'Post', 'Usuário', 'Comentário', 'Resposta', 'Status', 'comment_id', 'media_id']);
+  const sheet = getSheet_(IG.aba, ['Data', 'Post', 'Usuário', 'Comentário', 'Resposta', 'Status', 'comment_id', 'media_id', 'Direct']);
+  if (!sheet.getRange(1, 9).getValue()) sheet.getRange(1, 9).setValue('Direct').setFontWeight('bold');
+  return sheet;
 }
 
 // A planilha às vezes recusa a escrita ("You do not have permission…") logo depois da resposta já
@@ -308,17 +384,18 @@ function igGravarPendentes_(log, props) {
 
 function igFeitos_(sheet, props) {
   const ids = {}, pessoas = {};
-  let hoje = 0, hora = 0;
+  let hoje = 0, hora = 0, dmHoje = 0;
   const dia = new Date().toDateString(), umaHora = Date.now() - 3600000;
   const marcar = function (v) {
     ids[v[6]] = true;
     pessoas[v[7] + '|' + v[2]] = true;
     if (v[5] === 'ok' && new Date(v[0]).toDateString() === dia) hoje++;
     if (v[5] === 'ok' && new Date(v[0]).getTime() >= umaHora) hora++;
+    if (v[8] === 'enviado' && new Date(v[0]).toDateString() === dia) dmHoje++;
   };
-  if (sheet.getLastRow() > 1) sheet.getRange(2, 1, sheet.getLastRow() - 1, 8).getValues().forEach(marcar);
+  if (sheet.getLastRow() > 1) sheet.getRange(2, 1, sheet.getLastRow() - 1, 9).getValues().forEach(marcar);
   JSON.parse(props.getProperty('IG_PENDENTES') || '[]').forEach(marcar); // ainda não foram para a planilha
-  return { ids: ids, pessoas: pessoas, hoje: hoje, hora: hora };
+  return { ids: ids, pessoas: pessoas, hoje: hoje, hora: hora, dmHoje: dmHoje };
 }
 
 // Rode uma vez: procura nos posts as respostas da automação que não chegaram na planilha e grava
@@ -359,7 +436,7 @@ function igPosts_(token) {
   const props = PropertiesService.getScriptProperties();
   const cache = JSON.parse(props.getProperty('IG_FIXOS') || '{}');
   const eu = igConta_(token);
-  let r = igGet_('/' + eu.id + '/media', { fields: 'id,permalink,comments_count', limit: IG.postsRecentes }, token);
+  let r = igGet_('/' + eu.id + '/media', { fields: 'id,permalink,comments_count,timestamp', limit: IG.postsRecentes }, token);
   const posts = (r.data || []).slice();
   const faltam = IG.postsFixos.filter(function (code) { return !cache[code]; });
   // procura os fixos que ainda não têm id (até ~300 posts para trás)
