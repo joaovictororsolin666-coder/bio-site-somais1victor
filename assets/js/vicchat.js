@@ -81,7 +81,7 @@
     if (!TITULOS[v]) v = "inicio";
     $$(".vc-view").forEach(function (s) { s.hidden = s.id !== "view-" + v; });
     $$(".vc-nav a").forEach(function (a) { a.classList.toggle("is-on", a.dataset.view === v || ((v === "comentarios" || v === "fluxo") && a.dataset.view === "automacoes")); });
-    if (v === "fluxo") { fxRender(); } else if (typeof fxFechar === "function" && fx.aberto) fxFechar();
+    if (v === "fluxo" && window.VCFluxo) window.VCFluxo.render();
     $("#titulo").textContent = TITULOS[v];
     window.scrollTo(0, 0);
   }
@@ -123,7 +123,7 @@
     $("#det-erro").hidden = !d.erro;
 
     renderDm(d.dm, ativo);
-    fxRender();
+    if (window.VCFluxo) window.VCFluxo.render();
     renderGrafico(s.porDia || {});
     renderFluxo(d.config);
     renderTabela(d.ultimas || []);
@@ -347,212 +347,8 @@
   $$("#max-rodada, #max-dia").forEach(function (i) { i.addEventListener("input", mexeu); });
   $("#tab-config").addEventListener("submit", salvar);
 
-  /* ───────────── Fluxo do Direct (#fluxo): teia clicável + métricas ───────────── */
-
-  var FX_NOS = [
-    { id: "gatilho", x: 20, y: 190, tipo: "Gatilho", cor: "azul", titulo: "Comentário com palavra-chave" },
-    { id: "resposta", x: 20, y: 470, tipo: "Comentário", cor: "cinza", titulo: "Resposta pública no comentário" },
-    { id: "atraso", x: 310, y: 215, tipo: "Atraso", cor: "amarelo", titulo: "Espera antes de enviar" },
-    { id: "segue", x: 570, y: 190, tipo: "Condição", cor: "roxo", titulo: "Segue o perfil?" },
-    { id: "link", x: 960, y: 10, tipo: "Mensagem", cor: "verde", titulo: "Envia o link" },
-    { id: "seguir", x: 960, y: 270, tipo: "Mensagem", cor: "verde", titulo: "Pede para seguir" },
-    { id: "abrir", x: 960, y: 530, tipo: "Mensagem", cor: "verde", titulo: "Botão para abrir a conversa" },
-    { id: "espera", x: 1290, y: 330, tipo: "Espera", cor: "amarelo", titulo: "Espera a resposta" },
-    { id: "segue2", x: 1590, y: 310, tipo: "Condição", cor: "roxo", titulo: "Segue agora?" },
-    { id: "link2", x: 1900, y: 150, tipo: "Mensagem", cor: "verde", titulo: "Envia o link" },
-    { id: "ainda", x: 1900, y: 450, tipo: "Mensagem", cor: "verde", titulo: "Ainda não segue" }
-  ];
-  var FX_LIGA = [
-    ["gatilho", "atraso"], ["gatilho", "resposta", "", "baixo"], ["atraso", "segue"],
-    ["segue", "link", "Sim"], ["segue", "seguir", "Não"], ["segue", "abrir", "Não dá pra saber"],
-    ["seguir", "espera"], ["abrir", "espera"], ["espera", "segue2"],
-    ["segue2", "link2", "Sim"], ["segue2", "ainda", "Não"], ["ainda", "espera", "de novo", "volta"]
-  ];
-  // Campos editáveis de cada bloco
-  var FX_CAMPOS = {
-    resposta: [["respostas", "Quando a DM sai (uma é sorteada)", "lista"], ["falhou", "Quando a DM não sai (uma é sorteada)", "lista"]],
-    atraso: [["atraso", "Segundos de espera antes de cada DM (0 a 60)", "num"]],
-    link: [["texto", "Texto da mensagem", "texto"], ["botao", "Texto do botão (até 20 letras)", "curto"], ["link", "Link do botão", "url"]],
-    link2: [["texto", "Texto da mensagem", "texto"], ["botao", "Texto do botão (até 20 letras)", "curto"], ["link", "Link do botão", "url"]],
-    seguir: [["seguir", "Texto da mensagem", "texto"], ["seguiBotao", "Texto do botão (até 20 letras)", "curto"]],
-    abrir: [["abrir", "Texto da mensagem", "texto"], ["abrirBotao", "Texto do botão (até 20 letras)", "curto"]],
-    ainda: [["aindaNao", "Texto da mensagem", "texto"], ["tentativas", "Quantas vezes pede para seguir (1 a 5)", "num"]]
-  };
-  var fx = { aberto: "", montado: false };
-
-  function fxNum(n) { return nf.format(n || 0); }
-  function fxPct(a, b) { return b ? Math.round(a / b * 100) + "%" : "—"; }
-  function fxCliques(dm, chaves) {
-    var c = dm.cliques || {}, t = { visitas: 0, quiz: 0, checkout: 0 };
-    chaves.forEach(function (k) { var o = c[k]; if (o) { t.visitas += o.visitas; t.quiz += o.quiz; t.checkout += o.checkout; } });
-    return t;
-  }
-  function fxChip(t, url) { return '<span class="fx-btn' + (url ? " fx-btn--url" : "") + '">' + esc(t) + (url ? ' <small>↗</small>' : "") + "</span>"; }
-  function fxMet(pares) {
-    return '<div class="fx-met">' + pares.map(function (p) { return "<span><b>" + fxNum(p[0]) + "</b> " + p[1] + "</span>"; }).join("") + "</div>";
-  }
-
-  function fxCorpo(no, d) {
-    var dm = d.dm, m = dm.met || {}, cfg = d.config || {};
-    switch (no.id) {
-      case "gatilho":
-        return '<p>Alguém comenta em um post publicado depois que o Direct foi ligado:</p><div class="fx-kws">' +
-          (cfg.palavras || []).slice(0, 8).map(function (p) { return '<span class="vc-kw">' + esc(p) + "</span>"; }).join(" ") + "</div>" +
-          fxMet([[m.g, "comentários"]]);
-      case "resposta":
-        return '<p class="fx-bolha fx-bolha--cinza">' + esc((dm.respostas || [])[0] || "") + "</p>" +
-          '<p class="vc-muted">Se a DM não sair: “' + esc((dm.falhou || [])[0] || "") + "”</p>" + fxMet([[m.f, "DMs que falharam"]]);
-      case "atraso":
-        return '<p class="fx-grande">' + (dm.atraso ? dm.atraso + " s" : "Sem espera") + "</p><p class=\"vc-muted\">Até " + dm.porRodada + " DMs por minuto e " + dm.porDia + " por dia.</p>";
-      case "segue":
-        return '<p>Confere no Instagram se quem comentou já segue o perfil.</p>';
-      case "link":
-        var c1 = fxCliques(dm, ["link_direto"]);
-        return '<p class="fx-bolha">' + esc(dm.texto) + "</p>" + fxChip(dm.botao, true) +
-          fxMet([[m.l, "enviadas"], [c1.visitas, "cliques"], [c1.checkout, "checkout"]]);
-      case "seguir":
-        return '<p class="fx-bolha">' + esc(dm.seguir) + "</p>" + fxChip(dm.seguiBotao) + fxMet([[m.s, "enviadas"]]);
-      case "abrir":
-        return '<p class="fx-bolha">' + esc(dm.abrir) + "</p>" + fxChip(dm.abrirBotao) + fxMet([[m.a, "enviadas"]]);
-      case "espera":
-        return '<p>A pessoa toca no botão ou responde no Direct. Conferido a cada minuto, por até 24 h.</p>' +
-          fxMet([[m.t, "responderam"], [dm.esperando, "esperando agora"]]);
-      case "segue2":
-        return '<p>Confere de novo se a pessoa já segue o perfil.</p>';
-      case "link2":
-        var c2 = fxCliques(dm, ["link_seguir", "link_botao"]);
-        return '<p class="fx-bolha">' + esc(dm.texto) + "</p>" + fxChip(dm.botao, true) +
-          fxMet([[m.ls, "enviadas"], [c2.visitas, "cliques"], [c2.checkout, "checkout"]]);
-      case "ainda":
-        return '<p class="fx-bolha">' + esc(dm.aindaNao) + "</p>" + fxChip(dm.seguiBotao) +
-          '<p class="vc-muted">Pede até ' + dm.tentativas + " vezes. Depois, desiste.</p>" + fxMet([[m.n, "enviadas"]]);
-    }
-    return "";
-  }
-
-  function fxMontar() {
-    var cv = $("#fx-canvas");
-    cv.innerHTML = '<svg class="fx-linhas" id="fx-linhas"></svg>' + FX_NOS.map(function (no) {
-      return '<article class="fx-no fx-no--' + no.cor + '" id="fx-' + no.id + '" style="left:' + no.x + "px;top:" + no.y + 'px" tabindex="0" role="button" aria-label="' + esc(no.titulo) + '">' +
-        '<header><span class="fx-tipo">' + no.tipo + "</span><strong>" + esc(no.titulo) + "</strong>" +
-        (FX_CAMPOS[no.id] || no.id === "gatilho" ? '<span class="fx-editar" aria-hidden="true">✎</span>' : "") + "</header>" +
-        '<div class="fx-corpo"></div></article>';
-    }).join("");
-    fx.montado = true;
-  }
-
-  function fxLinhas() {
-    var svg = $("#fx-linhas"), cv = $("#fx-canvas");
-    svg.setAttribute("width", cv.scrollWidth); svg.setAttribute("height", cv.scrollHeight);
-    var caixa = function (id) { var el = $("#fx-" + id); return { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }; };
-    svg.innerHTML = '<defs><marker id="fx-seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#a1a1aa"/></marker></defs>' +
-      FX_LIGA.map(function (l) {
-        var a = caixa(l[0]), b = caixa(l[1]), d, lx, ly;
-        if (l[3] === "baixo") {
-          var x1 = a.x + a.w / 2, y1 = a.y + a.h, x2 = b.x + b.w / 2, y2 = b.y;
-          d = "M" + x1 + " " + y1 + " C" + x1 + " " + (y1 + 40) + " " + x2 + " " + (y2 - 40) + " " + x2 + " " + y2;
-          lx = x1; ly = (y1 + y2) / 2;
-        } else if (l[3] === "volta") {
-          var sx = a.x + a.w / 2, sy = a.y + a.h, ex = b.x + b.w / 2, ey = b.y + b.h, fundo = Math.max(sy, ey) + 70;
-          d = "M" + sx + " " + sy + " C" + sx + " " + fundo + " " + ex + " " + fundo + " " + ex + " " + ey;
-          lx = (sx + ex) / 2; ly = fundo - 18;
-        } else {
-          var ax = a.x + a.w, ay = a.y + Math.min(60, a.h / 2), bx = b.x, by = b.y + Math.min(60, b.h / 2), mx = (ax + bx) / 2;
-          d = "M" + ax + " " + ay + " C" + mx + " " + ay + " " + mx + " " + by + " " + bx + " " + by;
-          lx = mx; ly = (ay + by) / 2;
-        }
-        return '<path d="' + d + '" marker-end="url(#fx-seta)"/>' + (l[2] ? '<g class="fx-rotulo"><rect x="' + (lx - l[2].length * 3.6 - 8) + '" y="' + (ly - 11) + '" width="' + (l[2].length * 7.2 + 16) + '" height="22" rx="11"/><text x="' + lx + '" y="' + (ly + 4) + '">' + esc(l[2]) + "</text></g>" : "");
-      }).join("");
-  }
-
-  function fxRender() {
-    var d = state.dados;
-    if (!d || !d.dm || !d.dm.met) { $("#fx-sem").hidden = !(d && d.dm); return; }
-    $("#fx-sem").hidden = true;
-    if (!fx.montado) fxMontar();
-    var dm = d.dm, m = dm.met || {}, cl = fxCliques(dm, Object.keys(dm.cliques || {}));
-    var enviadas = (m.l || 0) + (m.s || 0) + (m.a || 0) + (m.ls || 0) + (m.n || 0), comLink = (m.l || 0) + (m.ls || 0);
-    $("#fx-tiles").innerHTML = [
-      ["Comentários", m.g, ""], ["DMs enviadas", enviadas, ""], ["Responderam", m.t, fxPct(m.t, (m.s || 0) + (m.a || 0)) + " de quem recebeu botão"],
-      ["Receberam o link", comLink, ""], ["Cliques no link", cl.visitas, fxPct(cl.visitas, comLink) + " de quem recebeu"],
-      ["Começaram o quiz", cl.quiz, ""], ["Clicaram no checkout", cl.checkout, ""]
-    ].map(function (t) { return '<div class="vc-tile"><span>' + t[0] + "</span><b>" + fxNum(t[1]) + "</b>" + (t[2] ? "<small>" + t[2] + "</small>" : "") + "</div>"; }).join("");
-    FX_NOS.forEach(function (no) { $("#fx-" + no.id + " .fx-corpo").innerHTML = fxCorpo(no, d); });
-    $("#fx-pill").textContent = dm.ativo && d.ativo ? "ATIVA" : dm.ativo ? "AGUARDANDO" : "DESLIGADA";
-    $("#fx-pill").classList.toggle("is-on", dm.ativo && d.ativo);
-    $("#fx-toggle").checked = !!dm.ativo;
-    $("#fx-toggle").disabled = false;
-    $$("#fx-periodo button").forEach(function (b) { b.classList.toggle("is-on", +b.dataset.dias === (dm.dias || 7)); });
-    $("#fx-erro").textContent = dm.erro && !dm.ativo ? "Desligado por erro: " + dm.erro : "";
-    $("#fx-erro").hidden = !(dm.erro && !dm.ativo);
-    if (!$("#view-fluxo").hidden) requestAnimationFrame(fxLinhas);
-  }
-
-  function fxAbrir(id) {
-    var no = FX_NOS.filter(function (n) { return n.id === id; })[0];
-    if (!no) return;
-    var dm = state.dados.dm, campos = FX_CAMPOS[id];
-    fx.aberto = id;
-    $$(".fx-no").forEach(function (el) { el.classList.toggle("is-sel", el.id === "fx-" + id); });
-    $("#fx-g-tipo").textContent = no.tipo;
-    $("#fx-g-titulo").textContent = no.titulo;
-    if (id === "gatilho") {
-      $("#fx-g-campos").innerHTML = '<p class="vc-muted">As palavras-chave e os posts vigiados são os mesmos da resposta nos comentários.</p><a class="vc-btn vc-btn--primary" href="#comentarios" id="fx-ir-config">Editar palavras-chave</a>';
-    } else if (!campos) {
-      $("#fx-g-campos").innerHTML = '<p class="vc-muted">' + (no.tipo === "Condição" ? "A checagem é automática: o Instagram informa se a pessoa segue o perfil." : "Este passo é automático.") + "</p>";
-    } else {
-      $("#fx-g-campos").innerHTML = campos.map(function (c) {
-        var v = dm[c[0]], id2 = "fx-c-" + c[0];
-        if (c[2] === "lista") return '<label class="fx-campo"><span>' + c[1] + '</span><textarea class="vc-input" id="' + id2 + '" rows="5" data-k="' + c[0] + '" data-tipo="lista">' + esc((v || []).join("\n")) + '</textarea><small class="vc-muted">Uma mensagem por linha.</small></label>';
-        if (c[2] === "texto") return '<label class="fx-campo"><span>' + c[1] + '</span><textarea class="vc-input" id="' + id2 + '" rows="4" maxlength="600" data-k="' + c[0] + '">' + esc(v) + "</textarea></label>";
-        var tipo = c[2] === "num" ? 'type="number" min="0" max="60"' : c[2] === "url" ? 'type="url"' : 'type="text" maxlength="20"';
-        return '<label class="fx-campo"><span>' + c[1] + '</span><input class="vc-input" id="' + id2 + '" ' + tipo + ' data-k="' + c[0] + '" value="' + esc(v) + '"></label>';
-      }).join("") + '<p class="vc-muted">' + (id === "link" || id === "link2" ? "As duas mensagens de link usam o mesmo texto e botão. O link recebe sozinho a marcação de qual etapa veio o clique." : "") + "</p>" +
-        '<div class="fx-g-acoes"><span class="vc-muted" id="fx-salvo"></span><button class="vc-btn vc-btn--primary" type="submit">Salvar</button></div>';
-    }
-    $("#fx-gaveta").hidden = false;
-  }
-
-  function fxFechar() {
-    fx.aberto = "";
-    $("#fx-gaveta").hidden = true;
-    $$(".fx-no").forEach(function (el) { el.classList.remove("is-sel"); });
-  }
-
-  function fxSalvar(e) {
-    e.preventDefault();
-    var config = {};
-    $$("#fx-g-campos [data-k]").forEach(function (el) {
-      config[el.dataset.k] = el.dataset.tipo === "lista" ? el.value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean) : el.value;
-    });
-    var btn = $("#fx-gaveta button[type=submit]");
-    btn.disabled = true; $("#fx-salvo").textContent = "Salvando…";
-    request({ action: "vicchat_dm", senha: state.senha, config: JSON.stringify(config) }).then(function (res) {
-      btn.disabled = false;
-      if (tratar(res)) { $("#fx-salvo").textContent = "Salvo ✓"; fxAbrir(fx.aberto); var s = $("#fx-salvo"); if (s) s.textContent = "Salvo ✓"; }
-      else $("#fx-salvo").textContent = "Não foi salvo.";
-    }, function () { btn.disabled = false; $("#fx-salvo").textContent = "Sem conexão: não foi salvo."; });
-  }
-
-  function fxLigar() {
-    $("#fx-canvas").addEventListener("click", function (e) { var no = e.target.closest(".fx-no"); if (no) fxAbrir(no.id.slice(3)); });
-    $("#fx-canvas").addEventListener("keydown", function (e) { var no = e.target.closest(".fx-no"); if (no && e.key === "Enter") fxAbrir(no.id.slice(3)); });
-    $("#fx-fechar").addEventListener("click", fxFechar);
-    $("#fx-gaveta").addEventListener("submit", fxSalvar);
-    $("#fx-gaveta").addEventListener("click", function (e) { if (e.target.id === "fx-ir-config") { fxFechar(); setTimeout(function () { abrirTab("config"); }, 0); } });
-    $("#fx-toggle").addEventListener("change", alternarDm);
-    $$("#fx-periodo button").forEach(function (b) {
-      b.addEventListener("click", function () { state.dias = +b.dataset.dias; carregar(); });
-    });
-    // Arrastar para mover a teia (mouse)
-    var wrap = $("#fx-wrap"), arr = null;
-    wrap.addEventListener("mousedown", function (e) { if (e.target.closest(".fx-no")) return; arr = { x: e.clientX, y: e.clientY, l: wrap.scrollLeft, t: wrap.scrollTop }; wrap.classList.add("is-arrastando"); });
-    window.addEventListener("mousemove", function (e) { if (!arr) return; wrap.scrollLeft = arr.l - (e.clientX - arr.x); wrap.scrollTop = arr.t - (e.clientY - arr.y); });
-    window.addEventListener("mouseup", function () { arr = null; wrap.classList.remove("is-arrastando"); });
-    window.addEventListener("resize", function () { if (!$("#view-fluxo").hidden && fx.montado) fxLinhas(); });
-  }
-
-  fxLigar();
+  /* ───────────── Ponte para o editor do fluxo (vicchat-fluxo.js) ───────────── */
+  window.VC = { $: $, $$: $$, esc: esc, nf: nf, state: state, request: request, tratar: tratar, carregar: carregar, abrirTab: abrirTab, alternarDm: alternarDm };
   $("#card-dm").addEventListener("click", function (e) { if (!e.target.closest(".vc-switch")) location.hash = "fluxo"; });
 
   /* ───────────── Dados de exemplo (?demo=1) ───────────── */
@@ -576,11 +372,31 @@
           falhou: ["Não consegui te mandar no direct 😕 mas o passo a passo está no link da minha bio, é só acessar por lá! 🔗"],
           met: { g: 142, l: 51, s: 38, a: 29, t: 44, ls: 31, n: 9, f: 4 },
           cliques: { link_direto: { visitas: 33, quiz: 29, checkout: 9 }, link_seguir: { visitas: 14, quiz: 12, checkout: 3 }, link_botao: { visitas: 6, quiz: 5, checkout: 1 } },
-          ultimos: [] } };
+          ultimos: [],
+          fluxo: { nos: [
+            { id: "g", tipo: "gatilho", x: 40, y: 220, respostas: ["Te mandei no direct 👀 Se não aparecer, olha em Pedidos de mensagem."], falhou: ["Não consegui te mandar no direct 😕 mas o passo a passo está no link da minha bio! 🔗"] },
+            { id: "a", tipo: "atraso", x: 340, y: 250, seg: 5 },
+            { id: "s1", tipo: "segue", x: 680, y: 230 },
+            { id: "m1", tipo: "mensagem", x: 1020, y: 40, texto: "Aqui está o passo a passo que você pediu 👇 Toca no botão pra começar.", botao: "link", link: { titulo: "Ver o passo a passo", url: "https://www.ovictorgomes.com.br/quiz?utm_source=instagram&utm_medium=direct&utm_campaign=vicchat" }, respostas: [] },
+            { id: "m2", tipo: "mensagem", x: 1020, y: 300, texto: "Pra eu te mandar o passo a passo, me segue aqui no perfil 🙏 Depois é só tocar em \"Já segui\" 👇", botao: "respostas", respostas: ["Já segui ✅"] },
+            { id: "m3", tipo: "mensagem", x: 1020, y: 560, texto: "Oi! Vi seu comentário 😊 Toca no botão aqui embaixo que eu te mando o passo a passo 👇", botao: "respostas", respostas: ["Quero o passo a passo"] },
+            { id: "s2", tipo: "segue", x: 1380, y: 420 },
+            { id: "m4", tipo: "mensagem", x: 1740, y: 260, texto: "Aqui está o passo a passo que você pediu 👇 Toca no botão pra começar.", botao: "link", link: { titulo: "Ver o passo a passo", url: "https://www.ovictorgomes.com.br/quiz?utm_source=instagram&utm_medium=direct&utm_campaign=vicchat" }, respostas: [] },
+            { id: "m5", tipo: "mensagem", x: 1740, y: 560, texto: "Ainda não apareceu que você me segue 😅 Segue o perfil e toca em \"Já segui\" de novo 👇", botao: "respostas", respostas: ["Já segui ✅"] }
+          ], ligas: [
+            { de: "g", saida: "prox", para: "a" }, { de: "a", saida: "prox", para: "s1" },
+            { de: "s1", saida: "sim", para: "m1" }, { de: "s1", saida: "nao", para: "m2" }, { de: "s1", saida: "talvez", para: "m3" },
+            { de: "m2", saida: "b0", para: "s2" }, { de: "m3", saida: "b0", para: "s2" },
+            { de: "s2", saida: "sim", para: "m4" }, { de: "s2", saida: "nao", para: "m5" }, { de: "s2", saida: "talvez", para: "m5" },
+            { de: "m5", saida: "b0", para: "s2" }
+          ] },
+          fxMet: { g: { p: 142 }, a: { p: 140 }, s1: { p: 140 }, m1: { p: 51, e: 51 }, m2: { p: 38, e: 38, r: 24 }, m3: { p: 29, e: 29, r: 20 }, s2: { p: 53 }, m4: { p: 31, e: 31 }, m5: { p: 22, e: 9, r: 6 } },
+          cliques: { fx_m1: { visitas: 33, quiz: 29, checkout: 9 }, fx_m4: { visitas: 20, quiz: 17, checkout: 4 } } } };
     }
     if (params.action === "vicchat_ativar") demoDados.ativo = params.ativo === "1";
     if (params.action === "vicchat_dm" && params.ativo) demoDados.dm.ativo = params.ativo === "1";
     if (params.action === "vicchat_dm" && params.config) Object.assign(demoDados.dm, JSON.parse(params.config));
+    if (params.action === "vicchat_fluxo") demoDados.dm.fluxo = JSON.parse(params.fluxo);
     if (params.dias) demoDados.dm.dias = +params.dias;
     if (params.action === "vicchat_config") { var c = JSON.parse(params.config); c.postsRecentes = 12; c.minutos = 1; demoDados.config = c; }
     return JSON.parse(JSON.stringify(demoDados));

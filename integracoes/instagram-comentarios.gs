@@ -142,7 +142,8 @@ function igRodada_(props, token) {
             if (igErroGeral_(e)) { igDmFalhou_(props, direct); dm.ativo = false; } // token, permissão ou bloqueio: desliga
           }
         }
-        const lista = /^erro/.test(direct) ? dm.falhou : direct ? dm.respostas : IG.respostas;
+        const fxT = igFxTextos_(dm);
+        const lista = /^erro/.test(direct) ? fxT.falhou : direct ? fxT.respostas : IG.respostas;
         const texto = lista[Math.floor(Math.random() * lista.length)];
         let status = 'ok';
         try {
@@ -235,6 +236,9 @@ function vicchat_(p) {
     const ligar = p.ativo === '1';
     props.setProperty('IG_ATIVO', ligar ? '1' : '0');
     if (ligar) props.setProperty('IG_DESDE', String(Date.now())); // ao religar, não responde o que chegou pausado
+  } else if (p.action === 'vicchat_fluxo') {
+    try { igFxSalvar_(JSON.parse(p.fluxo || '{}')); }
+    catch (e) { return json_({ ok: false, error: String(e.message || e) === 'fluxo_sem_gatilho' ? 'fluxo_sem_gatilho' : 'fluxo_invalido' }); }
   } else if (p.action === 'vicchat_dm') {
     const dm = igDm_();
     if (p.ativo === '1' && !dm.ativo) { dm.desde = Date.now(); props.deleteProperty('IG_DM_ERRO'); }
@@ -329,6 +333,7 @@ function igResumo_(props, dias) {
         seguir: dm.seguir, aindaNao: dm.aindaNao, seguiBotao: dm.seguiBotao, tentativas: dm.tentativas, atraso: dm.atraso,
         respostas: dm.respostas, falhou: dm.falhou, porDia: dm.porDia, porRodada: dm.porRodada,
         hoje: igDmConta_(props), total: dmTotal, dias: dias, met: igMetSoma_(props, dias), cliques: cliques,
+        fluxo: igFluxo_(), fxMet: igFxMetSoma_(props, dias),
         esperando: Object.keys(igPendentes_(props)).length, ultimos: JSON.parse(props.getProperty('IG_DM_ULT') || '[]').slice(0, 10),
         erro: props.getProperty('IG_DM_ERRO') || '' };
     })(),
@@ -410,23 +415,6 @@ function igSegue_(igsid, token) {
   } catch (e) { return null; }
 }
 
-// 1ª DM a partir do comentário: quem segue recebe o link; quem não segue, o pedido para seguir;
-// sem como saber, um botão "Quero o passo a passo" (ao tocar, a conversa abre e a gente confere)
-function igDmPrimeira_(eu, c, quem, dm, token, props) {
-  const igsid = c.from && c.from.id;
-  const segue = igsid ? igSegue_(igsid, token) : null;
-  const rec = { comment_id: c.id };
-  let msg, etapa;
-  if (segue === true) { msg = igMsgLink_(dm); etapa = ''; }
-  else if (segue === false) { msg = igMsgBotao_(dm.seguir, dm.seguiBotao, 'SEGUI'); etapa = 'seguir'; }
-  else { msg = igMsgBotao_(dm.abrir, dm.abrirBotao, 'QUERO'); etapa = 'abrir'; }
-  igEsperar_(dm);
-  const r = igMandar_(eu, rec, msg, token);
-  igMet_(props, segue === true ? 'l' : etapa === 'seguir' ? 's' : 'a');
-  const para = r.recipient_id || igsid;
-  if (etapa && para) igPendente_(props, para, { u: quem, t: Date.now(), n: etapa === 'seguir' ? 1 : 0 });
-  return segue === true ? 'enviado' : etapa === 'seguir' ? 'pediu seguir' : 'enviado botão';
-}
 
 // Pessoas esperando o link: { igsid: { u, t, n } } (some depois de 24 h ou de receber o link)
 function igPendentes_(props) {
@@ -438,53 +426,11 @@ function igPendentes_(props) {
 function igPendente_(props, igsid, dados) {
   const lista = igPendentes_(props);
   if (dados) lista[igsid] = dados; else delete lista[igsid];
-  const chaves = Object.keys(lista).sort(function (a, b) { return lista[b].t - lista[a].t; }).slice(0, 80);
+  const chaves = Object.keys(lista).sort(function (a, b) { return lista[b].t - lista[a].t; }).slice(0, 50);
   const novo = {}; chaves.forEach(function (k) { novo[k] = lista[k]; });
   props.setProperty('IG_DM_PEND', JSON.stringify(novo));
 }
 
-// A cada rodada: quem respondeu no Direct (tocou no botão ou escreveu) é conferido.
-// Segue → manda o link. Não segue → pede para seguir de novo (até dm.tentativas vezes).
-function igDmPendentes_(eu, token, props) {
-  const dm = igDm_();
-  if (!dm.ativo) return;
-  const lista = igPendentes_(props);
-  const ids = Object.keys(lista).slice(0, 10);
-  for (const igsid of ids) {
-    if (igDmConta_(props) >= dm.porDia) return;
-    const p = lista[igsid];
-    const conv = igGet_(igMe_(eu, 'conversations'), { platform: 'instagram', user_id: igsid,
-      fields: 'messages.limit(5){from,created_time}' }, token).data || [];
-    const msgs = (conv[0] && conv[0].messages && conv[0].messages.data) || [];
-    const respondeu = msgs.some(function (m) {
-      return m.from && m.from.id === igsid && new Date(m.created_time).getTime() > p.t;
-    });
-    if (!respondeu) continue;
-    igMet_(props, 't');
-    const segue = igSegue_(igsid, token);
-    try {
-      igEsperar_(dm);
-      if (segue === true) {
-        igMandar_(eu, { id: igsid }, igMsgLink_(dm, p.n ? 'link_seguir' : 'link_botao'), token);
-        igMet_(props, 'ls');
-        igPendente_(props, igsid, null);
-        igDmRegistrar_(props, p.u, 'link enviado');
-      } else if (p.n < dm.tentativas) {
-        igMandar_(eu, { id: igsid }, igMsgBotao_(p.n ? dm.aindaNao : dm.seguir, dm.seguiBotao, 'SEGUI'), token);
-        igMet_(props, p.n ? 'n' : 's');
-        igPendente_(props, igsid, { u: p.u, t: Date.now(), n: p.n + 1 });
-        igDmRegistrar_(props, p.u, 'pediu seguir');
-      } else {
-        igPendente_(props, igsid, null); // desistiu depois de N pedidos
-      }
-      igDmSomar_(props);
-    } catch (e) {
-      if (igErroGeral_(e)) { igDmFalhou_(props, 'erro: ' + String(e.message || e).slice(0, 250)); return; }
-      igPendente_(props, igsid, null);
-    }
-    Utilities.sleep(3000 + Math.random() * 4000);
-  }
-}
 
 // Contador de DMs do dia (1ª mensagem + mensagens de seguir/link)
 function igDmConta_(props) {
@@ -523,6 +469,232 @@ function testarDirect() {
   const eu = igConta_(token);
   token = eu.token || token;
   Logger.log(JSON.stringify(igMandar_(eu, { comment_id: commentId }, igMsgLink_(igDm_(), 'teste'), token)));
+}
+
+/* ───────────── Motor do fluxo do Direct (editor /vicchat → aba "Fluxo IG") ─────────────
+ * O fluxo é um grafo: { nos: [{ id, tipo, x, y, ... }], ligas: [{ de, saida, para }] }
+ * Tipos: gatilho (saída prox) · atraso { seg } (prox) · segue (sim / nao / talvez)
+ *        mensagem { texto, botao: 'nenhum'|'link'|'respostas', link: { titulo, url }, respostas: [títulos] }
+ *          (com respostas: uma saída por botão b0, b1, b2; sem: prox) · espera (prox, quando a pessoa responder)
+ * Regra do Instagram: a 1ª mensagem vai como resposta privada ao comentário (só uma). As próximas só
+ * depois que a pessoa responder no Direct; aí a conversa fica aberta por 24 h.
+ */
+
+const IG_FX_ABA = 'Fluxo IG';
+const IG_FX_TIPOS = ['gatilho', 'atraso', 'segue', 'mensagem', 'espera'];
+
+function igFxPadrao_() {
+  const dm = igDm_();
+  const msgLink = function (id, x, y) { return { id: id, tipo: 'mensagem', x: x, y: y, texto: dm.texto, botao: 'link', link: { titulo: dm.botao, url: dm.link }, respostas: [] }; };
+  return {
+    nos: [
+      { id: 'g', tipo: 'gatilho', x: 40, y: 220, respostas: dm.respostas, falhou: dm.falhou },
+      { id: 'a', tipo: 'atraso', x: 340, y: 250, seg: dm.atraso || 0 },
+      { id: 's1', tipo: 'segue', x: 680, y: 230 },
+      msgLink('m1', 1020, 40),
+      { id: 'm2', tipo: 'mensagem', x: 1020, y: 300, texto: dm.seguir, botao: 'respostas', respostas: [dm.seguiBotao] },
+      { id: 'm3', tipo: 'mensagem', x: 1020, y: 560, texto: dm.abrir, botao: 'respostas', respostas: [dm.abrirBotao] },
+      { id: 's2', tipo: 'segue', x: 1380, y: 420 },
+      msgLink('m4', 1740, 260),
+      { id: 'm5', tipo: 'mensagem', x: 1740, y: 560, texto: dm.aindaNao, botao: 'respostas', respostas: [dm.seguiBotao] }
+    ],
+    ligas: [
+      { de: 'g', saida: 'prox', para: 'a' }, { de: 'a', saida: 'prox', para: 's1' },
+      { de: 's1', saida: 'sim', para: 'm1' }, { de: 's1', saida: 'nao', para: 'm2' }, { de: 's1', saida: 'talvez', para: 'm3' },
+      { de: 'm2', saida: 'b0', para: 's2' }, { de: 'm3', saida: 'b0', para: 's2' },
+      { de: 's2', saida: 'sim', para: 'm4' }, { de: 's2', saida: 'nao', para: 'm5' }, { de: 's2', saida: 'talvez', para: 'm5' },
+      { de: 'm5', saida: 'b0', para: 's2' }
+    ]
+  };
+}
+
+// Fluxo salvo (lido uma vez por execução)
+let IG_FX_CACHE = null;
+function igFluxo_() {
+  if (IG_FX_CACHE) return IG_FX_CACHE;
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(IG_FX_ABA);
+  const txt = sh ? String(sh.getRange(2, 1).getValue() || '') : '';
+  try { IG_FX_CACHE = txt ? JSON.parse(txt) : igFxPadrao_(); } catch (e) { IG_FX_CACHE = igFxPadrao_(); }
+  return IG_FX_CACHE;
+}
+
+// Valida e limpa o fluxo vindo do editor
+function igFxLimpar_(f) {
+  if (!f || !Array.isArray(f.nos) || !Array.isArray(f.ligas)) throw new Error('fluxo_invalido');
+  const txt = function (v, max) { return String(v == null ? '' : v).trim().slice(0, max); };
+  const num = function (v, a, b) { v = parseInt(v, 10); return isNaN(v) ? a : Math.max(a, Math.min(b, v)); };
+  const ids = {};
+  const nos = f.nos.slice(0, 40).filter(function (n) { return n && IG_FX_TIPOS.indexOf(n.tipo) > -1 && /^[A-Za-z0-9_-]{1,20}$/.test(n.id) && !ids[n.id] && (ids[n.id] = true); })
+    .map(function (n) {
+      const o = { id: n.id, tipo: n.tipo, x: num(n.x, -2000, 6000), y: num(n.y, -2000, 6000) };
+      if (n.tipo === 'atraso') o.seg = num(n.seg, 0, 60);
+      if (n.tipo === 'gatilho') {
+        o.respostas = (n.respostas || []).map(function (s) { return txt(s, 300); }).filter(Boolean).slice(0, 10);
+        o.falhou = (n.falhou || []).map(function (s) { return txt(s, 300); }).filter(Boolean).slice(0, 10);
+      }
+      if (n.tipo === 'mensagem') {
+        o.texto = txt(n.texto, 900) || '…';
+        o.botao = ['nenhum', 'link', 'respostas'].indexOf(n.botao) > -1 ? n.botao : 'nenhum';
+        const url = txt(n.link && n.link.url, 400);
+        o.link = { titulo: txt(n.link && n.link.titulo, 20) || 'Abrir', url: /^https:\/\//.test(url) ? url : '' };
+        o.respostas = (n.respostas || []).map(function (s) { return txt(s, 20); }).filter(Boolean).slice(0, 3);
+        if (o.botao === 'link' && !o.link.url) o.botao = 'nenhum';
+        if (o.botao === 'respostas' && !o.respostas.length) o.botao = 'nenhum';
+      }
+      return o;
+    });
+  if (nos.filter(function (n) { return n.tipo === 'gatilho'; }).length !== 1) throw new Error('fluxo_sem_gatilho');
+  const vistos = {};
+  const ligas = f.ligas.slice(0, 120).filter(function (l) {
+    if (!l || !ids[l.de] || !ids[l.para]) return false;
+    const k = l.de + '|' + l.saida;
+    if (vistos[k] || !/^(prox|sim|nao|talvez|b[0-2])$/.test(l.saida)) return false;
+    return (vistos[k] = true);
+  }).map(function (l) { return { de: l.de, saida: l.saida, para: l.para }; });
+  return { nos: nos, ligas: ligas };
+}
+
+function igFxSalvar_(f) {
+  const limpo = igFxLimpar_(f);
+  const sh = getSheet_(IG_FX_ABA, ['fluxo (editado pelo /vicchat)']);
+  sh.getRange(2, 1).setValue(JSON.stringify(limpo));
+  IG_FX_CACHE = limpo;
+  return limpo;
+}
+
+function igFxNo_(f, id) { return f.nos.filter(function (n) { return n.id === id; })[0]; }
+function igFxProx_(f, id, saida) {
+  const l = f.ligas.filter(function (x) { return x.de === id && x.saida === saida; })[0];
+  return l ? l.para : '';
+}
+// Textos da resposta pública no comentário (ficam no bloco gatilho)
+function igFxTextos_(dm) {
+  const g = igFluxo_().nos.filter(function (n) { return n.tipo === 'gatilho'; })[0] || {};
+  return { respostas: (g.respostas && g.respostas.length) ? g.respostas : dm.respostas, falhou: (g.falhou && g.falhou.length) ? g.falhou : dm.falhou };
+}
+
+// Métricas por bloco e dia: IG_FX_MET = { 'yyyy-MM-dd': { idDoBloco: { p: passou, e: enviou, r: respondeu, f: falhou } } }
+function igFxMet_(props, no, chave) {
+  const met = JSON.parse(props.getProperty('IG_FX_MET') || '{}');
+  const dia = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  met[dia] = met[dia] || {};
+  met[dia][no] = met[dia][no] || {};
+  met[dia][no][chave] = (met[dia][no][chave] || 0) + 1;
+  const dias = Object.keys(met).sort().slice(-31);
+  const novo = {}; dias.forEach(function (d) { novo[d] = met[d]; });
+  props.setProperty('IG_FX_MET', JSON.stringify(novo));
+}
+function igFxMetSoma_(props, dias) {
+  const met = JSON.parse(props.getProperty('IG_FX_MET') || '{}');
+  const desde = Utilities.formatDate(new Date(Date.now() - (dias - 1) * 86400000), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  const soma = {};
+  Object.keys(met).forEach(function (d) {
+    if (d < desde) return;
+    Object.keys(met[d]).forEach(function (no) {
+      soma[no] = soma[no] || {};
+      Object.keys(met[d][no]).forEach(function (k) { soma[no][k] = (soma[no][k] || 0) + met[d][no][k]; });
+    });
+  });
+  return soma;
+}
+
+function igFxMsg_(no) {
+  if (no.botao === 'link' && no.link && no.link.url) {
+    const url = no.link.url + (no.link.url.indexOf('?') > -1 ? '&' : '?') + 'utm_content=fx_' + no.id;
+    return { attachment: { type: 'template', payload: { template_type: 'button', text: no.texto,
+      buttons: [{ type: 'web_url', url: url, title: no.link.titulo }] } } };
+  }
+  if (no.botao === 'respostas' && no.respostas.length) {
+    return { text: no.texto, quick_replies: no.respostas.map(function (t, i) { return { content_type: 'text', title: t, payload: 'B' + i }; }) };
+  }
+  return { text: no.texto };
+}
+
+// Anda pelo fluxo a partir de `inicio` até precisar esperar a pessoa ou acabar.
+// ctx: { eu, token, props, f, igsid, quem, comentario (id, só na 1ª), aberta (conversa aberta), v (visitas por bloco) }
+// Devolve 'enviado' se mandou alguma DM, '' se não mandou nada. Erros sobem (quem chama decide).
+function igFxRodar_(ctx, inicio) {
+  let id = inicio, mandou = false;
+  for (let passo = 0; passo < 15 && id; passo++) {
+    const no = igFxNo_(ctx.f, id);
+    if (!no) break;
+    ctx.v[id] = (ctx.v[id] || 0) + 1;
+    if (ctx.v[id] > 3) break; // evita voltas infinitas (ex.: "ainda não segue" no máximo 3 vezes)
+    igFxMet_(ctx.props, id, 'p');
+    if (no.tipo === 'gatilho') { id = igFxProx_(ctx.f, id, 'prox'); continue; }
+    if (no.tipo === 'atraso') { if (no.seg) Utilities.sleep(Math.min(60, no.seg) * 1000); id = igFxProx_(ctx.f, id, 'prox'); continue; }
+    if (no.tipo === 'segue') {
+      const s = ctx.igsid ? igSegue_(ctx.igsid, ctx.token) : null;
+      id = igFxProx_(ctx.f, id, s === true ? 'sim' : s === false ? 'nao' : 'talvez');
+      continue;
+    }
+    if (no.tipo === 'espera') { igFxEsperar_(ctx, id, 'prox'); return mandou ? 'enviado' : ''; }
+    // mensagem
+    if (!ctx.comentario && !ctx.aberta) { igFxEsperar_(ctx, id, 'antes'); return mandou ? 'enviado' : ''; } // só depois que a pessoa responder
+    if (igDmConta_(ctx.props) >= igDm_().porDia) { igFxEsperar_(ctx, id, 'antes'); return mandou ? 'enviado' : ''; }
+    const rec = ctx.comentario ? { comment_id: ctx.comentario } : { id: ctx.igsid };
+    let r;
+    try { r = igMandar_(ctx.eu, rec, igFxMsg_(no), ctx.token); }
+    catch (e) { igFxMet_(ctx.props, id, 'f'); throw e; }
+    igFxMet_(ctx.props, id, 'e'); igDmSomar_(ctx.props); mandou = true;
+    igDmRegistrar_(ctx.props, ctx.quem, 'recebeu "' + no.texto.slice(0, 40) + '"');
+    if (ctx.comentario) { ctx.igsid = r.recipient_id || ctx.igsid; ctx.comentario = ''; }
+    if (no.botao === 'respostas' && no.respostas.length) { igFxEsperar_(ctx, id, 'resp'); return 'enviado'; }
+    id = igFxProx_(ctx.f, id, 'prox');
+  }
+  if (ctx.igsid) igPendente_(ctx.props, ctx.igsid, null); // acabou o fluxo
+  return mandou ? 'enviado' : '';
+}
+
+function igFxEsperar_(ctx, no, modo) {
+  if (!ctx.igsid) return;
+  igPendente_(ctx.props, ctx.igsid, { u: ctx.quem, t: Date.now(), no: no, m: modo, v: ctx.v });
+}
+
+// 1ª DM a partir do comentário (chamada pela rodada)
+function igDmPrimeira_(eu, c, quem, dm, token, props) {
+  const ctx = { eu: eu, token: token, props: props, f: igFluxo_(), igsid: c.from && c.from.id, quem: quem, comentario: c.id, aberta: false, v: {} };
+  const g = ctx.f.nos.filter(function (n) { return n.tipo === 'gatilho'; })[0];
+  return igFxRodar_(ctx, g.id);
+}
+
+// A cada rodada: quem respondeu no Direct continua o fluxo de onde parou
+function igDmPendentes_(eu, token, props) {
+  const dm = igDm_();
+  if (!dm.ativo) return;
+  const f = igFluxo_();
+  const lista = igPendentes_(props);
+  const ids = Object.keys(lista).slice(0, 10);
+  for (const igsid of ids) {
+    if (igDmConta_(props) >= dm.porDia) return;
+    const p = lista[igsid];
+    if (!p.no) { igPendente_(props, igsid, null); continue; } // formato antigo
+    const conv = igGet_(igMe_(eu, 'conversations'), { platform: 'instagram', user_id: igsid,
+      fields: 'messages.limit(5){from,created_time,message}' }, token).data || [];
+    const msgs = ((conv[0] && conv[0].messages && conv[0].messages.data) || []).filter(function (m) {
+      return m.from && m.from.id === igsid && new Date(m.created_time).getTime() > p.t;
+    });
+    if (!msgs.length) continue;
+    igMet_(props, 't');
+    igFxMet_(props, p.no, 'r');
+    const no = igFxNo_(f, p.no);
+    let inicio = '';
+    if (no && p.m === 'antes') inicio = no.id;
+    else if (no && p.m === 'resp') {
+      const resp = String(msgs[0].message || '').toLowerCase().replace(/[^\p{L}\p{N} ]/gu, '').trim();
+      let i = no.respostas.findIndex(function (b) { return b.toLowerCase().replace(/[^\p{L}\p{N} ]/gu, '').trim() === resp; });
+      if (i < 0) i = 0;
+      inicio = igFxProx_(f, no.id, 'b' + i);
+    } else if (no) inicio = igFxProx_(f, no.id, 'prox');
+    const ctx = { eu: eu, token: token, props: props, f: f, igsid: igsid, quem: p.u, comentario: '', aberta: true, v: p.v || {} };
+    igPendente_(props, igsid, null);
+    try {
+      if (inicio) igFxRodar_(ctx, inicio);
+    } catch (e) {
+      if (igErroGeral_(e)) { igDmFalhou_(props, 'erro: ' + String(e.message || e).slice(0, 250)); return; }
+    }
+    Utilities.sleep(2000 + Math.random() * 3000);
+  }
 }
 
 /* ───────────── Apoio ───────────── */
