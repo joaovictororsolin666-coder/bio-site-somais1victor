@@ -67,15 +67,11 @@
 
         <h3 class="vc-h3">Suas automações</h3>
         <div class="vc-atalhos">
-          <a class="vc-atalho" href="#comentarios">
-            <span class="vc-atalho__tag">Comentários</span>
-            <strong>Resposta com link da bio</strong>
-            <span class="vc-muted" id="inicio-auto">—</span>
-          </a>
           <a class="vc-atalho" href="#automacoes">
-            <span class="vc-atalho__tag">Direct</span>
-            <strong>Enviar link por DM a partir dos comentários</strong>
+            <span class="vc-atalho__tag">Comentário → Direct</span>
+            <strong>Quem comenta a palavra-chave recebe os links no Direct</strong>
             <span class="vc-muted" id="inicio-dm">—</span>
+            <span class="vc-muted" id="inicio-auto" hidden>—</span>
           </a>
         </div>
       </section>
@@ -83,7 +79,7 @@
       <!-- Lista de automações -->
       <section class="vc-view" id="view-automacoes" hidden>
         <div class="vc-lista">
-          <article class="vc-card vc-card--link" id="card-comentarios" tabindex="0" role="link" aria-label="Abrir automação de comentários">
+          <article class="vc-card vc-card--link" id="card-comentarios" tabindex="0" role="link" aria-label="Abrir automação de comentários" hidden>
             <div class="vc-card__linha">
               <span class="vc-pill" id="lista-pill">—</span>
               <strong class="vc-card__nome">[COMENTÁRIOS] Resposta com link da bio</strong>
@@ -99,15 +95,16 @@
           <article class="vc-card vc-card--link" id="card-dm" tabindex="0" role="link" aria-label="Abrir o fluxo do Direct">
             <div class="vc-card__linha">
               <span class="vc-pill" id="dm-pill">—</span>
-              <strong class="vc-card__nome">[DIRECT] Link por DM a partir dos comentários</strong>
+              <strong class="vc-card__nome">[COMENTÁRIO → DIRECT] Links por DM</strong>
               <div class="vc-card__num"><b id="dm-hoje">0</b><span id="dm-limite">DMs hoje</span></div>
             </div>
             <div class="vc-card__gatilho">
               <svg viewBox="0 0 24 24" class="vc-ig"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
               <span id="dm-desc">Quem comentar a palavra-chave em um post novo recebe uma mensagem com botão para o quiz</span>
-              <label class="vc-switch" title="Ligar ou desligar o Direct"><input type="checkbox" id="dm-toggle"><span></span></label>
+              <label class="vc-switch" title="Ligar ou pausar a automação"><input type="checkbox" id="dm-toggle"><span></span></label>
             </div>
             <p class="vc-muted" id="dm-texto" style="margin:10px 0 0;font-size:13px"></p>
+            <p class="vc-muted" style="margin:8px 0 0;font-size:13px"><b id="dm-respondidos">0</b> comentários respondidos · <a href="#comentarios" id="dm-palavras">Palavras-chave e respostas públicas →</a></p>
             <p class="vc-falha" id="dm-erro" hidden style="margin:8px 0 0;font-size:13px"></p>
           </article>
         </div>

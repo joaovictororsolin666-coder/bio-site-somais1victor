@@ -133,31 +133,33 @@
   function renderDm(dm, ativo) {
     if (!dm) { $("#card-dm").hidden = true; $("#inicio-dm").textContent = "Atualize o Apps Script"; return; }
     var on = dm.ativo && ativo;
-    $("#dm-pill").textContent = on ? "ATIVA" : dm.ativo ? "AGUARDANDO" : "DESLIGADA";
+    $("#dm-pill").textContent = on ? "ATIVA" : "PAUSADA";
     $("#dm-pill").classList.toggle("is-on", on);
-    $("#dm-toggle").checked = !!dm.ativo;
-    $("#dm-toggle").disabled = false;
+    $("#dm-toggle").checked = on;
+    $("#dm-toggle").disabled = !state.dados.gatilho;
+    $("#dm-respondidos").textContent = nf.format((state.dados.stats || {}).total || 0);
     $("#dm-hoje").textContent = nf.format(dm.hoje || 0);
     $("#dm-limite").textContent = "de " + dm.porDia + " DMs hoje";
-    $("#dm-texto").textContent = "Mensagem: \u201c" + dm.texto + "\u201d · Botão: " + dm.botao;
-    $("#dm-desc").textContent = !dm.ativo ? "Desligado: os comentários recebem só a resposta pública"
-      : !ativo ? "Ligado, mas a automação de comentários está pausada"
-      : "Quem segue recebe o link na hora; quem não segue recebe um pedido para seguir e o link depois do “Já segui”" +
+    $("#dm-texto").textContent = "Fluxo: “Quero receber ✅” → pede para seguir → links. Toque no card para editar.";
+    $("#dm-desc").textContent = !on ? "Pausada: nenhum comentário é respondido e nenhuma DM sai"
+      : "Quem comenta a palavra-chave recebe os links no Direct (depois de seguir). Passou da trava diária: resposta com link da bio" +
         (dm.esperando ? " · " + dm.esperando + " esperando confirmar" : "");
     var ult = (dm.ultimos || []).slice(0, 5).map(function (x) { return "@" + x.u + ": " + x.o + " (" + quando(x.d) + ")"; });
     if (ult.length) $("#dm-texto").textContent += " · Últimos: " + ult.join(" · ");
     $("#dm-erro").textContent = dm.erro ? "Desligado por erro: " + dm.erro : "";
     $("#dm-erro").hidden = !dm.erro || dm.ativo;
-    $("#inicio-dm").textContent = (dm.ativo ? "Ligado · " : "Desligado · ") + nf.format(dm.total || 0) + " DMs enviadas";
+    $("#inicio-dm").textContent = (on ? "Ativa · " : "Pausada · ") + nf.format(dm.hoje || 0) + " de " + dm.porDia + " DMs hoje";
   }
 
+  // Um botão só: pausar para os comentários (e com eles o Direct); ligar religa os dois
   function alternarDm(e) {
-    var ligar = e.target.checked;
+    var ligar = e.target.checked, d = state.dados, falhou = function () { aviso("Sem conexão: nada mudou.", true); render(); };
     e.target.disabled = true;
-    request({ action: "vicchat_dm", senha: state.senha, ativo: ligar ? "1" : "0" }).then(tratar, function () {
-      aviso("Sem conexão: o Direct não mudou.", true);
-      render();
-    });
+    var passo = request({ action: "vicchat_ativar", senha: state.senha, ativo: ligar ? "1" : "0" });
+    if (ligar && d.dm && !d.dm.ativo) {
+      passo = passo.then(function (r) { tratar(r); return request({ action: "vicchat_dm", senha: state.senha, ativo: "1" }); });
+    }
+    passo.then(tratar, falhou);
   }
 
   function renderGrafico(porDia) {
@@ -349,7 +351,7 @@
 
   /* ───────────── Ponte para o editor do fluxo (vicchat-fluxo.js) ───────────── */
   window.VC = { $: $, $$: $$, esc: esc, nf: nf, state: state, request: request, tratar: tratar, carregar: carregar, abrirTab: abrirTab, alternarDm: alternarDm };
-  $("#card-dm").addEventListener("click", function (e) { if (!e.target.closest(".vc-switch")) location.hash = "fluxo"; });
+  $("#card-dm").addEventListener("click", function (e) { if (!e.target.closest(".vc-switch, a")) location.hash = "fluxo"; });
 
   /* ───────────── Dados de exemplo (?demo=1) ───────────── */
 
