@@ -39,22 +39,39 @@
     if (no.tipo === "gatilho") it.push([m.p, "comentários"]);
     else if (no.tipo === "mensagem") {
       it.push([m.e, "enviadas"]);
-      if (no.botao === "respostas") it.push([m.r, "responderam"]);
-      if (no.botao === "link") { it.push([cl.visitas, "cliques"]); it.push([cl.checkout, "checkout"]); }
+      if (no.botao === "respostas") it.push([m.r, "responderam", pct(m.r, m.e)]);
+      if (no.botao === "link") { it.push([cl.visitas, "cliques", pct(cl.visitas, m.e)]); if (cl.checkout) it.push([cl.checkout, "checkout"]); }
       if (m.f) it.push([m.f, "falharam"]);
     } else if (no.tipo === "espera") it.push([m.r, "responderam"]);
     else it.push([m.p, "passaram"]);
-    return '<div class="fe-met">' + it.map(function (x) { return "<span><b>" + nf.format(x[0] || 0) + "</b> " + x[1] + "</span>"; }).join("") + "</div>";
+    return '<div class="fe-met">' + it.map(function (x) { return "<span><b>" + nf.format(x[0] || 0) + "</b> " + x[1] + (x[2] ? " · " + x[2] : "") + "</span>"; }).join("") + "</div>";
+  }
+
+  function pct(a, b) { return b ? Math.round((a || 0) / b * 1000) / 10 + "%" : ""; }
+
+  // Botão dentro da mensagem, com a bolinha de saída e os toques/cliques dele
+  function htmlBotao(no, dm, rotulo, saida, extra, classe) {
+    return '<span class="fe-bt' + (classe || "") + '">' + esc(rotulo) + (extra ? "<small>" + extra + "</small>" : "") +
+      (saida ? '<i class="fe-porta fe-porta--out" data-de="' + esc(no.id) + '" data-saida="' + saida + '"></i>' : "") + "</span>";
   }
 
   function corpo(no, dm, palavras) {
     if (no.tipo === "gatilho") return '<div class="fe-kws">' + (palavras || []).slice(0, 6).map(function (p) { return '<span class="vc-kw">' + esc(p) + "</span>"; }).join(" ") + "</div>" +
+      '<p class="fe-mini">' + (no.posts && no.posts.length ? no.posts.length + (no.posts.length > 1 ? " posts escolhidos" : " post escolhido") : "Em todos os posts e reels") + "</p>" +
+      (no.posts && no.posts.length ? '<div class="fe-posts">' + no.posts.slice(0, 5).map(function (x) { return x.thumb ? '<img src="' + esc(x.thumb) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : "<span>▶</span>"; }).join("") + (no.posts.length > 5 ? "<span>+" + (no.posts.length - 5) + "</span>" : "") + "</div>" : "") +
       '<p class="fe-mini">Também responde o comentário: “' + esc(((no.respostas || [])[0] || "").slice(0, 70)) + "…”</p>";
     if (no.tipo === "atraso") return '<p class="fe-grande">' + (no.seg ? no.seg + " s" : "Sem espera") + "</p>";
     if (no.tipo === "segue") return '<p class="fe-mini">Confere no Instagram se a pessoa segue o perfil.</p>';
     if (no.tipo === "espera") return '<p class="fe-mini">Continua quando a pessoa responder no Direct (até 24 h).</p>';
-    var h = '<p class="fe-bolha">' + esc(no.texto || "") + "</p>";
-    if (no.botao === "link") linksDe(no).forEach(function (l) { h += '<span class="fe-botao fe-botao--url">' + esc(l.titulo) + " ↗</span>"; });
+    var h = '<p class="fe-bolha">' + esc(no.texto || "") + "</p>", m = (dm.fxMet || {})[no.id] || {};
+    if (no.botao === "link") linksDe(no).forEach(function (l, i) {
+      var c = ((dm.cliques || {})["fx_" + no.id + "_" + i] || {}).visitas || 0;
+      h += htmlBotao(no, dm, l.titulo + " ↗", "", nf.format(c) + " cliques" + (m.e ? " · " + pct(c, m.e) : ""), " fe-bt--url");
+    });
+    if (no.botao === "respostas") (no.respostas || []).forEach(function (t, i) {
+      var c = m["b" + i] || 0;
+      h += htmlBotao(no, dm, t, "b" + i, nf.format(c) + " toques" + (m.e ? " · " + pct(c, m.e) : ""));
+    });
     return h;
   }
 
@@ -66,7 +83,7 @@
       (no.tipo !== "gatilho" ? '<i class="fe-porta fe-porta--in" data-in="' + esc(no.id) + '"></i>' : "") +
       '<header class="fe-cab"><span class="fe-tipo">' + t.nome + "</span><strong>" + esc(t.titulo) + "</strong></header>" +
       '<div class="fe-corpo">' + corpo(no, dm, palavras) + "</div>" +
-      '<ul class="fe-saidas">' + saidas(no).map(function (s) {
+      '<ul class="fe-saidas">' + saidas(no).filter(function (s) { return !/^b\d$/.test(s[0]); }).map(function (s) {
         return '<li data-saida="' + s[0] + '"><span>' + esc(s[1]) + '</span><i class="fe-porta fe-porta--out" data-de="' + esc(no.id) + '" data-saida="' + s[0] + '"></i></li>';
       }).join("") + "</ul>" + metricas(no, dm) + "</article>";
   }
@@ -199,6 +216,11 @@
     var t = TIPOS[no.tipo], h = '<span class="fe-tipo fe-tipo--' + t.cor + '">' + t.nome + "</span><h3>" + esc(t.titulo) + "</h3>";
     if (no.tipo === "gatilho") {
       h += '<p class="vc-muted">Palavras-chave: ' + palavras().map(esc).join(", ") + '. <a href="#comentarios" data-acao="palavras">Editar palavras</a></p>' +
+        '<div class="fe-campo"><span>Posts e reels</span>' +
+          '<select class="vc-input" data-acao-sel="posts"><option value="todos"' + (no.posts && no.posts.length ? "" : " selected") + '>Todos os posts e reels</option><option value="escolher"' + (no.posts && no.posts.length ? " selected" : "") + ">Só os posts que eu escolher</option></select>" +
+          (no.posts && no.posts.length ? '<div class="fe-posts">' + no.posts.map(function (x) { return x.thumb ? '<img src="' + esc(x.thumb) + '" alt="" title="' + esc(x.legenda || "") + '" referrerpolicy="no-referrer">' : "<span>▶</span>"; }).join("") + "</div>" : "") +
+          (no.posts && no.posts.length ? '<button type="button" class="vc-btn vc-btn--ghost" data-acao="escolher-posts">Trocar posts escolhidos</button>' : "") +
+          "<small>Comentário com palavra-chave nesses posts dispara o Direct.</small></div>" +
         campo("Resposta no comentário quando a DM sai", '<textarea class="vc-input" rows="4" data-k="respostas" data-lista="1">' + esc((no.respostas || []).join("\n")) + "</textarea>", "Uma por linha. Uma é sorteada.") +
         campo("Resposta no comentário quando a DM não sai", '<textarea class="vc-input" rows="4" data-k="falhou" data-lista="1">' + esc((no.falhou || []).join("\n")) + "</textarea>", "Uma por linha.");
     } else if (no.tipo === "atraso") {
@@ -222,12 +244,47 @@
       } else if (no.botao === "respostas") {
         h += '<div class="fe-campo"><span>Botões (até 3). Cada um ganha uma saída própria.</span>' +
           resp.map(function (r, i) { return '<div class="fe-linha"><input class="vc-input" maxlength="20" data-resp="' + i + '" value="' + esc(r) + '"><button type="button" class="vc-icone" data-acao="tirar-resp" data-i="' + i + '" aria-label="Remover botão">×</button></div>'; }).join("") +
-          (resp.length < 3 ? '<button type="button" class="vc-btn vc-btn--ghost" data-acao="add-resp">+ Adicionar botão</button>' : "") + "</div>";
+          (resp.length < 3 ? '<button type="button" class="vc-btn vc-btn--ghost" data-acao="add-resp">+ Adicionar botão</button>' : "") + "</div>" +
+          campo("Como os botões aparecem no Direct", '<select class="vc-input" data-k="estilo"><option value="botao"' + (no.estilo !== "rapida" ? " selected" : "") + '>Dentro da mensagem</option><option value="rapida"' + (no.estilo === "rapida" ? " selected" : "") + ">Flutuantes (acima do teclado)</option></select>");
       }
       h += '<p class="fe-aviso">Regra do Instagram: depois da 1ª mensagem, as próximas só saem quando a pessoa responder. Se a mensagem não tem botão de resposta e liga em outra mensagem, o fluxo espera a pessoa responder.</p>';
     }
     if (no.tipo !== "gatilho") h += '<div class="fe-acoes"><button type="button" class="vc-btn vc-btn--ghost" data-acao="duplicar">Duplicar</button><button type="button" class="vc-btn fe-perigo" data-acao="apagar">Apagar bloco</button></div>';
     box.innerHTML = h;
+  }
+
+  // Janela com os últimos posts e reels para marcar quais disparam o Direct
+  function escolherPosts(g) {
+    var marcados = {}; (g.posts || []).forEach(function (x) { marcados[x.id] = x; });
+    var caixa = document.createElement("div");
+    caixa.className = "vc-modal";
+    caixa.innerHTML = '<div class="vc-modal__caixa" role="dialog" aria-modal="true" aria-label="Escolher posts"><h3>Escolha os posts e reels</h3><div class="vc-grade"><div class="vc-esqueleto"></div><div class="vc-esqueleto"></div><div class="vc-esqueleto"></div></div>' +
+      '<div class="vc-modal__rodape"><span class="vc-muted" data-n></span><span><button type="button" class="vc-btn vc-btn--ghost" data-x>Cancelar</button> <button type="button" class="vc-btn vc-btn--primary" data-ok>Usar estes posts</button></span></div></div>';
+    document.body.appendChild(caixa);
+    var lista = [], grade = $(".vc-grade", caixa), conta = function () { $("[data-n]", caixa).textContent = Object.keys(marcados).length + " escolhidos"; };
+    var fechar2 = function () { caixa.remove(); painel(); };
+    conta();
+    VC.request({ action: "vicchat_posts", senha: VC.state.senha }).then(function (r) {
+      if (!r || !r.ok) { grade.innerHTML = '<p class="vc-erro">Não deu para carregar os posts' + (r && /obrigat|desconhec/i.test(r.error || "") ? ": falta publicar a versão nova do Apps Script." : ".") + "</p>"; return; }
+      lista = r.posts || [];
+      grade.innerHTML = lista.map(function (x) {
+        var d = new Date(x.data);
+        return '<button type="button" class="vc-post' + (marcados[x.id] ? " is-on" : "") + '" data-id="' + esc(x.id) + '">' +
+          (x.thumb ? '<img src="' + esc(x.thumb) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '<span class="vc-post__sem"></span>') +
+          "<b>" + (x.tipo === "VIDEO" ? "Reel" : x.tipo === "CAROUSEL_ALBUM" ? "Carrossel" : "Post") + " · " + d.getDate() + "/" + (d.getMonth() + 1) + "</b>" +
+          "<small>" + esc(x.legenda || "Sem legenda") + " · " + nf.format(x.comentarios) + " coment.</small></button>";
+      }).join("") || '<p class="vc-muted">Nenhum post encontrado.</p>';
+    }, function () { grade.innerHTML = '<p class="vc-erro">Sem conexão.</p>'; });
+    caixa.addEventListener("click", function (e) {
+      var b = e.target.closest(".vc-post");
+      if (b) {
+        var x = lista.filter(function (p) { return p.id === b.dataset.id; })[0];
+        if (marcados[x.id]) delete marcados[x.id]; else marcados[x.id] = { id: x.id, permalink: x.permalink, thumb: x.thumb, legenda: x.legenda };
+        b.classList.toggle("is-on", !!marcados[x.id]); conta(); return;
+      }
+      if (e.target.closest("[data-x]") || e.target === caixa) { fechar2(); return; }
+      if (e.target.closest("[data-ok]")) { g.posts = Object.keys(marcados).map(function (k) { return marcados[k]; }); mudou(); redesenhar(); fechar2(); }
+    });
   }
 
   function editarCampo(el) {
@@ -398,12 +455,20 @@
 
     // Painel de propriedades
     $("#fe-props").addEventListener("input", function (e) { if (e.target.matches("[data-k],[data-resp],[data-link]") && e.target.tagName !== "SELECT") editarCampo(e.target); });
-    $("#fe-props").addEventListener("change", function (e) { if (e.target.matches("select[data-k]")) editarCampo(e.target); });
+    $("#fe-props").addEventListener("change", function (e) {
+      if (e.target.matches("select[data-k]")) editarCampo(e.target);
+      if (e.target.matches('[data-acao-sel="posts"]')) {
+        var g = acharNo(ed.sel);
+        if (e.target.value === "todos") { g.posts = []; mudou(); painel(); redesenhar(); }
+        else escolherPosts(g);
+      }
+    });
     $("#fe-props").addEventListener("click", function (e) {
       var b = e.target.closest("[data-acao]");
       if (!b) return;
       var no = acharNo(ed.sel), acao = b.dataset.acao;
       if (acao === "palavras") { e.preventDefault(); if (!ed.sujo || confirm("Sair do editor sem salvar?")) { ed.sujo = false; fechar(); location.hash = "comentarios"; setTimeout(function () { VC.abrirTab("config"); }, 0); } return; }
+      if (acao === "escolher-posts") { escolherPosts(acharNo(ed.sel)); return; }
       if (acao === "apagar-liga") { ed.f.ligas.splice(ed.liga, 1); ed.liga = -1; mudou(); setas(camada, ed.f, true); painel(); return; }
       if (!no) return;
       if (acao === "apagar") {

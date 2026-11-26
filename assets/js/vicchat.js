@@ -10,6 +10,7 @@
   var endpoint = (CFG.form || {}).endpoint;
   var DEMO = /[?&]demo=1\b/.test(location.search);
   var STORE = "vg_painel"; // senha lembrada (compartilhada com /painel e /aplicacoes)
+  var CACHE = "vc_cache";  // últimos dados: a tela abre na hora e atualiza por trás
   var ATUALIZA_MS = 60000;
   var TITULOS = { inicio: "Início", automacoes: "Automação", comentarios: "Automação", fluxo: "Automação" };
 
@@ -50,7 +51,11 @@
   }
 
   function tratar(res) {
-    if (res && res.ok) { state.dados = res; render(); aviso(DEMO ? "Dados de exemplo (fictícios), só para ver o visual." : ""); return true; }
+    if (res && res.ok) {
+      state.dados = res; render(); aviso(DEMO ? "Dados de exemplo (fictícios), só para ver o visual." : "");
+      if (!DEMO) { try { localStorage.setItem(CACHE, JSON.stringify(res)); } catch (e) { /* sem espaço */ } }
+      return true;
+    }
     var err = res && res.error;
     if (err === "senha_invalida") { showLogin("Senha incorreta."); return false; }
     if (err === "senha_nao_configurada") { showLogin("A senha do painel ainda não foi configurada no Apps Script."); return false; }
@@ -294,7 +299,7 @@
     $("#login").hidden = false;
     $("#login-erro").textContent = msg || "";
     $("#login-erro").hidden = !msg;
-    try { localStorage.removeItem(STORE); } catch (e) { /* ignore */ }
+    try { localStorage.removeItem(STORE); localStorage.removeItem(CACHE); } catch (e) { /* ignore */ }
     $("#senha").focus();
   }
 
@@ -357,6 +362,12 @@
 
   var demoDados = null;
   function demo(params) {
+    if (params.action === "vicchat_posts") {
+      return { ok: true, posts: [0, 1, 2, 3, 4, 5, 6, 7].map(function (i) {
+        var d = new Date(); d.setDate(d.getDate() - i * 2);
+        return { id: "1790000000000" + i, permalink: "https://www.instagram.com/reel/EXEMPLO" + i + "/", legenda: "Post de exemplo " + (i + 1) + ": como vender sem aparecer", tipo: i % 3 ? "VIDEO" : "IMAGE", thumb: "", data: d.toISOString(), comentarios: 40 - i * 4 };
+      }) };
+    }
     if (!demoDados) {
       var porDia = {}, ultimas = [], nomes = ["ana.receitas", "carlos_fin", "ju.makeup", "pedro.alves", "bia_fit", "lucas.dev"];
       for (var i = 0; i < 14; i++) { var dt = new Date(); dt.setDate(dt.getDate() - i); porDia[diaKey(dt)] = Math.round(Math.random() * 30) + (i < 3 ? 12 : 0); }
@@ -407,5 +418,17 @@
   /* ───────────── Início ───────────── */
 
   try { state.senha = localStorage.getItem(STORE) || ""; } catch (e) { state.senha = ""; }
-  if (DEMO || state.senha) { showApp(); carregar(); } else showLogin("");
+  // Tema claro/escuro
+  $("#tema").addEventListener("click", function () {
+    var raiz = document.documentElement, atual = raiz.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    raiz.dataset.theme = atual === "dark" ? "light" : "dark";
+    try { localStorage.setItem("vc_tema", raiz.dataset.theme); } catch (e) { /* ignore */ }
+  });
+
+  if (DEMO || state.senha) {
+    if (!DEMO) { try { var salvo = JSON.parse(localStorage.getItem(CACHE) || "null"); if (salvo && salvo.ok) state.dados = salvo; } catch (e) { /* ignore */ } }
+    showApp();
+    if (state.dados) { render(); aviso("Atualizando…"); }
+    carregar();
+  } else showLogin("");
 })();

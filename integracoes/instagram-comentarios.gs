@@ -130,7 +130,7 @@ function igRodada_(props, token) {
 
         // Direct: só em posts publicados depois de ligar, dentro dos limites
         let direct = '';
-        const postNovo = m.timestamp && new Date(m.timestamp).getTime() >= Number(dm.desde || 0);
+        const postNovo = igFxPostOk_(m, dm);
         if (dm.ativo && postNovo) igMet_(props, 'g');
         if (dm.ativo && postNovo && dmRodada < dm.porRodada && igDmConta_(props) < dm.porDia) {
           try {
@@ -236,6 +236,15 @@ function vicchat_(p) {
     const ligar = p.ativo === '1';
     props.setProperty('IG_ATIVO', ligar ? '1' : '0');
     if (ligar) props.setProperty('IG_DESDE', String(Date.now())); // ao religar, não responde o que chegou pausado
+  } else if (p.action === 'vicchat_posts') {
+    let token = props.getProperty('IG_TOKEN');
+    const eu = igConta_(token);
+    token = eu.token || token;
+    const r = igGet_('/' + eu.id + '/media', { fields: 'id,permalink,caption,media_type,thumbnail_url,media_url,timestamp,comments_count', limit: 36 }, token);
+    return json_({ ok: true, posts: (r.data || []).map(function (m) {
+      return { id: m.id, permalink: m.permalink, legenda: String(m.caption || '').slice(0, 80), tipo: m.media_type,
+        thumb: m.thumbnail_url || (m.media_type === 'VIDEO' ? '' : m.media_url) || '', data: m.timestamp, comentarios: m.comments_count || 0 };
+    }) });
   } else if (p.action === 'vicchat_fluxo') {
     try { igFxSalvar_(JSON.parse(p.fluxo || '{}')); }
     catch (e) { return json_({ ok: false, error: String(e.message || e) === 'fluxo_sem_gatilho' ? 'fluxo_sem_gatilho' : 'fluxo_invalido' }); }
@@ -494,8 +503,8 @@ function igFxPadrao_() {
       { id: 'm2', tipo: 'mensagem', x: 1320, y: 360, texto: 'Mas antes, entra no meu perfil e me segue pra você não perder os próximos conteúdos...', botao: 'respostas', respostas: ['Seguindo'], links: [] },
       { id: 's2', tipo: 'segue', x: 1660, y: 380 },
       { id: 'm4', tipo: 'mensagem', x: 2000, y: 560, texto: 'Ainda não apareceu que você me segue 😅 Segue o perfil e toca em "Seguindo" de novo ↓', botao: 'respostas', respostas: ['Seguindo'], links: [] },
-      { id: 'm3', tipo: 'mensagem', x: 2000, y: 60, texto: 'Pronto! Aqui estão os links ↓\n\n🎬 Editar com IA: seus vídeos cortados, legendados e animados sozinhos, sem você editar nada.\n\n💰 Renda sem aparecer: venda produto digital ou monte um perfil de cortes ou dark, sem mostrar o rosto.',
-        botao: 'link', respostas: [], links: [{ titulo: '🎬 EDITAR COM IA', url: 'https://www.ovictorgomes.com.br/editflow?utm_source=instagram&utm_medium=direct&utm_campaign=vicchat' }, { titulo: '💰 SEM APARECER', url: 'https://www.ovictorgomes.com.br/quiz?utm_source=instagram&utm_medium=direct&utm_campaign=vicchat' }] }
+      { id: 'm3', tipo: 'mensagem', x: 2000, y: 60, texto: 'Pronto! Aqui estão os links ↓\n\n💰 Renda sem aparecer: venda produto digital ou monte um perfil de cortes ou dark, sem mostrar o rosto.\n\n🎬 Editar com IA: seus vídeos cortados, legendados e animados sozinhos, sem você editar nada.',
+        botao: 'link', respostas: [], links: [{ titulo: '💰 SEM APARECER', url: 'https://www.ovictorgomes.com.br/quiz?utm_source=instagram&utm_medium=direct&utm_campaign=vicchat' }, { titulo: '🎬 EDITAR COM IA', url: 'https://www.ovictorgomes.com.br/editflow?utm_source=instagram&utm_medium=direct&utm_campaign=vicchat' }] }
     ],
     ligas: [
       { de: 'g', saida: 'prox', para: 'a' }, { de: 'a', saida: 'prox', para: 'm1' }, { de: 'm1', saida: 'b0', para: 's1' },
@@ -530,6 +539,12 @@ function igFxLimpar_(f) {
       if (n.tipo === 'gatilho') {
         o.respostas = (n.respostas || []).map(function (s) { return txt(s, 300); }).filter(Boolean).slice(0, 10);
         o.falhou = (n.falhou || []).map(function (s) { return txt(s, 300); }).filter(Boolean).slice(0, 10);
+        if (Array.isArray(n.posts)) {
+          o.posts = n.posts.filter(function (x) { return x && /^[0-9]{5,30}$/.test(String(x.id)); }).slice(0, 40).map(function (x) {
+            return { id: String(x.id), permalink: /^https:\/\/www\.instagram\.com\//.test(x.permalink || '') ? txt(x.permalink, 200) : '',
+              thumb: /^https:\/\//.test(x.thumb || '') ? txt(x.thumb, 900) : '', legenda: txt(x.legenda, 80) };
+          });
+        }
       }
       if (n.tipo === 'mensagem') {
         o.texto = txt(n.texto, 900) || '…';
@@ -540,6 +555,7 @@ function igFxLimpar_(f) {
         o.respostas = (n.respostas || []).map(function (s) { return txt(s, 20); }).filter(Boolean).slice(0, 3);
         if (o.botao === 'link' && !o.links.length) o.botao = 'nenhum';
         if (o.botao === 'respostas' && !o.respostas.length) o.botao = 'nenhum';
+        o.estilo = n.estilo === 'rapida' ? 'rapida' : 'botao';
       }
       return o;
     });
@@ -560,6 +576,13 @@ function igFxSalvar_(f) {
   sh.getRange(2, 1).setValue(JSON.stringify(limpo));
   IG_FX_CACHE = limpo;
   return limpo;
+}
+
+// O post entra no Direct? Com posts escolhidos no gatilho, só eles; senão, todos publicados depois de `desde`
+function igFxPostOk_(m, dm) {
+  const g = igFluxo_().nos.filter(function (n) { return n.tipo === 'gatilho'; })[0] || {};
+  if (g.posts && g.posts.length) return g.posts.some(function (x) { return x.id === m.id; });
+  return !!m.timestamp && new Date(m.timestamp).getTime() >= Number(dm.desde || 0);
 }
 
 function igFxNo_(f, id) { return f.nos.filter(function (n) { return n.id === id; })[0]; }
@@ -607,7 +630,12 @@ function igFxMsg_(no) {
       }) } } };
   }
   if (no.botao === 'respostas' && no.respostas.length) {
-    return { text: no.texto, quick_replies: no.respostas.map(function (t, i) { return { content_type: 'text', title: t, payload: 'B' + i }; }) };
+    if (no.estilo === 'rapida') {
+      return { text: no.texto, quick_replies: no.respostas.map(function (t, i) { return { content_type: 'text', title: t, payload: 'B' + i }; }) };
+    }
+    // Botões presos na própria mensagem (o toque aparece na conversa com o texto do botão)
+    return { attachment: { type: 'template', payload: { template_type: 'button', text: no.texto.slice(0, 640),
+      buttons: no.respostas.map(function (t, i) { return { type: 'postback', title: t, payload: 'fx_' + no.id + '_b' + i }; }) } } };
   }
   return { text: no.texto };
 }
@@ -686,6 +714,7 @@ function igDmPendentes_(eu, token, props) {
       const resp = String(msgs[0].message || '').toLowerCase().replace(/[^\p{L}\p{N} ]/gu, '').trim();
       let i = no.respostas.findIndex(function (b) { return b.toLowerCase().replace(/[^\p{L}\p{N} ]/gu, '').trim() === resp; });
       if (i < 0) i = 0;
+      igFxMet_(props, no.id, 'b' + i);
       inicio = igFxProx_(f, no.id, 'b' + i);
     } else if (no) inicio = igFxProx_(f, no.id, 'prox');
     const ctx = { eu: eu, token: token, props: props, f: f, igsid: igsid, quem: p.u, comentario: '', aberta: true, v: p.v || {} };
@@ -831,6 +860,12 @@ function igPosts_(token) {
   const fixos = IG.postsFixos.map(function (code) { return cache[code]; }).filter(function (f) {
     return f && !posts.some(function (m) { return m.id === f.id; });
   });
+  try {
+    const g = igFluxo_().nos.filter(function (n) { return n.tipo === 'gatilho'; })[0] || {};
+    if (igDm_().ativo) (g.posts || []).forEach(function (x) {
+      if (!posts.some(function (m) { return m.id === x.id; }) && !fixos.some(function (f) { return f.id === x.id; })) fixos.push({ id: x.id, permalink: x.permalink });
+    });
+  } catch (e) { /* fluxo indisponível */ }
   if (fixos.length) {
     // Contagem dos fixos: uma chamada por post (o parâmetro "ids" foi descontinuado na Graph API v26)
     const n = {}; fixos.forEach(function (f) { n[f.id] = igGet_('/' + f.id, { fields: 'comments_count' }, token); });
