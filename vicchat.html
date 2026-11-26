@@ -11,10 +11,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
   <script>try{var t=localStorage.getItem("vc_tema");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
-  <link rel="stylesheet" href="assets/css/vicchat.css?v=2">
+  <link rel="stylesheet" href="assets/css/vicchat.css?v=3">
   <script src="assets/js/config.js" defer></script>
-  <script src="assets/js/vicchat.js?v=2" defer></script>
-  <script src="assets/js/vicchat-fluxo.js?v=2" defer></script>
+  <script src="assets/js/vicchat.js?v=3" defer></script>
+  <script src="assets/js/vicchat-fluxo.js?v=3" defer></script>
 </head>
 <body>
 
@@ -99,45 +99,56 @@
             </div>
           </article>
 
-          <article class="vc-card vc-card--link" id="card-dm" tabindex="0" role="link" aria-label="Abrir o fluxo do Direct">
-            <div class="vc-card__linha">
-              <span class="vc-pill" id="dm-pill">—</span>
-              <strong class="vc-card__nome">[COMENTÁRIO → DIRECT] Links por DM</strong>
-              <div class="vc-card__num"><b id="dm-hoje">0</b><span id="dm-limite">DMs hoje</span></div>
-            </div>
-            <div class="vc-card__gatilho">
-              <svg viewBox="0 0 24 24" class="vc-ig"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
-              <span id="dm-desc">Quem comentar a palavra-chave em um post novo recebe uma mensagem com botão para o quiz</span>
-              <label class="vc-switch" title="Ligar ou pausar a automação"><input type="checkbox" id="dm-toggle"><span></span></label>
-            </div>
-            <p class="vc-muted" id="dm-texto" style="margin:10px 0 0;font-size:13px"></p>
-            <p class="vc-muted" style="margin:8px 0 0;font-size:13px"><b id="dm-respondidos">0</b> comentários respondidos · <a href="#comentarios" id="dm-palavras">Palavras-chave e respostas públicas →</a></p>
-            <p class="vc-falha" id="dm-erro" hidden style="margin:8px 0 0;font-size:13px"></p>
-          </article>
+          <div class="mc-lista__topo">
+            <h2>Minhas automações</h2>
+            <label class="mc-busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="mc-busca" placeholder="Pesquisar automações"></label>
+          </div>
+          <div class="mc-tabela">
+            <div class="mc-tabela__cab"><span>Nome</span><span>Execuções</span><span>CTR</span><span>DMs hoje</span></div>
+            <article class="mc-auto" id="card-dm" tabindex="0" role="link" aria-label="Abrir a automação Comentário para Direct">
+              <div class="mc-auto__linha">
+                <span class="vc-pill" id="dm-pill">—</span>
+                <strong class="mc-auto__nome">[COMENTÁRIO → DIRECT] Links por DM</strong>
+                <b class="mc-num" id="dm-exec">0</b>
+                <b class="mc-num" id="dm-ctr">—</b>
+                <span class="mc-num"><b id="dm-hoje">0</b><small id="dm-limite">de 40</small></span>
+              </div>
+              <div class="mc-gat">
+                <svg viewBox="0 0 24 24" class="vc-ig"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+                <span class="mc-gat__txt" id="dm-desc">O usuário comenta em um post ou reel</span>
+                <label class="vc-switch" title="Ligar ou pausar a automação"><input type="checkbox" id="dm-toggle"><span></span></label>
+                <span class="mc-num mc-num--sub" id="dm-gat-exec">0</span>
+                <span class="mc-num mc-num--sub" id="dm-gat-ctr">—</span>
+                <span class="mc-num mc-num--sub" id="dm-esperando"></span>
+              </div>
+              <p class="mc-auto__rodape"><span id="dm-texto"></span> · <b id="dm-respondidos">0</b> comentários respondidos · <a href="#comentarios" id="dm-palavras">Palavras-chave</a></p>
+              <p class="vc-falha" id="dm-erro" hidden></p>
+            </article>
+          </div>
         </div>
       </section>
 
       <!-- Fluxo do Direct: teia clicável -->
-      <section class="vc-view" id="view-fluxo" hidden>
-        <div class="vc-det__topo">
-          <a class="vc-voltar" href="#automacoes">← Automações</a>
-          <div class="vc-det__titulo">
-            <span class="vc-pill" id="fx-pill">—</span>
-            <h2>Link por DM a partir dos comentários</h2>
-            <label class="vc-switch vc-switch--grande" title="Ligar ou desligar o Direct"><input type="checkbox" id="fx-toggle"><span></span></label>
-          </div>
-          <p class="vc-erro" id="fx-erro" hidden></p>
+      <section class="vc-view mc-auto-tela" id="view-fluxo" hidden>
+        <div class="mc-migalha">
+          <a href="#automacoes">Automações</a><span>›</span><strong>[COMENTÁRIO → DIRECT] Links por DM</strong>
+          <span class="vc-pill" id="fx-pill">—</span>
+          <label class="vc-switch" title="Ligar ou pausar a automação"><input type="checkbox" id="fx-toggle"><span></span></label>
+          <button type="button" class="vc-btn mc-editar" id="fx-abrir"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Editar automação</button>
         </div>
+        <p class="vc-erro" id="fx-erro" hidden></p>
         <p class="vc-aviso is-erro" id="fx-sem" hidden>Falta publicar a versão nova do Apps Script para ver o fluxo e as métricas.</p>
-        <div class="fx-periodo" id="fx-periodo" role="group" aria-label="Período das métricas">
-          <button type="button" data-dias="1">Hoje</button><button type="button" data-dias="7" class="is-on">7 dias</button><button type="button" data-dias="30">30 dias</button>
+        <div class="mc-construtor">
+          <aside class="mc-met">
+            <h3>Principais métricas</h3>
+            <div class="fx-periodo" id="fx-periodo" role="group" aria-label="Período das métricas">
+              <button type="button" data-dias="1">Hoje</button><button type="button" data-dias="7" class="is-on">7 dias</button><button type="button" data-dias="30">30 dias</button>
+            </div>
+            <div class="mc-met__grade" id="fx-tiles"></div>
+            <p class="vc-muted">Clique em um bloco para editar. Os números de cada mensagem e botão ficam no próprio bloco.</p>
+          </aside>
+          <div class="fx-wrap" id="fx-wrap"><span class="mc-selo">Você está vendo a versão publicada</span><div class="fx-canvas fe-camada" id="fx-canvas"></div></div>
         </div>
-        <div class="vc-tiles fx-tiles" id="fx-tiles"></div>
-        <div class="fx-barra">
-          <p class="vc-muted">Os números de cada bloco aparecem na própria teia. Clique em um bloco ou no botão para editar.</p>
-          <button type="button" class="vc-btn vc-btn--primary" id="fx-abrir">Abrir editor do fluxo</button>
-        </div>
-        <div class="fx-wrap" id="fx-wrap"><div class="fx-canvas fe-camada" id="fx-canvas"></div></div>
       </section>
 
       <!-- Detalhe: automação de comentários -->

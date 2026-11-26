@@ -366,3 +366,87 @@ body, .vc-card, .vc-tile, .vc-side, .vc-top, .fe-no, .vc-input { transition: bac
 .vc-post.is-on::after { content: "✓"; position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 800; }
 .vc-modal__rodape { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .fe-topo, .fe-lateral, .fe-palco { -webkit-user-select: none; user-select: none; }
+
+/* ───────────── Lista de automações (tabela) ───────────── */
+.mc-lista__topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.mc-lista__topo h2 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+.mc-busca { display: flex; align-items: center; gap: 8px; min-width: 240px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--muted); }
+.mc-busca input { flex: 1; min-height: 40px; border: 0; background: none; color: var(--text); font: inherit; outline: none; }
+.mc-tabela { display: grid; gap: 12px; }
+.mc-tabela__cab, .mc-auto__linha, .mc-gat { display: grid; grid-template-columns: minmax(0, 1fr) 96px 80px 96px; align-items: center; gap: 12px; }
+.mc-tabela__cab { padding: 0 20px; color: var(--muted); font-size: 12.5px; font-weight: 700; }
+.mc-tabela__cab span:not(:first-child), .mc-num { text-align: right; font-variant-numeric: tabular-nums; }
+.mc-auto { padding: 16px 20px; border: 1px solid var(--line); border-radius: var(--r); background: var(--card); cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.mc-auto:hover { border-color: var(--line3); box-shadow: 0 2px 12px rgba(0,0,0,.05); }
+.mc-auto__linha { grid-template-columns: auto minmax(0, 1fr) 96px 80px 96px; }
+.mc-auto__nome { min-width: 0; font-size: 15.5px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mc-num b, b.mc-num { font-size: 15px; }
+.mc-num small { display: block; color: var(--muted); font-size: 11.5px; font-weight: 600; }
+.mc-gat { grid-template-columns: 20px minmax(0, 1fr) auto 72px 80px 96px; margin-top: 12px; padding: 10px 0 0 4px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+.mc-gat .vc-ig { width: 18px; height: 18px; color: #dd2a7b; }
+.mc-gat__txt { line-height: 1.7; }
+.mc-num--sub { color: var(--muted); font-size: 13px; }
+.mc-chip { display: inline-block; margin: 1px 3px 1px 0; padding: 0 8px; border: 1px solid var(--line); border-radius: 99px; background: var(--soft); color: var(--text2); font-size: 12px; font-weight: 700; line-height: 1.6; }
+.mc-auto__rodape { margin: 10px 0 0; color: var(--muted); font-size: 12.5px; }
+.mc-auto .vc-falha { margin: 8px 0 0; font-size: 13px; }
+@media (max-width: 760px) {
+  .mc-tabela__cab { display: none; }
+  .mc-auto__linha { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .mc-auto__linha #dm-ctr, .mc-auto__linha #dm-exec { display: none; }
+  .mc-gat { grid-template-columns: 20px minmax(0, 1fr) auto; }
+  .mc-gat .mc-num--sub { display: none; }
+}
+
+/* ───────────── Tela da automação (construtor) ───────────── */
+.mc-migalha { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; font-size: 14px; }
+.mc-migalha a { color: var(--muted); font-weight: 600; text-decoration: none; }
+.mc-migalha a:hover { color: var(--text); }
+.mc-migalha > span { color: var(--muted2); }
+.mc-migalha strong { font-weight: 800; }
+.mc-editar { gap: 8px; margin-left: auto; min-height: 38px; padding: 0 14px; border: 1px solid var(--line); background: var(--card); color: var(--text); }
+.mc-editar svg { width: 16px; height: 16px; }
+.mc-editar:hover { border-color: var(--line3); }
+.mc-construtor { display: grid; grid-template-columns: 290px minmax(0, 1fr); height: calc(100vh - 190px); min-height: 480px; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; background: var(--card); }
+.mc-met { overflow-y: auto; padding: 18px; border-right: 1px solid var(--line); }
+.mc-met h3 { margin: 0 0 10px; font-size: 17px; font-weight: 800; }
+.mc-met .fx-periodo { display: flex; margin: 0 0 12px; }
+.mc-met .fx-periodo button { flex: 1; }
+.mc-met__grade { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.mc-met__card { display: grid; gap: 2px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; }
+.mc-met__card span { color: var(--muted); font-size: 12px; font-weight: 700; }
+.mc-met__card b { font-size: 20px; font-variant-numeric: tabular-nums; }
+.mc-met__card small { color: var(--muted); font-size: 11px; font-weight: 600; }
+.mc-auto-tela .fx-wrap { height: auto; max-height: none; border: 0; border-radius: 0; }
+.mc-selo { position: sticky; top: 10px; left: 50%; z-index: 2; display: table; margin: 10px auto -34px; padding: 5px 12px; border: 1px solid #f5d48a; border-radius: 8px; background: #fff8e6; color: #7a5a00; font-size: 12.5px; font-weight: 700; }
+:root[data-theme="dark"] .mc-selo { border-color: #5c4710; background: #2a2210; color: #f3d27a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mc-selo { border-color: #5c4710; background: #2a2210; color: #f3d27a; } }
+@media (max-width: 900px) {
+  .mc-construtor { grid-template-columns: 1fr; height: auto; }
+  .mc-met { border-right: 0; border-bottom: 1px solid var(--line); }
+  .mc-auto-tela .fx-wrap { height: 70vh; }
+}
+
+/* ───────────── Blocos no estilo construtor ───────────── */
+.fe-no { border-top-width: 1px; border-top-color: var(--line); box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.fe-cab { display: flex; align-items: center; gap: 9px; padding: 11px 12px 8px; }
+.fe-cab > span { display: grid; gap: 0; min-width: 0; }
+.fe-cab .fe-tipo { color: var(--muted); font-size: 10.5px; letter-spacing: .02em; text-transform: none; font-weight: 700; }
+.fe-ico { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 8px; background: color-mix(in srgb, var(--c) 14%, transparent); color: var(--c); }
+.fe-ico svg { width: 16px; height: 16px; }
+.fe-ico--mensagem { background: linear-gradient(135deg, #f58529, #dd2a7b 55%, #8134af); color: #fff; }
+.fe-faixa { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; margin: 0 12px 10px; padding: 7px 4px; border-radius: 10px; background: var(--soft); text-align: center; }
+.fe-faixa b { display: block; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.fe-faixa small { color: var(--muted); font-size: 10.5px; font-weight: 700; }
+.fe-gatcard { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; padding: 9px; border-radius: 10px; background: var(--soft); }
+.fe-gatcard .fe-ico { width: 22px; height: 22px; border-radius: 6px; }
+.fe-gatcard .fe-ico svg { width: 13px; height: 13px; }
+.fe-gatcard p { margin: 0; font-size: 12.5px; line-height: 1.4; }
+.fe-saidas li[data-saida="prox"] span { color: var(--muted); }
+
+/* Painel do gatilho em passos */
+.fe-passo { display: flex; align-items: center; gap: 10px; margin: 18px 0 8px; font-size: 14.5px; }
+.fe-passo__n { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--soft); color: var(--text2); font-size: 12px; font-weight: 800; }
+.fe-caixa { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; }
+.fe-caixa p { margin: 0; }
+.fe-caixa a { color: var(--blue); font-size: 13px; font-weight: 700; }
+.vc-view.mc-auto-tela { max-width: none; }

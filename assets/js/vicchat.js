@@ -144,13 +144,22 @@
     $("#dm-toggle").disabled = !state.dados.gatilho;
     $("#dm-respondidos").textContent = nf.format((state.dados.stats || {}).total || 0);
     $("#dm-hoje").textContent = nf.format(dm.hoje || 0);
-    $("#dm-limite").textContent = "de " + dm.porDia + " DMs hoje";
-    $("#dm-texto").textContent = "Fluxo: “Quero receber ✅” → pede para seguir → links. Toque no card para editar.";
-    $("#dm-desc").textContent = !on ? "Pausada: nenhum comentário é respondido e nenhuma DM sai"
-      : "Quem comenta a palavra-chave recebe os links no Direct (depois de seguir). Passou da trava diária: resposta com link da bio" +
-        (dm.esperando ? " · " + dm.esperando + " esperando confirmar" : "");
-    var ult = (dm.ultimos || []).slice(0, 5).map(function (x) { return "@" + x.u + ": " + x.o + " (" + quando(x.d) + ")"; });
-    if (ult.length) $("#dm-texto").textContent += " · Últimos: " + ult.join(" · ");
+    $("#dm-limite").textContent = "de " + dm.porDia;
+    // Execuções (comentários que entraram no fluxo) e CTR (cliques nos links / mensagens com link enviadas)
+    var f = dm.fluxo || { nos: [] }, fm = dm.fxMet || {}, g = f.nos.filter(function (n) { return n.tipo === "gatilho"; })[0] || {};
+    var exec = (fm[g.id] || {}).p || 0, comLink = 0, cliques = 0;
+    f.nos.forEach(function (n) { if (n.tipo === "mensagem" && n.botao === "link") comLink += (fm[n.id] || {}).e || 0; });
+    Object.keys(dm.cliques || {}).forEach(function (k) { if (/^fx_/.test(k)) cliques += dm.cliques[k].visitas || 0; });
+    var ctr = comLink ? (Math.round(cliques / comLink * 1000) / 10).toString().replace(".", ",") + "%" : "—";
+    $("#dm-exec").textContent = nf.format(exec); $("#dm-gat-exec").textContent = nf.format(exec);
+    $("#dm-ctr").textContent = ctr; $("#dm-gat-ctr").textContent = ctr;
+    $("#dm-esperando").textContent = dm.esperando ? dm.esperando + " no meio" : "";
+    var kws = ((state.dados.config || {}).palavras || []).slice(0, 8);
+    $("#dm-desc").innerHTML = (on ? "" : "<b>Pausada.</b> ") + "O usuário comenta em " + (g.posts && g.posts.length ? "<b>" + g.posts.length + (g.posts.length > 1 ? " posts escolhidos" : " post escolhido") + "</b>" : "<b>qualquer post ou reel</b>") +
+      " e o comentário inclui " + kws.map(function (k) { return '<span class="mc-chip">' + esc(k) + "</span>"; }).join("");
+    $("#dm-texto").textContent = "Últimos " + (dm.dias || 7) + " dias";
+    var ult = (dm.ultimos || []).slice(0, 3).map(function (x) { return "@" + x.u + " (" + quando(x.d) + ")"; });
+    if (ult.length) $("#dm-texto").textContent += " · Últimos no Direct: " + ult.join(", ");
     $("#dm-erro").textContent = dm.erro ? "Desligado por erro: " + dm.erro : "";
     $("#dm-erro").hidden = !dm.erro || dm.ativo;
     $("#inicio-dm").textContent = (on ? "Ativa · " : "Pausada · ") + nf.format(dm.hoje || 0) + " de " + dm.porDia + " DMs hoje";
@@ -418,6 +427,12 @@
   /* ───────────── Início ───────────── */
 
   try { state.senha = localStorage.getItem(STORE) || ""; } catch (e) { state.senha = ""; }
+  // Busca na lista de automações
+  $("#mc-busca").addEventListener("input", function (e) {
+    var q = e.target.value.trim().toLowerCase();
+    $$(".mc-auto").forEach(function (a) { a.hidden = q && a.textContent.toLowerCase().indexOf(q) < 0; });
+  });
+
   // Tema claro/escuro
   $("#tema").addEventListener("click", function () {
     var raiz = document.documentElement, atual = raiz.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");

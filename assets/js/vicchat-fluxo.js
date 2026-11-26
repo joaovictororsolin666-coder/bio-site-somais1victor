@@ -10,10 +10,10 @@
   var $ = VC.$, $$ = VC.$$, esc = VC.esc, nf = VC.nf;
 
   var TIPOS = {
-    gatilho: { nome: "Gatilho", cor: "azul", titulo: "Comentário com palavra-chave" },
-    atraso: { nome: "Atraso", cor: "amarelo", titulo: "Espera antes de seguir" },
+    gatilho: { nome: "Gatilho", cor: "azul", titulo: "Quando…" },
+    atraso: { nome: "Atraso", cor: "amarelo", titulo: "Atraso" },
     segue: { nome: "Condição", cor: "roxo", titulo: "Segue o perfil?" },
-    mensagem: { nome: "Mensagem", cor: "verde", titulo: "Mensagem no Direct" },
+    mensagem: { nome: "Instagram", cor: "verde", titulo: "Enviar mensagem" },
     espera: { nome: "Espera", cor: "amarelo", titulo: "Espera a resposta" }
   };
   var PALETA = [
@@ -28,7 +28,7 @@
     if (no.tipo === "espera") return [["prox", "Quando responder"]];
     if (no.tipo === "mensagem" && no.botao === "respostas" && (no.respostas || []).length)
       return no.respostas.map(function (t, i) { return ["b" + i, "Tocou em “" + t + "”"]; });
-    return [["prox", "Depois"]];
+    return [["prox", no.tipo === "gatilho" ? "Então" : "Depois"]];
   }
 
   /* ───────────── Desenho (prévia e editor usam o mesmo) ───────────── */
@@ -36,7 +36,7 @@
   function metricas(no, dm) {
     var m = (dm.fxMet || {})[no.id] || {}, cl = { visitas: 0, checkout: 0 }, it = [];
     Object.keys(dm.cliques || {}).forEach(function (k) { if (k === "fx_" + no.id || k.indexOf("fx_" + no.id + "_") === 0) { cl.visitas += dm.cliques[k].visitas; cl.checkout += dm.cliques[k].checkout; } });
-    if (no.tipo === "gatilho") it.push([m.p, "comentários"]);
+    if (no.tipo === "gatilho") it.push([m.p, "execuções"]);
     else if (no.tipo === "mensagem") {
       it.push([m.e, "enviadas"]);
       if (no.botao === "respostas") it.push([m.r, "responderam", pct(m.r, m.e)]);
@@ -45,6 +45,25 @@
     } else if (no.tipo === "espera") it.push([m.r, "responderam"]);
     else it.push([m.p, "passaram"]);
     return '<div class="fe-met">' + it.map(function (x) { return "<span><b>" + nf.format(x[0] || 0) + "</b> " + x[1] + (x[2] ? " · " + x[2] : "") + "</span>"; }).join("") + "</div>";
+  }
+
+  function icone(tipo) {
+    var d = { gatilho: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>', atraso: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+      segue: '<path d="M6 3v12M18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 9a9 9 0 0 1-9 9"/>',
+      espera: '<path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"/>',
+      mensagem: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/>' };
+    return '<i class="fe-ico fe-ico--' + tipo + '"><svg viewBox="0 0 24 24">' + (d[tipo] || d.espera) + "</svg></i>";
+  }
+
+  // Faixa de métricas no topo da mensagem: Enviado · Respondeu · Clicou · Falhou
+  function faixa(no, dm) {
+    var m = (dm.fxMet || {})[no.id] || {}, cl = 0;
+    Object.keys(dm.cliques || {}).forEach(function (k) { if (k === "fx_" + no.id || k.indexOf("fx_" + no.id + "_") === 0) cl += dm.cliques[k].visitas || 0; });
+    var cel = [[nf.format(m.e || 0), "Enviado"]];
+    if (no.botao === "respostas") cel.push([pct(m.r, m.e) || "0%", "Respondeu"]);
+    if (no.botao === "link") cel.push([pct(cl, m.e) || "0%", "Clicou"]);
+    cel.push([nf.format(m.f || 0), "Falhou"]);
+    return '<div class="fe-faixa">' + cel.map(function (c) { return "<span><b>" + c[0] + "</b><small>" + c[1] + "</small></span>"; }).join("") + "</div>";
   }
 
   function pct(a, b) { return b ? Math.round((a || 0) / b * 1000) / 10 + "%" : ""; }
@@ -56,8 +75,9 @@
   }
 
   function corpo(no, dm, palavras) {
-    if (no.tipo === "gatilho") return '<div class="fe-kws">' + (palavras || []).slice(0, 6).map(function (p) { return '<span class="vc-kw">' + esc(p) + "</span>"; }).join(" ") + "</div>" +
-      '<p class="fe-mini">' + (no.posts && no.posts.length ? no.posts.length + (no.posts.length > 1 ? " posts escolhidos" : " post escolhido") : "Em todos os posts e reels") + "</p>" +
+    if (no.tipo === "gatilho") return '<div class="fe-gatcard">' + icone("mensagem") + '<p>O usuário comenta em ' + (no.posts && no.posts.length ? "um post ou reel <b>específico</b>" : "<b>qualquer</b> post ou reel") + " e o comentário inclui</p></div>" +
+      '<div class="fe-kws">' + (palavras || []).slice(0, 6).map(function (p) { return '<span class="vc-kw">' + esc(p) + "</span>"; }).join(" ") + "</div>" +
+      (no.posts && no.posts.length ? '<p class="fe-mini">' + no.posts.length + (no.posts.length > 1 ? " posts escolhidos" : " post escolhido") + "</p>" : "") +
       (no.posts && no.posts.length ? '<div class="fe-posts">' + no.posts.slice(0, 5).map(function (x) { return x.thumb ? '<img src="' + esc(x.thumb) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : "<span>▶</span>"; }).join("") + (no.posts.length > 5 ? "<span>+" + (no.posts.length - 5) + "</span>" : "") + "</div>" : "") +
       '<p class="fe-mini">Também responde o comentário: “' + esc(((no.respostas || [])[0] || "").slice(0, 70)) + "…”</p>";
     if (no.tipo === "atraso") return '<p class="fe-grande">' + (no.seg ? no.seg + " s" : "Sem espera") + "</p>";
@@ -81,11 +101,12 @@
     var t = TIPOS[no.tipo];
     return '<article class="fe-no fe-no--' + t.cor + '" data-id="' + esc(no.id) + '" style="left:' + no.x + "px;top:" + no.y + 'px">' +
       (no.tipo !== "gatilho" ? '<i class="fe-porta fe-porta--in" data-in="' + esc(no.id) + '"></i>' : "") +
-      '<header class="fe-cab"><span class="fe-tipo">' + t.nome + "</span><strong>" + esc(t.titulo) + "</strong></header>" +
+      '<header class="fe-cab">' + icone(no.tipo) + '<span><span class="fe-tipo">' + t.nome + "</span><strong>" + esc(t.titulo) + "</strong></span></header>" +
+      (no.tipo === "mensagem" ? faixa(no, dm) : "") +
       '<div class="fe-corpo">' + corpo(no, dm, palavras) + "</div>" +
       '<ul class="fe-saidas">' + saidas(no).filter(function (s) { return !/^b\d$/.test(s[0]); }).map(function (s) {
         return '<li data-saida="' + s[0] + '"><span>' + esc(s[1]) + '</span><i class="fe-porta fe-porta--out" data-de="' + esc(no.id) + '" data-saida="' + s[0] + '"></i></li>';
-      }).join("") + "</ul>" + metricas(no, dm) + "</article>";
+      }).join("") + "</ul>" + (no.tipo === "mensagem" ? "" : metricas(no, dm)) + "</article>";
   }
 
   function desenhar(camada, f, dm, palavras, editor) {
@@ -134,11 +155,11 @@
     var gat = f.nos.filter(function (n) { return n.tipo === "gatilho"; })[0] || {};
     var comLink = soma("e", function (n) { return n.tipo === "mensagem" && n.botao === "link"; });
     var tiles = [
-      ["Comentários", (fm[gat.id] || {}).p, ""], ["DMs enviadas", soma("e"), ""], ["Responderam", soma("r"), ""],
+      ["Execuções", (fm[gat.id] || {}).p, ""], ["DMs enviadas", soma("e"), ""], ["Responderam", soma("r"), ""],
       ["Receberam o link", comLink, ""], ["Cliques no link", cl.visitas, comLink ? Math.round(cl.visitas / comLink * 100) + "% de quem recebeu" : ""],
       ["Começaram o quiz", cl.quiz, ""], ["Clicaram no checkout", cl.checkout, ""]
     ];
-    $("#fx-tiles").innerHTML = tiles.map(function (t) { return '<div class="vc-tile"><span>' + t[0] + "</span><b>" + nf.format(t[1] || 0) + "</b>" + (t[2] ? "<small>" + t[2] + "</small>" : "") + "</div>"; }).join("");
+    $("#fx-tiles").innerHTML = tiles.map(function (t) { return '<div class="mc-met__card"><span>' + t[0] + "</span><b>" + nf.format(t[1] || 0) + "</b>" + (t[2] ? "<small>" + t[2] + "</small>" : "") + "</div>"; }).join("");
     $("#fx-pill").textContent = dm.ativo && d.ativo ? "ATIVA" : dm.ativo ? "AGUARDANDO" : "DESLIGADA";
     $("#fx-pill").classList.toggle("is-on", !!(dm.ativo && d.ativo));
     $("#fx-toggle").checked = !!dm.ativo;
@@ -215,14 +236,17 @@
     }
     var t = TIPOS[no.tipo], h = '<span class="fe-tipo fe-tipo--' + t.cor + '">' + t.nome + "</span><h3>" + esc(t.titulo) + "</h3>";
     if (no.tipo === "gatilho") {
-      h += '<p class="vc-muted">Palavras-chave: ' + palavras().map(esc).join(", ") + '. <a href="#comentarios" data-acao="palavras">Editar palavras</a></p>' +
-        '<div class="fe-campo"><span>Posts e reels</span>' +
+      h += '<div class="fe-passo"><span class="fe-passo__n">1</span><b>Quando alguém comenta em</b></div>' +
+        '<div class="fe-campo"><span class="vc-sr">Posts e reels</span>' +
           '<select class="vc-input" data-acao-sel="posts"><option value="todos"' + (no.posts && no.posts.length ? "" : " selected") + '>Todos os posts e reels</option><option value="escolher"' + (no.posts && no.posts.length ? " selected" : "") + ">Só os posts que eu escolher</option></select>" +
           (no.posts && no.posts.length ? '<div class="fe-posts">' + no.posts.map(function (x) { return x.thumb ? '<img src="' + esc(x.thumb) + '" alt="" title="' + esc(x.legenda || "") + '" referrerpolicy="no-referrer">' : "<span>▶</span>"; }).join("") + "</div>" : "") +
           (no.posts && no.posts.length ? '<button type="button" class="vc-btn vc-btn--ghost" data-acao="escolher-posts">Trocar posts escolhidos</button>' : "") +
-          "<small>Comentário com palavra-chave nesses posts dispara o Direct.</small></div>" +
-        campo("Resposta no comentário quando a DM sai", '<textarea class="vc-input" rows="4" data-k="respostas" data-lista="1">' + esc((no.respostas || []).join("\n")) + "</textarea>", "Uma por linha. Uma é sorteada.") +
-        campo("Resposta no comentário quando a DM não sai", '<textarea class="vc-input" rows="4" data-k="falhou" data-lista="1">' + esc((no.falhou || []).join("\n")) + "</textarea>", "Uma por linha.");
+          "</div>" +
+        '<div class="fe-passo"><span class="fe-passo__n">2</span><b>E o comentário</b></div>' +
+        '<div class="fe-caixa"><p class="vc-muted">contém estas palavras-chave:</p><div class="fe-kws">' + palavras().map(function (p) { return '<span class="mc-chip">' + esc(p) + "</span>"; }).join("") + '</div><a href="#comentarios" data-acao="palavras">Editar palavras-chave</a></div>' +
+        '<div class="fe-passo"><span class="fe-passo__n">3</span><b>Responder também ao comentário</b></div>' +
+        campo("Quando a DM sai", '<textarea class="vc-input" rows="4" data-k="respostas" data-lista="1">' + esc((no.respostas || []).join("\n")) + "</textarea>", "Uma por linha. Uma é sorteada.") +
+        campo("Quando a DM não sai (ou passou da trava do dia)", '<textarea class="vc-input" rows="4" data-k="falhou" data-lista="1">' + esc((no.falhou || []).join("\n")) + "</textarea>", "Uma por linha.");
     } else if (no.tipo === "atraso") {
       h += campo("Segundos de espera (0 a 60)", '<input class="vc-input" type="number" min="0" max="60" data-k="seg" value="' + (no.seg || 0) + '">');
     } else if (no.tipo === "segue") {
