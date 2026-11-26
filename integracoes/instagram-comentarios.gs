@@ -131,11 +131,14 @@ function igRodada_(props, token) {
         // Direct: só em posts publicados depois de ligar, dentro dos limites
         let direct = '';
         const postNovo = igFxPostOk_(m, dm);
-        if (dm.ativo && postNovo) igMet_(props, 'g');
-        if (dm.ativo && postNovo && dmRodada < dm.porRodada && igDmConta_(props) < dm.porDia) {
+        const noDirect = dm.ativo && postNovo;
+        if (noDirect && dmRodada >= dm.porRodada) { completo = false; continue; } // passou de 2 DMs no minuto: fica para a próxima rodada
+        if (noDirect) igMet_(props, 'g');
+        if (noDirect && igDmConta_(props) >= dm.porDia) direct = 'limite do dia';
+        else if (noDirect) {
           try {
             direct = igDmPrimeira_(eu, c, quem, dm, token, props);
-            dmRodada++; igDmSomar_(props);
+            dmRodada++; // a contagem do dia já é somada em cada mensagem enviada pelo fluxo
           } catch (e) {
             direct = 'erro: ' + String(e.message || e).slice(0, 250);
             igMet_(props, 'f');
@@ -143,7 +146,8 @@ function igRodada_(props, token) {
           }
         }
         const fxT = igFxTextos_(dm);
-        const lista = /^erro/.test(direct) ? fxT.falhou : direct ? fxT.respostas : IG.respostas;
+        // No Direct: DM saiu → "olha o direct"; não saiu (erro, trava do dia) → "não consegui, tá no link da bio"
+        const lista = !noDirect ? IG.respostas : direct === 'enviado' ? fxT.respostas : fxT.falhou;
         const texto = lista[Math.floor(Math.random() * lista.length)];
         let status = 'ok';
         try {
