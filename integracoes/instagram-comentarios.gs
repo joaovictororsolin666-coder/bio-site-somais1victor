@@ -318,6 +318,18 @@ function igAutoAcao_(p, props) {
   if (p.op === 'criar') return igAutoCriar_(String(p.nome || '').trim().slice(0, 60));
   const a = autos.filter(function (x) { return x.id === p.auto; })[0];
   if (!a) throw new Error('auto_inexistente');
+  if (p.op === 'duplicar') {
+    if (autos.length >= 10) throw new Error('limite_autos');
+    let n = autos.length + 1;
+    while (autos.some(function (x) { return x.id === 'a' + n; })) n++;
+    const id = 'a' + n, troca = {}, c = JSON.parse(JSON.stringify(a));
+    c.fluxo.nos.forEach(function (no, i) { troca[no.id] = id + 'n' + i; no.id = troca[no.id]; }); // ids novos: métricas e cliques separados
+    c.fluxo.ligas.forEach(function (l) { l.de = troca[l.de]; l.para = troca[l.para]; });
+    c.id = id; c.nome = (a.nome + ' (cópia)').slice(0, 60); c.ativo = false; // a cópia nasce pausada
+    autos.push(c);
+    igAutosSalvar_(autos);
+    return id;
+  }
   if (p.op === 'renomear') {
     const n = String(p.nome || '').trim().slice(0, 60);
     if (n) a.nome = n;
@@ -603,13 +615,16 @@ function igAutosSalvar_(autos) {
 // Automação ligada que atende o comentário: as com posts escolhidos vêm antes das que valem para todos os posts
 function igAutoPara_(m, texto, dm) {
   if (!dm.ativo) return null;
-  const esp = [], ger = [];
-  igAutos_().forEach(function (a) {
-    if (!a.ativo) return;
+  // Ordem: posts escolhidos primeiro; depois a com menos palavras-chave (mais específica: "claude" ganha de uma lista geral)
+  const peso = function (a) {
     const g = igGat_(a.fluxo);
-    (g.posts && g.posts.length ? esp : ger).push(a);
-  });
-  return esp.concat(ger).filter(function (a) {
+    return (g.posts && g.posts.length ? 0 : 1000) + (g.palavras && g.palavras.length ? g.palavras.length : 500);
+  };
+  const lista = igAutos_().filter(function (a) { return a.ativo; })
+    .map(function (a, i) { return { a: a, i: i, p: peso(a) }; })
+    .sort(function (x, y) { return x.p - y.p || x.i - y.i; })
+    .map(function (x) { return x.a; });
+  return lista.filter(function (a) {
     const g = igGat_(a.fluxo);
     const postOk = g.posts && g.posts.length ? g.posts.some(function (x) { return x.id === m.id; })
       : !!m.timestamp && new Date(m.timestamp).getTime() >= Number(dm.desde || 0);
@@ -715,7 +730,26 @@ function igFxMetSoma_(props, dias) {
   return soma;
 }
 
-function igFxMsg_(no) {
+// Primeiro nome da pessoa (perfil do Instagram). '' quando a API não informa.
+function igNome_(igsid, token) {
+  if (!igsid) return '';
+  try {
+    const r = igGet_('/' + igsid, { fields: 'name' }, token);
+    const p = String(r.name || '').trim().split(/\s+/)[0].replace(/[^\p{L}'-]/gu, '');
+    return p.length > 1 && p.length <= 20 ? p.charAt(0).toUpperCase() + p.slice(1).toLowerCase() : '';
+  } catch (e) { return ''; }
+}
+// {nome} no texto vira o primeiro nome; sem nome some com a vírgula/espaço ("Oi {nome}!" → "Oi!")
+function igComNome_(t, nome) {
+  t = String(t || '');
+  if (t.indexOf('{nome}') < 0) return t;
+  if (nome) return t.split('{nome}').join(nome);
+  t = t.replace(/(^|\n)\{nome\}[,!]?[ \t]*/g, '$1').replace(/[ \t]*\{nome\}/g, '');
+  return t.replace(/(^|\n)(\S)/g, function (m, a, b) { return a + b.toUpperCase(); });
+}
+
+function igFxMsg_(no, nome) {
+  no = Object.assign({}, no, { texto: igComNome_(no.texto, nome) });
   const links = (no.links && no.links.length) ? no.links : (no.link && no.link.url ? [no.link] : []);
   if (no.botao === 'link' && links.length) {
     return { attachment: { type: 'template', payload: { template_type: 'button', text: no.texto.slice(0, 640),
@@ -758,7 +792,8 @@ function igFxRodar_(ctx, inicio) {
     if (igDmConta_(ctx.props) >= igDm_().porDia) { igFxEsperar_(ctx, id, 'antes'); return mandou ? 'enviado' : ''; }
     const rec = ctx.comentario ? { comment_id: ctx.comentario } : { id: ctx.igsid };
     let r;
-    try { r = igMandar_(ctx.eu, rec, igFxMsg_(no), ctx.token); }
+    if (ctx.nome == null && String(no.texto || '').indexOf('{nome}') > -1) ctx.nome = igNome_(ctx.igsid, ctx.token);
+    try { r = igMandar_(ctx.eu, rec, igFxMsg_(no, ctx.nome), ctx.token); }
     catch (e) { igFxMet_(ctx.props, id, 'f'); throw e; }
     igFxMet_(ctx.props, id, 'e'); igDmSomar_(ctx.props); mandou = true;
     igDmRegistrar_(ctx.props, ctx.quem, 'recebeu "' + no.texto.slice(0, 40) + '"');
@@ -772,7 +807,7 @@ function igFxRodar_(ctx, inicio) {
 
 function igFxEsperar_(ctx, no, modo) {
   if (!ctx.igsid) return;
-  igPendente_(ctx.props, ctx.igsid, { u: ctx.quem, t: Date.now(), no: no, m: modo, v: ctx.v });
+  igPendente_(ctx.props, ctx.igsid, { u: ctx.quem, t: Date.now(), no: no, m: modo, v: ctx.v, n: ctx.nome });
 }
 
 // 1ª DM a partir do comentário (chamada pela rodada)
@@ -812,7 +847,7 @@ function igDmPendentes_(eu, token, props) {
       igFxMet_(props, no.id, 'b' + i);
       inicio = igFxProx_(f, no.id, 'b' + i);
     } else if (no) inicio = igFxProx_(f, no.id, 'prox');
-    const ctx = { eu: eu, token: token, props: props, f: f, igsid: igsid, quem: p.u, comentario: '', aberta: true, v: p.v || {} };
+    const ctx = { eu: eu, token: token, props: props, f: f, igsid: igsid, quem: p.u, comentario: '', aberta: true, v: p.v || {}, nome: p.n };
     igPendente_(props, igsid, null);
     try {
       if (inicio) igFxRodar_(ctx, inicio);

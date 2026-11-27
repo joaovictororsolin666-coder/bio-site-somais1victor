@@ -164,6 +164,7 @@
     var on = VC.autoLigada(auto);
     $("#fx-nome").textContent = auto.nome;
     $("#fx-apagar").hidden = !!auto.velho || VC.autos().length < 2;
+    $("#fx-duplicar").hidden = !!auto.velho;
     $("#fx-renomear").hidden = !!auto.velho;
     $("#fx-pill").textContent = on ? "ATIVA" : "PAUSADA";
     $("#fx-pill").classList.toggle("is-on", on);
@@ -261,7 +262,7 @@
       h += '<p class="vc-muted">O fluxo para aqui e continua quando a pessoa mandar qualquer mensagem no Direct, em até 24 h.</p>';
     } else {
       var resp = no.respostas || [];
-      h += campo("Texto da mensagem", '<textarea class="vc-input" rows="5" maxlength="900" data-k="texto">' + esc(no.texto || "") + "</textarea>") +
+      h += campo("Texto da mensagem", '<textarea class="vc-input" rows="5" maxlength="900" data-k="texto">' + esc(no.texto || "") + "</textarea>", "Escreva {nome} para chamar a pessoa pelo primeiro nome. Se o Instagram não informar o nome, ele some do texto.") +
         campo("Botão", '<select class="vc-input" data-k="botao"><option value="nenhum"' + (no.botao === "nenhum" ? " selected" : "") + '>Sem botão</option><option value="link"' + (no.botao === "link" ? " selected" : "") + '>Botão com link</option><option value="respostas"' + (no.botao === "respostas" ? " selected" : "") + ">Botões de resposta</option></select>");
       if (no.botao === "link") {
         no.links = linksDe(no).slice();
@@ -537,6 +538,10 @@
   $("#fx-renomear").addEventListener("click", function () {
     var a = VC.autoAtual(), n = a && prompt("Nome da automação", a.nome);
     if (n && n.trim()) VC.acaoAuto({ op: "renomear", auto: a.id, nome: n.trim().slice(0, 60) });
+  });
+  $("#fx-duplicar").addEventListener("click", function () {
+    var a = VC.autoAtual();
+    if (a) VC.acaoAuto({ op: "duplicar", auto: a.id }).then(function (r) { if (r) { VC.state.auto = r.autoId; render(); VC.aviso("Cópia criada (pausada). Troque as palavras-chave e as mensagens."); } });
   });
   $("#fx-apagar").addEventListener("click", function () {
     var a = VC.autoAtual();

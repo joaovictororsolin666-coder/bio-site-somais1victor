@@ -490,6 +490,7 @@
         r0 = nid;
       } else if (params.op === "renomear") { ax.nome = params.nome; r0 = ax.id; }
       else if (params.op === "apagar") { da.splice(da.indexOf(ax), 1); r0 = ax.id; }
+      else if (params.op === "duplicar") { var cp = JSON.parse(JSON.stringify(ax)), did = "a" + (da.length + 1), tr = {}; cp.fluxo.nos.forEach(function (n, i) { tr[n.id] = did + "n" + i; n.id = tr[n.id]; }); cp.fluxo.ligas.forEach(function (l) { l.de = tr[l.de]; l.para = tr[l.para]; }); cp.id = did; cp.nome = ax.nome + " (cópia)"; cp.ativo = false; da.push(cp); r0 = did; }
       else if (params.op === "ativar") { ax.ativo = params.ativo === "1"; if (ax.ativo) { demoDados.ativo = true; demoDados.dm.ativo = true; } r0 = ax.id; }
       var copiaR = JSON.parse(JSON.stringify(demoDados)); copiaR.autoId = r0; return copiaR;
     }
