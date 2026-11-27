@@ -66,14 +66,30 @@
     <!-- ─────────── Ofertas ─────────── -->
     <section class="offers" aria-label="Como posso te ajudar">
 
-      <!-- Card 01 — Método Primeira Venda: só o banner (o banner inteiro é o link) + botão "Quero começar" por cima (23/11).
-           O link vem de assets/js/config.js → links.metodoPrimeiraRenda. Para trocar a arte: mpv-titulo-800/1200.webp -->
-      <a class="bn bn--mpv-banner reveal" style="--i:4" href="#" data-link="metodoPrimeiraRenda" data-track="mprClick" data-clique="mpr"
-         aria-label="Método Primeira Venda: aprenda a ganhar dinheiro com vídeos curtos e vender produtos digitais, sem precisar aparecer e só com o celular">
-        <img src="assets/img/mpv-titulo-1200.webp" srcset="assets/img/mpv-titulo-800.webp 800w, assets/img/mpv-titulo-1200.webp 1200w"
-             sizes="(min-width: 900px) 520px, calc(100vw - 34px)" alt="" width="1200" height="504" fetchpriority="high" decoding="async">
-        <span class="bn__btn" aria-hidden="true">Quero começar <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-      </a>
+      <!-- Card 01 — Método Primeira Venda: banner + título + texto + botão embaixo (modelo de card, de volta em 26/11).
+           A versão só-banner com o botão por cima (23/11) usava mpv-titulo-800/1200.webp e a classe .bn--mpv-banner -->
+      <article class="card card--featured reveal" style="--i:4" data-card>
+        <div class="card__media">
+          <!-- Banner: proporção 1200×504. Para trocar, substitua mpv-800.webp e mpv-1200.webp -->
+          <img src="assets/img/mpv-1200.webp"
+               srcset="assets/img/mpv-800.webp 800w, assets/img/mpv-1200.webp 1200w"
+               sizes="(min-width: 900px) 520px, calc(100vw - 34px)"
+               alt="Método Primeira Venda: aprenda a vender produtos na internet usando vídeos simples, sem precisar aparecer"
+               width="1200" height="504" fetchpriority="high" decoding="async">
+        </div>
+
+        <div class="card__body">
+          <h2 class="card__title">Método Primeira Venda</h2>
+          <p class="card__desc card__desc--lead">Aprenda a <strong>ganhar dinheiro com vídeos curtos</strong> e vender produtos digitais, <strong>sem precisar aparecer</strong> e só com o celular.</p>
+          <div class="card__cta">
+            <!-- O link é definido em assets/js/config.js → links.metodoPrimeiraRenda -->
+            <a class="btn btn--primary" href="#" data-link="metodoPrimeiraRenda" data-track="mprClick" data-clique="mpr" data-card-action>
+              <span class="btn__label">QUERO COMEÇAR A LUCRAR</span>
+              <svg class="btn__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
 
       <!-- Card EditFlow AI: só o banner (o banner inteiro é o link) + seta. Página: /editflow
            Fora da bio desde 26/11 (o EditFlow vai só pelo Direct): para voltar, tire o atributo hidden -->
