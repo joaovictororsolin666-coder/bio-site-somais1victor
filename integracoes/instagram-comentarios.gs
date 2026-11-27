@@ -125,19 +125,19 @@ function igRodada_(props, token) {
         const quem = (c.from && c.from.username) || c.username || '';
         if (!quem || quem === eu.username) continue;                 // comentário meu
         if (feitos.ids[c.id] || feitos.pessoas[m.id + '|' + quem]) continue; // já respondido
-        if (!igTemPalavra_(c.text)) continue;
+        const auto = igAutoPara_(m, c.text, dm); // automação de Direct que atende esse comentário (ou nenhuma)
+        if (!auto && !igTemPalavra_(c.text)) continue;
         if ((c.replies && c.replies.data || []).some(function (r) { return r.username === eu.username; })) continue; // já respondi na mão
 
-        // Direct: só em posts publicados depois de ligar, dentro dos limites
+        // Direct: só quando alguma automação ligada atende o post e a palavra, dentro dos limites
         let direct = '';
-        const postNovo = igFxPostOk_(m, dm);
-        const noDirect = dm.ativo && postNovo;
+        const noDirect = !!auto;
         if (noDirect && dmRodada >= dm.porRodada) { completo = false; continue; } // passou de 2 DMs no minuto: fica para a próxima rodada
         if (noDirect) igMet_(props, 'g');
         if (noDirect && igDmConta_(props) >= dm.porDia) direct = 'limite do dia';
         else if (noDirect) {
           try {
-            direct = igDmPrimeira_(eu, c, quem, dm, token, props);
+            direct = igDmPrimeira_(eu, c, quem, auto, token, props);
             dmRodada++; // a contagem do dia já é somada em cada mensagem enviada pelo fluxo
           } catch (e) {
             direct = 'erro: ' + String(e.message || e).slice(0, 250);
@@ -145,7 +145,7 @@ function igRodada_(props, token) {
             if (igErroGeral_(e)) { igDmFalhou_(props, direct); dm.ativo = false; } // token, permissão ou bloqueio: desliga
           }
         }
-        const fxT = igFxTextos_(dm);
+        const fxT = igFxTextos_(dm, auto);
         // No Direct: DM saiu → "olha o direct"; não saiu (erro, trava do dia) → "não consegui, tá no link da bio"
         const lista = !noDirect ? IG.respostas : direct === 'enviado' ? fxT.respostas : fxT.falhou;
         const texto = lista[Math.floor(Math.random() * lista.length)];
@@ -250,8 +250,15 @@ function vicchat_(p) {
         thumb: m.thumbnail_url || (m.media_type === 'VIDEO' ? '' : m.media_url) || '', data: m.timestamp, comentarios: m.comments_count || 0 };
     }) });
   } else if (p.action === 'vicchat_fluxo') {
-    try { igFxSalvar_(JSON.parse(p.fluxo || '{}')); }
-    catch (e) { return json_({ ok: false, error: String(e.message || e) === 'fluxo_sem_gatilho' ? 'fluxo_sem_gatilho' : 'fluxo_invalido' }); }
+    try { igFxSalvar_(p.auto || 'a1', JSON.parse(p.fluxo || '{}'), String(p.nome || '').trim().slice(0, 60)); }
+    catch (e) { const m = String(e.message || e); return json_({ ok: false, error: /^(fluxo_sem_gatilho|fluxo_grande|fluxo_ids)$/.test(m) ? m : 'fluxo_invalido' }); }
+  } else if (p.action === 'vicchat_auto') {
+    let id;
+    try { id = igAutoAcao_(p, props); }
+    catch (e) { return json_({ ok: false, error: String(e.message || e).slice(0, 60) }); }
+    const res = igResumo_(props, Math.max(1, Math.min(30, parseInt(p.dias, 10) || 7)));
+    res.autoId = id;
+    return json_(res);
   } else if (p.action === 'vicchat_dm') {
     const dm = igDm_();
     if (p.ativo === '1' && !dm.ativo) { dm.desde = Date.now(); props.deleteProperty('IG_DM_ERRO'); }
@@ -271,10 +278,7 @@ function vicchat_(p) {
         if (l.length) dm[k] = l;
       });
     }
-    const salvar = {};
-    ['ativo', 'desde', 'texto', 'botao', 'link', 'abrir', 'abrirBotao', 'seguir', 'aindaNao', 'seguiBotao', 'tentativas', 'atraso', 'respostas', 'falhou']
-      .forEach(function (k) { salvar[k] = dm[k]; });
-    props.setProperty('IG_DM', JSON.stringify(salvar));
+    igDmGuardar_(props, dm);
   } else if (p.action === 'vicchat_config') {
     let c;
     try { c = JSON.parse(p.config || '{}'); } catch (e) { return json_({ ok: false, error: 'config_invalida' }); }
@@ -299,6 +303,57 @@ function vicchat_(p) {
     igAplicarConfig_();
   }
   return json_(igResumo_(props, Math.max(1, Math.min(30, parseInt(p.dias, 10) || 7))));
+}
+
+function igDmGuardar_(props, dm) {
+  const salvar = {};
+  ['ativo', 'desde', 'texto', 'botao', 'link', 'abrir', 'abrirBotao', 'seguir', 'aindaNao', 'seguiBotao', 'tentativas', 'atraso', 'respostas', 'falhou']
+    .forEach(function (k) { salvar[k] = dm[k]; });
+  props.setProperty('IG_DM', JSON.stringify(salvar));
+}
+
+// Criar, renomear, ligar/pausar e apagar automações (cada uma tem o seu fluxo, posts e palavras)
+function igAutoAcao_(p, props) {
+  const autos = igAutos_();
+  if (p.op === 'criar') return igAutoCriar_(String(p.nome || '').trim().slice(0, 60));
+  const a = autos.filter(function (x) { return x.id === p.auto; })[0];
+  if (!a) throw new Error('auto_inexistente');
+  if (p.op === 'renomear') {
+    const n = String(p.nome || '').trim().slice(0, 60);
+    if (n) a.nome = n;
+  } else if (p.op === 'apagar') {
+    if (autos.length < 2) throw new Error('ultima_auto');
+    autos.splice(autos.indexOf(a), 1);
+  } else if (p.op === 'ativar') {
+    a.ativo = p.ativo === '1';
+    if (a.ativo) {
+      // ligar uma automação religa a rodada e o Direct (sem mexer em "desde": vale para todos os posts)
+      if (props.getProperty('IG_ATIVO') === '0') { props.setProperty('IG_ATIVO', '1'); props.setProperty('IG_DESDE', String(Date.now())); }
+      const dm = igDm_();
+      if (!dm.ativo) { dm.ativo = true; props.deleteProperty('IG_DM_ERRO'); igDmGuardar_(props, dm); }
+    } else if (!autos.some(function (x) { return x.ativo; })) props.setProperty('IG_ATIVO', '0'); // nenhuma ligada: pausa tudo
+  } else throw new Error('op_invalida');
+  igAutosSalvar_(autos);
+  return a.id;
+}
+
+function igAutoCriar_(nome) {
+  const autos = igAutos_();
+  if (autos.length >= 10) throw new Error('limite_autos');
+  let n = autos.length + 1;
+  while (autos.some(function (a) { return a.id === 'a' + n; })) n++;
+  const id = 'a' + n, dm = igDm_();
+  // Começa pausada: a pessoa escolhe os posts e as palavras antes de ligar
+  autos.push({ id: id, nome: nome || 'Nova automação', ativo: false, fluxo: {
+    nos: [
+      { id: id + 'g', tipo: 'gatilho', x: 40, y: 220, respostas: dm.respostas, falhou: dm.falhou, posts: [], palavras: [] },
+      { id: id + 'm1', tipo: 'mensagem', x: 400, y: 200, texto: 'Oi! Aqui está o link que você pediu ↓', botao: 'link', respostas: [],
+        links: [{ titulo: 'Acessar', url: dm.link }], estilo: 'botao' }
+    ],
+    ligas: [{ de: id + 'g', saida: 'prox', para: id + 'm1' }]
+  } });
+  igAutosSalvar_(autos);
+  return id;
 }
 
 function igResumo_(props, dias) {
@@ -346,7 +401,7 @@ function igResumo_(props, dias) {
         seguir: dm.seguir, aindaNao: dm.aindaNao, seguiBotao: dm.seguiBotao, tentativas: dm.tentativas, atraso: dm.atraso,
         respostas: dm.respostas, falhou: dm.falhou, porDia: dm.porDia, porRodada: dm.porRodada,
         hoje: igDmConta_(props), total: dmTotal, dias: dias, met: igMetSoma_(props, dias), cliques: cliques,
-        fluxo: igFluxo_(), fxMet: igFxMetSoma_(props, dias),
+        fluxo: igFluxo_(), autos: igAutos_(), fxMet: igFxMetSoma_(props, dias),
         esperando: Object.keys(igPendentes_(props)).length, ultimos: JSON.parse(props.getProperty('IG_DM_ULT') || '[]').slice(0, 10),
         erro: props.getProperty('IG_DM_ERRO') || '' };
     })(),
@@ -520,14 +575,46 @@ function igFxPadrao_() {
   };
 }
 
-// Fluxo salvo (lido uma vez por execução)
+// Automações salvas (lidas uma vez por execução): [{ id, nome, ativo, fluxo: { nos, ligas } }]
+// Formato antigo (um fluxo só) vira a automação a1. Os ids dos blocos são únicos entre todas.
+const IG_FX_NOME = '[COMENTÁRIO → DIRECT] Links por DM';
 let IG_FX_CACHE = null;
-function igFluxo_() {
+function igAutos_() {
   if (IG_FX_CACHE) return IG_FX_CACHE;
   const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(IG_FX_ABA);
   const txt = sh ? String(sh.getRange(2, 1).getValue() || '') : '';
-  try { IG_FX_CACHE = txt ? JSON.parse(txt) : igFxPadrao_(); } catch (e) { IG_FX_CACHE = igFxPadrao_(); }
+  let d = null;
+  try { d = txt ? JSON.parse(txt) : null; } catch (e) { d = null; }
+  if (d && Array.isArray(d.autos) && d.autos.length) IG_FX_CACHE = d.autos;
+  else IG_FX_CACHE = [{ id: 'a1', nome: IG_FX_NOME, ativo: true, fluxo: d && Array.isArray(d.nos) ? d : igFxPadrao_() }];
   return IG_FX_CACHE;
+}
+function igFluxo_() { return igAutos_()[0].fluxo; } // a primeira (compatibilidade com o painel antigo)
+function igGat_(f) { return f.nos.filter(function (n) { return n.tipo === 'gatilho'; })[0] || {}; }
+function igAutoDoNo_(no) { return igAutos_().filter(function (a) { return a.fluxo.nos.some(function (n) { return n.id === no; }); })[0]; }
+function igAutosSalvar_(autos) {
+  const txt = JSON.stringify({ autos: autos });
+  if (txt.length > 49000) throw new Error('fluxo_grande'); // limite de uma célula da planilha
+  const sh = getSheet_(IG_FX_ABA, ['automações (editadas pelo /vicchat)']);
+  sh.getRange(2, 1).setValue(txt);
+  IG_FX_CACHE = autos;
+}
+
+// Automação ligada que atende o comentário: as com posts escolhidos vêm antes das que valem para todos os posts
+function igAutoPara_(m, texto, dm) {
+  if (!dm.ativo) return null;
+  const esp = [], ger = [];
+  igAutos_().forEach(function (a) {
+    if (!a.ativo) return;
+    const g = igGat_(a.fluxo);
+    (g.posts && g.posts.length ? esp : ger).push(a);
+  });
+  return esp.concat(ger).filter(function (a) {
+    const g = igGat_(a.fluxo);
+    const postOk = g.posts && g.posts.length ? g.posts.some(function (x) { return x.id === m.id; })
+      : !!m.timestamp && new Date(m.timestamp).getTime() >= Number(dm.desde || 0);
+    return postOk && igTemPalavra_(texto, g.palavras && g.palavras.length ? g.palavras : null);
+  })[0] || null;
 }
 
 // Valida e limpa o fluxo vindo do editor
@@ -543,6 +630,10 @@ function igFxLimpar_(f) {
       if (n.tipo === 'gatilho') {
         o.respostas = (n.respostas || []).map(function (s) { return txt(s, 300); }).filter(Boolean).slice(0, 10);
         o.falhou = (n.falhou || []).map(function (s) { return txt(s, 300); }).filter(Boolean).slice(0, 10);
+        // Palavras-chave só desta automação (vazio = usa as palavras gerais)
+        o.palavras = (Array.isArray(n.palavras) ? n.palavras : []).map(function (s) {
+          return txt(s, 60).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+        }).filter(Boolean).slice(0, 30);
         if (Array.isArray(n.posts)) {
           o.posts = n.posts.filter(function (x) { return x && /^[0-9]{5,30}$/.test(String(x.id)); }).slice(0, 40).map(function (x) {
             return { id: String(x.id), permalink: /^https:\/\/www\.instagram\.com\//.test(x.permalink || '') ? txt(x.permalink, 200) : '',
@@ -574,19 +665,18 @@ function igFxLimpar_(f) {
   return { nos: nos, ligas: ligas };
 }
 
-function igFxSalvar_(f) {
+function igFxSalvar_(id, f, nome) {
   const limpo = igFxLimpar_(f);
-  const sh = getSheet_(IG_FX_ABA, ['fluxo (editado pelo /vicchat)']);
-  sh.getRange(2, 1).setValue(JSON.stringify(limpo));
-  IG_FX_CACHE = limpo;
+  const autos = igAutos_();
+  const a = autos.filter(function (x) { return x.id === id; })[0];
+  if (!a) throw new Error('fluxo_invalido');
+  const outros = {};
+  autos.forEach(function (x) { if (x !== a) x.fluxo.nos.forEach(function (n) { outros[n.id] = true; }); });
+  if (limpo.nos.some(function (n) { return outros[n.id]; })) throw new Error('fluxo_ids'); // métricas e cliques são por id do bloco
+  a.fluxo = limpo;
+  if (nome) a.nome = nome;
+  igAutosSalvar_(autos);
   return limpo;
-}
-
-// O post entra no Direct? Com posts escolhidos no gatilho, só eles; senão, todos publicados depois de `desde`
-function igFxPostOk_(m, dm) {
-  const g = igFluxo_().nos.filter(function (n) { return n.tipo === 'gatilho'; })[0] || {};
-  if (g.posts && g.posts.length) return g.posts.some(function (x) { return x.id === m.id; });
-  return !!m.timestamp && new Date(m.timestamp).getTime() >= Number(dm.desde || 0);
 }
 
 function igFxNo_(f, id) { return f.nos.filter(function (n) { return n.id === id; })[0]; }
@@ -595,8 +685,8 @@ function igFxProx_(f, id, saida) {
   return l ? l.para : '';
 }
 // Textos da resposta pública no comentário (ficam no bloco gatilho)
-function igFxTextos_(dm) {
-  const g = igFluxo_().nos.filter(function (n) { return n.tipo === 'gatilho'; })[0] || {};
+function igFxTextos_(dm, auto) {
+  const g = igGat_(auto ? auto.fluxo : igFluxo_());
   return { respostas: (g.respostas && g.respostas.length) ? g.respostas : dm.respostas, falhou: (g.falhou && g.falhou.length) ? g.falhou : dm.falhou };
 }
 
@@ -686,23 +776,24 @@ function igFxEsperar_(ctx, no, modo) {
 }
 
 // 1ª DM a partir do comentário (chamada pela rodada)
-function igDmPrimeira_(eu, c, quem, dm, token, props) {
-  const ctx = { eu: eu, token: token, props: props, f: igFluxo_(), igsid: c.from && c.from.id, quem: quem, comentario: c.id, aberta: false, v: {} };
-  const g = ctx.f.nos.filter(function (n) { return n.tipo === 'gatilho'; })[0];
-  return igFxRodar_(ctx, g.id);
+function igDmPrimeira_(eu, c, quem, auto, token, props) {
+  const ctx = { eu: eu, token: token, props: props, f: auto.fluxo, igsid: c.from && c.from.id, quem: quem, comentario: c.id, aberta: false, v: {} };
+  return igFxRodar_(ctx, igGat_(ctx.f).id);
 }
 
 // A cada rodada: quem respondeu no Direct continua o fluxo de onde parou
 function igDmPendentes_(eu, token, props) {
   const dm = igDm_();
   if (!dm.ativo) return;
-  const f = igFluxo_();
   const lista = igPendentes_(props);
   const ids = Object.keys(lista).slice(0, 10);
   for (const igsid of ids) {
     if (igDmConta_(props) >= dm.porDia) return;
     const p = lista[igsid];
-    if (!p.no) { igPendente_(props, igsid, null); continue; } // formato antigo
+    const auto = p.no && igAutoDoNo_(p.no);
+    if (!auto) { igPendente_(props, igsid, null); continue; } // formato antigo ou automação apagada
+    if (!auto.ativo) continue; // automação pausada: espera (some sozinho depois de 24 h)
+    const f = auto.fluxo;
     const conv = igGet_(igMe_(eu, 'conversations'), { platform: 'instagram', user_id: igsid,
       fields: 'messages.limit(5){from,created_time,message}' }, token).data || [];
     const msgs = ((conv[0] && conv[0].messages && conv[0].messages.data) || []).filter(function (m) {
@@ -751,14 +842,15 @@ function igComentarios_(mediaId, desde, token) {
 }
 
 // Palavras curtas (até 3 letras, como "ia" ou "clt") só valem inteiras: "bom dia" não dispara "ia"
-function igTemPalavra_(texto) {
+// `palavras` opcional: as da automação (senão, as palavras gerais). A lista de ignorar vale sempre.
+function igTemPalavra_(texto, palavras) {
   const t = String(texto || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const tem = function (p) {
     if (p.length > 3) return t.indexOf(p) > -1;
     return new RegExp('(^|[^a-z0-9])' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z0-9]|$)').test(t);
   };
   if (IG.ignorar.some(tem)) return false;
-  return IG.palavras.some(tem);
+  return (palavras || IG.palavras).some(tem);
 }
 
 function igLog_() {
@@ -865,9 +957,10 @@ function igPosts_(token) {
     return f && !posts.some(function (m) { return m.id === f.id; });
   });
   try {
-    const g = igFluxo_().nos.filter(function (n) { return n.tipo === 'gatilho'; })[0] || {};
-    if (igDm_().ativo) (g.posts || []).forEach(function (x) {
-      if (!posts.some(function (m) { return m.id === x.id; }) && !fixos.some(function (f) { return f.id === x.id; })) fixos.push({ id: x.id, permalink: x.permalink });
+    if (igDm_().ativo) igAutos_().forEach(function (a) {
+      if (a.ativo) (igGat_(a.fluxo).posts || []).forEach(function (x) {
+        if (!posts.some(function (m) { return m.id === x.id; }) && !fixos.some(function (f) { return f.id === x.id; })) fixos.push({ id: x.id, permalink: x.permalink });
+      });
     });
   } catch (e) { /* fluxo indisponível */ }
   if (fixos.length) {

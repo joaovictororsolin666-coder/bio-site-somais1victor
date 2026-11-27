@@ -76,7 +76,7 @@
 
   function corpo(no, dm, palavras) {
     if (no.tipo === "gatilho") return '<div class="fe-gatcard">' + icone("mensagem") + '<p>O usuário comenta em ' + (no.posts && no.posts.length ? "um post ou reel <b>específico</b>" : "<b>qualquer</b> post ou reel") + " e o comentário inclui</p></div>" +
-      '<div class="fe-kws">' + (palavras || []).slice(0, 6).map(function (p) { return '<span class="vc-kw">' + esc(p) + "</span>"; }).join(" ") + "</div>" +
+      '<div class="fe-kws">' + (no.palavras && no.palavras.length ? no.palavras : palavras || []).slice(0, 6).map(function (p) { return '<span class="vc-kw">' + esc(p) + "</span>"; }).join(" ") + "</div>" +
       (no.posts && no.posts.length ? '<p class="fe-mini">' + no.posts.length + (no.posts.length > 1 ? " posts escolhidos" : " post escolhido") + "</p>" : "") +
       (no.posts && no.posts.length ? '<div class="fe-posts">' + no.posts.slice(0, 5).map(function (x) { return x.thumb ? '<img src="' + esc(x.thumb) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : "<span>▶</span>"; }).join("") + (no.posts.length > 5 ? "<span>+" + (no.posts.length - 5) + "</span>" : "") + "</div>" : "") +
       '<p class="fe-mini">Também responde o comentário: “' + esc(((no.respostas || [])[0] || "").slice(0, 70)) + "…”</p>";
@@ -144,14 +144,15 @@
 
   function render() {
     var d = VC.state.dados;
-    var temFluxo = d && d.dm && d.dm.fluxo;
-    $("#fx-sem").hidden = !(d && d.dm && !temFluxo);
-    if (!temFluxo) return;
-    var dm = d.dm, fm = dm.fxMet || {}, f = dm.fluxo, soma = function (k, filtro) {
+    var auto = d && d.dm && VC.autoAtual();
+    $("#fx-sem").hidden = !(d && d.dm && !auto);
+    if (!auto) return;
+    var dm = d.dm, fm = dm.fxMet || {}, f = auto.fluxo, ids = {}, soma = function (k, filtro) {
       return f.nos.filter(filtro || function () { return true; }).reduce(function (t, n) { return t + (((fm[n.id] || {})[k]) || 0); }, 0);
     };
     var cl = { visitas: 0, quiz: 0, checkout: 0 };
-    Object.keys(dm.cliques || {}).forEach(function (k) { if (/^fx_|^link_/.test(k)) { var o = dm.cliques[k]; cl.visitas += o.visitas; cl.quiz += o.quiz; cl.checkout += o.checkout; } });
+    f.nos.forEach(function (n) { ids[n.id] = true; });
+    Object.keys(dm.cliques || {}).forEach(function (k) { var mm = k.match(/^fx_(.+?)(_\d+)?$/); if (mm ? ids[mm[1]] : auto.id === "a1" && /^link_/.test(k)) { var o = dm.cliques[k]; cl.visitas += o.visitas; cl.quiz += o.quiz; cl.checkout += o.checkout; } });
     var gat = f.nos.filter(function (n) { return n.tipo === "gatilho"; })[0] || {};
     var comLink = soma("e", function (n) { return n.tipo === "mensagem" && n.botao === "link"; });
     var tiles = [
@@ -160,29 +161,34 @@
       ["Começaram o quiz", cl.quiz, ""], ["Clicaram no checkout", cl.checkout, ""]
     ];
     $("#fx-tiles").innerHTML = tiles.map(function (t) { return '<div class="mc-met__card"><span>' + t[0] + "</span><b>" + nf.format(t[1] || 0) + "</b>" + (t[2] ? "<small>" + t[2] + "</small>" : "") + "</div>"; }).join("");
-    $("#fx-pill").textContent = dm.ativo && d.ativo ? "ATIVA" : dm.ativo ? "AGUARDANDO" : "DESLIGADA";
-    $("#fx-pill").classList.toggle("is-on", !!(dm.ativo && d.ativo));
-    $("#fx-toggle").checked = !!dm.ativo;
+    var on = VC.autoLigada(auto);
+    $("#fx-nome").textContent = auto.nome;
+    $("#fx-apagar").hidden = !!auto.velho || VC.autos().length < 2;
+    $("#fx-renomear").hidden = !!auto.velho;
+    $("#fx-pill").textContent = on ? "ATIVA" : "PAUSADA";
+    $("#fx-pill").classList.toggle("is-on", on);
+    $("#fx-toggle").checked = on;
     $("#fx-toggle").disabled = false;
     $$("#fx-periodo button").forEach(function (b) { b.classList.toggle("is-on", +b.dataset.dias === (dm.dias || 7)); });
     $("#fx-erro").textContent = dm.erro && !dm.ativo ? "Desligado por erro: " + dm.erro : "";
     $("#fx-erro").hidden = !(dm.erro && !dm.ativo);
     if (!$("#view-fluxo").hidden) desenhar($("#fx-canvas"), f, dm, (d.config || {}).palavras, false);
-    if (ed.aberto && !ed.sujo) { ed.f = copia(f); redesenhar(); }
+    if (ed.aberto && !ed.sujo && ed.auto === auto.id) { ed.f = copia(f); redesenhar(); }
   }
 
   /* ───────────── Editor em tela cheia ───────────── */
 
-  var ed = { aberto: false, f: null, sel: "", liga: -1, sujo: false, z: 1, px: 40, py: 40 };
+  var ed = { auto: "", aberto: false, f: null, sel: "", liga: -1, sujo: false, z: 1, px: 40, py: 40 };
   function copia(o) { return JSON.parse(JSON.stringify(o)); }
   function dm() { return (VC.state.dados || {}).dm || {}; }
   function palavras() { return ((VC.state.dados || {}).config || {}).palavras || []; }
   function acharNo(id) { return ed.f.nos.filter(function (n) { return n.id === id; })[0]; }
 
   function abrir(selId) {
-    var d = dm();
-    if (!d.fluxo) return;
-    ed.f = copia(d.fluxo); ed.sel = ""; ed.liga = -1; ed.sujo = false; ed.aberto = true;
+    var a = VC.autoAtual();
+    if (!a) return;
+    ed.auto = a.id; $("#fe-nome").textContent = a.nome;
+    ed.f = copia(a.fluxo); ed.sel = ""; ed.liga = -1; ed.sujo = false; ed.aberto = true;
     $("#fe").hidden = false;
     document.body.classList.add("fe-aberto");
     redesenhar();
@@ -238,12 +244,12 @@
     if (no.tipo === "gatilho") {
       h += '<div class="fe-passo"><span class="fe-passo__n">1</span><b>Quando alguém comenta em</b></div>' +
         '<div class="fe-campo"><span class="vc-sr">Posts e reels</span>' +
-          '<select class="vc-input" data-acao-sel="posts"><option value="todos"' + (no.posts && no.posts.length ? "" : " selected") + '>Todos os posts e reels</option><option value="escolher"' + (no.posts && no.posts.length ? " selected" : "") + ">Só os posts que eu escolher</option></select>" +
+          '<select class="vc-input" data-acao-sel="posts"><option value="todos"' + (no.posts && no.posts.length ? "" : " selected") + '>Todos os vídeos e posts</option><option value="escolher"' + (no.posts && no.posts.length ? " selected" : "") + ">Só os vídeos que eu escolher (1 ou mais)</option></select>" +
           (no.posts && no.posts.length ? '<div class="fe-posts">' + no.posts.map(function (x) { return x.thumb ? '<img src="' + esc(x.thumb) + '" alt="" title="' + esc(x.legenda || "") + '" referrerpolicy="no-referrer">' : "<span>▶</span>"; }).join("") + "</div>" : "") +
           (no.posts && no.posts.length ? '<button type="button" class="vc-btn vc-btn--ghost" data-acao="escolher-posts">Trocar posts escolhidos</button>' : "") +
           "</div>" +
         '<div class="fe-passo"><span class="fe-passo__n">2</span><b>E o comentário</b></div>' +
-        '<div class="fe-caixa"><p class="vc-muted">contém estas palavras-chave:</p><div class="fe-kws">' + palavras().map(function (p) { return '<span class="mc-chip">' + esc(p) + "</span>"; }).join("") + '</div><a href="#comentarios" data-acao="palavras">Editar palavras-chave</a></div>' +
+        campo("Contém uma destas palavras-chave", '<textarea class="vc-input" rows="4" data-k="palavras" data-lista="1" placeholder="' + esc(palavras().join(", ")) + '">' + esc((no.palavras || []).join("\n")) + "</textarea>", "Uma por linha. Em branco: usa as palavras gerais (" + esc(palavras().slice(0, 4).join(", ")) + "…).") +
         '<div class="fe-passo"><span class="fe-passo__n">3</span><b>Responder também ao comentário</b></div>' +
         campo("Quando a DM sai", '<textarea class="vc-input" rows="4" data-k="respostas" data-lista="1">' + esc((no.respostas || []).join("\n")) + "</textarea>", "Uma por linha. Uma é sorteada.") +
         campo("Quando a DM não sai (ou passou da trava do dia)", '<textarea class="vc-input" rows="4" data-k="falhou" data-lista="1">' + esc((no.falhou || []).join("\n")) + "</textarea>", "Uma por linha.");
@@ -356,10 +362,10 @@
   function salvar() {
     var btn = $("#fe-salvar");
     btn.disabled = true; $("#fe-status").textContent = "Salvando…";
-    VC.request({ action: "vicchat_fluxo", senha: VC.state.senha, fluxo: JSON.stringify(ed.f) }).then(function (res) {
+    VC.request({ action: "vicchat_fluxo", senha: VC.state.senha, auto: ed.auto, fluxo: JSON.stringify(ed.f) }).then(function (res) {
       btn.disabled = false;
       if (res && res.ok) { ed.sujo = false; VC.tratar(res); status(); $("#fe-status").textContent = "Salvo ✓"; }
-      else { $("#fe-status").textContent = res && res.error === "fluxo_sem_gatilho" ? "O fluxo precisa do bloco Gatilho." : "Não foi salvo."; VC.tratar(res); }
+      else { $("#fe-status").textContent = res && res.error === "fluxo_sem_gatilho" ? "O fluxo precisa do bloco Gatilho." : res && res.error === "fluxo_grande" ? "Automações grandes demais: apague blocos." : res && res.error === "fluxo_ids" ? "Bloco repetido de outra automação: apague e crie de novo." : "Não foi salvo."; VC.tratar(res); }
     }, function () { btn.disabled = false; $("#fe-status").textContent = "Sem conexão: não foi salvo."; });
   }
 
@@ -521,13 +527,22 @@
       }
     });
     window.addEventListener("beforeunload", function (e) { if (ed.aberto && ed.sujo) { e.preventDefault(); e.returnValue = ""; } });
-    window.addEventListener("resize", function () { if (!$("#view-fluxo").hidden && dm().fluxo) desenhar($("#fx-canvas"), dm().fluxo, dm(), palavras(), false); });
+    window.addEventListener("resize", function () { if (!$("#view-fluxo").hidden && VC.autoAtual()) desenhar($("#fx-canvas"), VC.autoAtual().fluxo, dm(), palavras(), false); });
   }
 
   // Prévia: clique em um bloco abre o editor nele
   $("#fx-canvas").addEventListener("click", function (e) { var no = e.target.closest(".fe-no"); abrir(no ? no.dataset.id : ""); });
   $("#fx-abrir").addEventListener("click", function () { abrir(""); });
   $("#fx-toggle").addEventListener("change", VC.alternarDm);
+  $("#fx-renomear").addEventListener("click", function () {
+    var a = VC.autoAtual(), n = a && prompt("Nome da automação", a.nome);
+    if (n && n.trim()) VC.acaoAuto({ op: "renomear", auto: a.id, nome: n.trim().slice(0, 60) });
+  });
+  $("#fx-apagar").addEventListener("click", function () {
+    var a = VC.autoAtual();
+    if (!a || !confirm("Apagar a automação “" + a.nome + "”? Isso não dá para desfazer.")) return;
+    VC.acaoAuto({ op: "apagar", auto: a.id }).then(function (r) { if (r) { VC.state.auto = ""; location.hash = "automacoes"; } });
+  });
   $$("#fx-periodo button").forEach(function (b) { b.addEventListener("click", function () { VC.state.dias = +b.dataset.dias; VC.carregar(); }); });
   ligarEditor();
 

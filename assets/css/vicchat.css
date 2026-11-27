@@ -450,3 +450,12 @@ body, .vc-card, .vc-tile, .vc-side, .vc-top, .fe-no, .vc-input { transition: bac
 .fe-caixa p { margin: 0; }
 .fe-caixa a { color: var(--blue); font-size: 13px; font-weight: 700; }
 .vc-view.mc-auto-tela { max-width: none; }
+
+/* ───────────── Várias automações ───────────── */
+.mc-lista__topo .mc-busca { margin-left: auto; }
+.mc-nova { white-space: nowrap; }
+.mc-tabela__rodape { padding: 0 4px; }
+.mc-vazio { padding: 28px 20px; color: var(--muted); text-align: center; }
+.mc-mini { width: 30px; height: 30px; }
+.mc-mini svg { width: 15px; height: 15px; }
+.vc-modal__caixa .vc-input + .vc-modal__rodape { margin-top: 16px; }

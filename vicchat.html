@@ -11,10 +11,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
   <script>try{var t=localStorage.getItem("vc_tema");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
-  <link rel="stylesheet" href="assets/css/vicchat.css?v=3">
+  <link rel="stylesheet" href="assets/css/vicchat.css?v=4">
   <script src="assets/js/config.js" defer></script>
-  <script src="assets/js/vicchat.js?v=3" defer></script>
-  <script src="assets/js/vicchat-fluxo.js?v=3" defer></script>
+  <script src="assets/js/vicchat.js?v=4" defer></script>
+  <script src="assets/js/vicchat-fluxo.js?v=4" defer></script>
 </head>
 <body>
 
@@ -102,28 +102,13 @@
           <div class="mc-lista__topo">
             <h2>Minhas automações</h2>
             <label class="mc-busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="mc-busca" placeholder="Pesquisar automações"></label>
+            <button type="button" class="vc-btn vc-btn--primary mc-nova" id="mc-nova">+ Nova automação</button>
           </div>
           <div class="mc-tabela">
-            <div class="mc-tabela__cab"><span>Nome</span><span>Execuções</span><span>CTR</span><span>DMs hoje</span></div>
-            <article class="mc-auto" id="card-dm" tabindex="0" role="link" aria-label="Abrir a automação Comentário para Direct">
-              <div class="mc-auto__linha">
-                <span class="vc-pill" id="dm-pill">—</span>
-                <strong class="mc-auto__nome">[COMENTÁRIO → DIRECT] Links por DM</strong>
-                <b class="mc-num" id="dm-exec">0</b>
-                <b class="mc-num" id="dm-ctr">—</b>
-                <span class="mc-num"><b id="dm-hoje">0</b><small id="dm-limite">de 40</small></span>
-              </div>
-              <div class="mc-gat">
-                <svg viewBox="0 0 24 24" class="vc-ig"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
-                <span class="mc-gat__txt" id="dm-desc">O usuário comenta em um post ou reel</span>
-                <label class="vc-switch" title="Ligar ou pausar a automação"><input type="checkbox" id="dm-toggle"><span></span></label>
-                <span class="mc-num mc-num--sub" id="dm-gat-exec">0</span>
-                <span class="mc-num mc-num--sub" id="dm-gat-ctr">—</span>
-                <span class="mc-num mc-num--sub" id="dm-esperando"></span>
-              </div>
-              <p class="mc-auto__rodape"><span id="dm-texto"></span> · <b id="dm-respondidos">0</b> comentários respondidos · <a href="#comentarios" id="dm-palavras">Palavras-chave</a></p>
-              <p class="vc-falha" id="dm-erro" hidden></p>
-            </article>
+            <div class="mc-tabela__cab"><span>Nome</span><span>Execuções</span><span>CTR</span><span>DMs enviadas</span></div>
+            <div id="mc-linhas"></div>
+            <p class="mc-auto__rodape mc-tabela__rodape"><span id="dm-texto"></span> · <b id="dm-hoje">0</b> de <span id="dm-limite">40</span> DMs hoje · <b id="dm-respondidos">0</b> comentários respondidos · <a href="#comentarios" id="dm-palavras">Palavras gerais</a></p>
+            <p class="vc-falha" id="dm-erro" hidden></p>
           </div>
         </div>
       </section>
@@ -131,10 +116,12 @@
       <!-- Fluxo do Direct: teia clicável -->
       <section class="vc-view mc-auto-tela" id="view-fluxo" hidden>
         <div class="mc-migalha">
-          <a href="#automacoes">Automações</a><span>›</span><strong>[COMENTÁRIO → DIRECT] Links por DM</strong>
+          <a href="#automacoes">Automações</a><span>›</span><strong id="fx-nome">—</strong>
+          <button type="button" class="vc-icone mc-mini" id="fx-renomear" title="Renomear automação" aria-label="Renomear automação"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button>
           <span class="vc-pill" id="fx-pill">—</span>
           <label class="vc-switch" title="Ligar ou pausar a automação"><input type="checkbox" id="fx-toggle"><span></span></label>
           <button type="button" class="vc-btn mc-editar" id="fx-abrir"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Editar automação</button>
+          <button type="button" class="vc-btn vc-btn--ghost fe-perigo" id="fx-apagar">Apagar</button>
         </div>
         <p class="vc-erro" id="fx-erro" hidden></p>
         <p class="vc-aviso is-erro" id="fx-sem" hidden>Falta publicar a versão nova do Apps Script para ver o fluxo e as métricas.</p>
@@ -231,7 +218,7 @@
   <div class="fe" id="fe" hidden>
     <header class="fe-topo">
       <button type="button" class="fe-voltar" id="fe-voltar">← Voltar</button>
-      <div class="fe-titulo"><strong>Fluxo do Direct</strong><span id="fe-status">Tudo salvo</span></div>
+      <div class="fe-titulo"><strong id="fe-nome">Fluxo do Direct</strong><span id="fe-status">Tudo salvo</span></div>
       <div class="fe-zoom"><button type="button" id="fe-menos" aria-label="Diminuir zoom">−</button><span id="fe-zoom-val">100%</span><button type="button" id="fe-mais" aria-label="Aumentar zoom">+</button><button type="button" id="fe-centro">Ajustar</button></div>
       <button type="button" class="vc-btn vc-btn--primary" id="fe-salvar">Salvar</button>
     </header>

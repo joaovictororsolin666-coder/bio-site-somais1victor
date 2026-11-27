@@ -127,7 +127,7 @@
     $("#det-erro").textContent = d.erro ? "Último erro: " + d.erro : "";
     $("#det-erro").hidden = !d.erro;
 
-    renderDm(d.dm, ativo);
+    renderDm(d.dm);
     if (window.VCFluxo) window.VCFluxo.render();
     renderGrafico(s.porDia || {});
     renderFluxo(d.config);
@@ -135,45 +135,99 @@
     if (!state.config || !state.editando) renderConfig(d.config);
   }
 
-  function renderDm(dm, ativo) {
-    if (!dm) { $("#card-dm").hidden = true; $("#inicio-dm").textContent = "Atualize o Apps Script"; return; }
-    var on = dm.ativo && ativo;
-    $("#dm-pill").textContent = on ? "ATIVA" : "PAUSADA";
-    $("#dm-pill").classList.toggle("is-on", on);
-    $("#dm-toggle").checked = on;
-    $("#dm-toggle").disabled = !state.dados.gatilho;
-    $("#dm-respondidos").textContent = nf.format((state.dados.stats || {}).total || 0);
-    $("#dm-hoje").textContent = nf.format(dm.hoje || 0);
-    $("#dm-limite").textContent = "de " + dm.porDia;
-    // Execuções (comentários que entraram no fluxo) e CTR (cliques nos links / mensagens com link enviadas)
-    var f = dm.fluxo || { nos: [] }, fm = dm.fxMet || {}, g = f.nos.filter(function (n) { return n.tipo === "gatilho"; })[0] || {};
-    var exec = (fm[g.id] || {}).p || 0, comLink = 0, cliques = 0;
-    f.nos.forEach(function (n) { if (n.tipo === "mensagem" && n.botao === "link") comLink += (fm[n.id] || {}).e || 0; });
-    Object.keys(dm.cliques || {}).forEach(function (k) { if (/^fx_/.test(k)) cliques += dm.cliques[k].visitas || 0; });
-    var ctr = comLink ? (Math.round(cliques / comLink * 1000) / 10).toString().replace(".", ",") + "%" : "—";
-    $("#dm-exec").textContent = nf.format(exec); $("#dm-gat-exec").textContent = nf.format(exec);
-    $("#dm-ctr").textContent = ctr; $("#dm-gat-ctr").textContent = ctr;
-    $("#dm-esperando").textContent = dm.esperando ? dm.esperando + " no meio" : "";
-    var kws = ((state.dados.config || {}).palavras || []).slice(0, 8);
-    $("#dm-desc").innerHTML = (on ? "" : "<b>Pausada.</b> ") + "O usuário comenta em " + (g.posts && g.posts.length ? "<b>" + g.posts.length + (g.posts.length > 1 ? " posts escolhidos" : " post escolhido") + "</b>" : "<b>qualquer post ou reel</b>") +
+  /* ───────────── Automações (cada uma: posts, palavras-chave e fluxo próprios) ───────────── */
+
+  var NOME_1 = "[COMENTÁRIO → DIRECT] Links por DM";
+  function autos() {
+    var dm = (state.dados || {}).dm || {};
+    if (dm.autos && dm.autos.length) return dm.autos;
+    return dm.fluxo ? [{ id: "a1", nome: NOME_1, ativo: true, fluxo: dm.fluxo, velho: true }] : [];
+  }
+  function autoAtual() { var l = autos(); return l.filter(function (a) { return a.id === state.auto; })[0] || l[0]; }
+  function gatDe(f) { return ((f || {}).nos || []).filter(function (n) { return n.tipo === "gatilho"; })[0] || {}; }
+  function autoLigada(a) { var d = state.dados || {}; return !!(a.ativo && d.dm && d.dm.ativo && d.ativo); }
+  // Números de uma automação: execuções, DMs enviadas, CTR (cliques nos links / mensagens com link)
+  function numeros(a, dm) {
+    var fm = dm.fxMet || {}, ids = {}, comLink = 0, env = 0, cliques = 0;
+    a.fluxo.nos.forEach(function (n) {
+      ids[n.id] = true;
+      if (n.tipo === "mensagem") { env += (fm[n.id] || {}).e || 0; if (n.botao === "link") comLink += (fm[n.id] || {}).e || 0; }
+    });
+    Object.keys(dm.cliques || {}).forEach(function (k) { var m = k.match(/^fx_(.+?)(_\d+)?$/); if (m && ids[m[1]]) cliques += dm.cliques[k].visitas || 0; });
+    return { exec: (fm[gatDe(a.fluxo).id] || {}).p || 0, env: env, ctr: comLink ? (Math.round(cliques / comLink * 1000) / 10).toString().replace(".", ",") + "%" : "—" };
+  }
+  function descGatilho(g) {
+    var kws = (g.palavras && g.palavras.length ? g.palavras : (state.dados.config || {}).palavras || []).slice(0, 8);
+    return "O usuário comenta em " + (g.posts && g.posts.length ? "<b>" + g.posts.length + (g.posts.length > 1 ? " posts escolhidos" : " post escolhido") + "</b>" : "<b>qualquer post ou reel</b>") +
       " e o comentário inclui " + kws.map(function (k) { return '<span class="mc-chip">' + esc(k) + "</span>"; }).join("");
-    $("#dm-texto").textContent = "Últimos " + (dm.dias || 7) + " dias";
-    var ult = (dm.ultimos || []).slice(0, 3).map(function (x) { return "@" + x.u + " (" + quando(x.d) + ")"; });
-    if (ult.length) $("#dm-texto").textContent += " · Últimos no Direct: " + ult.join(", ");
-    $("#dm-erro").textContent = dm.erro ? "Desligado por erro: " + dm.erro : "";
-    $("#dm-erro").hidden = !dm.erro || dm.ativo;
-    $("#inicio-dm").textContent = (on ? "Ativa · " : "Pausada · ") + nf.format(dm.hoje || 0) + " de " + dm.porDia + " DMs hoje";
   }
 
-  // Um botão só: pausar para os comentários (e com eles o Direct); ligar religa os dois
-  function alternarDm(e) {
-    var ligar = e.target.checked, d = state.dados, falhou = function () { aviso("Sem conexão: nada mudou.", true); render(); };
-    e.target.disabled = true;
-    var passo = request({ action: "vicchat_ativar", senha: state.senha, ativo: ligar ? "1" : "0" });
-    if (ligar && d.dm && !d.dm.ativo) {
-      passo = passo.then(function (r) { tratar(r); return request({ action: "vicchat_dm", senha: state.senha, ativo: "1" }); });
+  function renderDm(dm) {
+    if (!dm) { $("#mc-linhas").innerHTML = '<p class="mc-vazio">Atualize o Apps Script.</p>'; $("#inicio-dm").textContent = "Atualize o Apps Script"; return; }
+    var lista = autos(), ligadas = 0;
+    $("#mc-linhas").innerHTML = lista.map(function (a) {
+      var on = autoLigada(a), n = numeros(a, dm), g = gatDe(a.fluxo);
+      if (on) ligadas++;
+      return '<article class="mc-auto" data-auto="' + esc(a.id) + '" tabindex="0" role="link" aria-label="Abrir ' + esc(a.nome) + '">' +
+        '<div class="mc-auto__linha"><span class="vc-pill' + (on ? " is-on" : "") + '">' + (on ? "ATIVA" : "PAUSADA") + '</span><strong class="mc-auto__nome">' + esc(a.nome) + "</strong>" +
+        '<b class="mc-num">' + nf.format(n.exec) + '</b><b class="mc-num">' + n.ctr + '</b><b class="mc-num">' + nf.format(n.env) + "</b></div>" +
+        '<div class="mc-gat"><svg viewBox="0 0 24 24" class="vc-ig"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>' +
+        '<span class="mc-gat__txt">' + (on ? "" : "<b>Pausada.</b> ") + descGatilho(g) + "</span>" +
+        '<label class="vc-switch" title="Ligar ou pausar a automação"><input type="checkbox" data-toggle="' + esc(a.id) + '"' + (on ? " checked" : "") + (state.dados.gatilho ? "" : " disabled") + "><span></span></label>" +
+        '<span class="mc-num mc-num--sub">' + nf.format(n.exec) + '</span><span class="mc-num mc-num--sub">' + n.ctr + '</span><span class="mc-num mc-num--sub"></span></div></article>';
+    }).join("") || '<p class="mc-vazio">Nenhuma automação ainda. Clique em “+ Nova automação”.</p>';
+    $("#dm-respondidos").textContent = nf.format((state.dados.stats || {}).total || 0);
+    $("#dm-hoje").textContent = nf.format(dm.hoje || 0);
+    $("#dm-limite").textContent = dm.porDia;
+    $("#dm-texto").textContent = "Últimos " + (dm.dias || 7) + " dias" + (dm.esperando ? " · " + dm.esperando + " pessoas no meio de um fluxo" : "");
+    $("#dm-erro").textContent = dm.erro ? "Desligado por erro: " + dm.erro : "";
+    $("#dm-erro").hidden = !dm.erro || dm.ativo;
+    $("#inicio-dm").textContent = ligadas + (ligadas === 1 ? " automação ativa" : " automações ativas") + " · " + nf.format(dm.hoje || 0) + " de " + dm.porDia + " DMs hoje";
+    var q = $("#mc-busca").value.trim().toLowerCase();
+    if (q) $$(".mc-auto").forEach(function (el) { el.hidden = el.textContent.toLowerCase().indexOf(q) < 0; });
+  }
+
+  // Ligar/pausar uma automação (ligar religa a rodada e o Direct; pausar a última pausa tudo)
+  function alternarAuto(id, ligar) {
+    var a = autos().filter(function (x) { return x.id === id; })[0], falhou = function () { aviso("Sem conexão: nada mudou.", true); render(); };
+    if (a && a.velho) { // Apps Script antigo: um interruptor só
+      var passo = request({ action: "vicchat_ativar", senha: state.senha, ativo: ligar ? "1" : "0" });
+      if (ligar && !state.dados.dm.ativo) passo = passo.then(function (r) { tratar(r); return request({ action: "vicchat_dm", senha: state.senha, ativo: "1" }); });
+      return passo.then(tratar, falhou);
     }
-    passo.then(tratar, falhou);
+    return request({ action: "vicchat_auto", senha: state.senha, op: "ativar", auto: id, ativo: ligar ? "1" : "0" }).then(tratar, falhou);
+  }
+  function alternarDm(e) { e.target.disabled = true; alternarAuto(autoAtual().id, e.target.checked); }
+
+  function acaoAuto(params) {
+    params.action = "vicchat_auto"; params.senha = state.senha;
+    return request(params).then(function (r) {
+      if (r && r.ok && !r.autoId) { aviso("Falta publicar a versão nova do Apps Script para criar automações.", true); return null; }
+      if (r && !r.ok) { aviso(r.error === "limite_autos" ? "Limite de 10 automações." : r.error === "ultima_auto" ? "Precisa ficar pelo menos uma automação." : "Não deu certo: " + (r.error || "erro"), true); return null; }
+      tratar(r); return r;
+    }, function () { aviso("Sem conexão: nada mudou.", true); return null; });
+  }
+
+  function novaAutomacao() {
+    var caixa = document.createElement("div");
+    caixa.className = "vc-modal";
+    caixa.innerHTML = '<form class="vc-modal__caixa" style="max-width:440px;grid-template-rows:auto" role="dialog" aria-modal="true" aria-label="Nova automação"><h3>Nova automação</h3>' +
+      '<label class="fe-campo"><span>Nome</span><input class="vc-input" maxlength="60" required placeholder="Ex.: Reel do EditFlow → link" data-nome></label>' +
+      '<p class="vc-muted">Ela começa pausada. Depois você escolhe os vídeos (todos ou só os que quiser), as palavras-chave e as mensagens.</p>' +
+      '<div class="vc-modal__rodape"><span></span><span><button type="button" class="vc-btn vc-btn--ghost" data-x>Cancelar</button> <button type="submit" class="vc-btn vc-btn--primary">Criar automação</button></span></div></form>';
+    document.body.appendChild(caixa);
+    $("[data-nome]", caixa).focus();
+    caixa.addEventListener("click", function (e) { if (e.target === caixa || e.target.closest("[data-x]")) caixa.remove(); });
+    $("form", caixa).addEventListener("submit", function (e) {
+      e.preventDefault();
+      var b = $("[type=submit]", caixa); b.disabled = true; b.textContent = "Criando…";
+      acaoAuto({ op: "criar", nome: $("[data-nome]", caixa).value.trim() }).then(function (r) {
+        caixa.remove();
+        if (!r) return;
+        state.auto = r.autoId; location.hash = "fluxo";
+        setTimeout(function () { if (window.VCFluxo) window.VCFluxo.abrir(r.autoId + "g"); }, 0);
+      });
+    });
   }
 
   function renderGrafico(porDia) {
@@ -338,7 +392,6 @@
   window.addEventListener("hashchange", rota);
   $$(".vc-tabs button").forEach(function (b) { b.addEventListener("click", function () { abrirTab(b.dataset.tab); }); });
   $$("#lista-toggle, #det-toggle").forEach(function (t) { t.addEventListener("change", alternar); });
-  $("#dm-toggle").addEventListener("change", alternarDm);
   $("#lista-toggle").addEventListener("click", function (e) { e.stopPropagation(); });
   $("#card-comentarios").addEventListener("click", function (e) { if (!e.target.closest(".vc-switch")) location.hash = "comentarios"; });
   $("#card-comentarios").addEventListener("keydown", function (e) { if (e.key === "Enter") location.hash = "comentarios"; });
@@ -364,8 +417,13 @@
   $("#tab-config").addEventListener("submit", salvar);
 
   /* ───────────── Ponte para o editor do fluxo (vicchat-fluxo.js) ───────────── */
-  window.VC = { $: $, $$: $$, esc: esc, nf: nf, state: state, request: request, tratar: tratar, carregar: carregar, abrirTab: abrirTab, alternarDm: alternarDm };
-  $("#card-dm").addEventListener("click", function (e) { if (!e.target.closest(".vc-switch, a")) location.hash = "fluxo"; });
+  window.VC = { $: $, $$: $$, esc: esc, nf: nf, state: state, request: request, tratar: tratar, carregar: carregar, abrirTab: abrirTab, alternarDm: alternarDm,
+    autos: autos, autoAtual: autoAtual, autoLigada: autoLigada, acaoAuto: acaoAuto, aviso: aviso };
+  var abrirAuto = function (el) { state.auto = el.dataset.auto; if (location.hash === "#fluxo") rota(); else location.hash = "fluxo"; };
+  $("#mc-linhas").addEventListener("click", function (e) { var el = e.target.closest(".mc-auto"); if (el && !e.target.closest(".vc-switch, a")) abrirAuto(el); });
+  $("#mc-linhas").addEventListener("keydown", function (e) { var el = e.target.closest(".mc-auto"); if (el && e.key === "Enter") abrirAuto(el); });
+  $("#mc-linhas").addEventListener("change", function (e) { var t = e.target.closest("[data-toggle]"); if (t) { t.disabled = true; alternarAuto(t.dataset.toggle, t.checked); } });
+  $("#mc-nova").addEventListener("click", novaAutomacao);
 
   /* ───────────── Dados de exemplo (?demo=1) ───────────── */
 
@@ -418,7 +476,23 @@
     if (params.action === "vicchat_ativar") demoDados.ativo = params.ativo === "1";
     if (params.action === "vicchat_dm" && params.ativo) demoDados.dm.ativo = params.ativo === "1";
     if (params.action === "vicchat_dm" && params.config) Object.assign(demoDados.dm, JSON.parse(params.config));
-    if (params.action === "vicchat_fluxo") demoDados.dm.fluxo = JSON.parse(params.fluxo);
+    var da = demoDados.dm.autos = demoDados.dm.autos || [{ id: "a1", nome: NOME_1, ativo: true, fluxo: demoDados.dm.fluxo }];
+    var achar = function (id) { return da.filter(function (a) { return a.id === id; })[0]; };
+    if (params.action === "vicchat_fluxo") { var af = achar(params.auto || "a1"); af.fluxo = JSON.parse(params.fluxo); if (params.nome) af.nome = params.nome; }
+    if (params.action === "vicchat_auto") {
+      var r0, ax = achar(params.auto);
+      if (params.op === "criar") {
+        var nid = "a" + (da.length + 1);
+        da.push({ id: nid, nome: params.nome || "Nova automação", ativo: false, fluxo: { nos: [
+          { id: nid + "g", tipo: "gatilho", x: 40, y: 220, respostas: demoDados.dm.respostas, falhou: demoDados.dm.falhou, posts: [], palavras: [] },
+          { id: nid + "m1", tipo: "mensagem", x: 400, y: 200, texto: "Oi! Aqui está o link que você pediu ↓", botao: "link", respostas: [], links: [{ titulo: "Acessar", url: demoDados.dm.link }], estilo: "botao" }
+        ], ligas: [{ de: nid + "g", saida: "prox", para: nid + "m1" }] } });
+        r0 = nid;
+      } else if (params.op === "renomear") { ax.nome = params.nome; r0 = ax.id; }
+      else if (params.op === "apagar") { da.splice(da.indexOf(ax), 1); r0 = ax.id; }
+      else if (params.op === "ativar") { ax.ativo = params.ativo === "1"; if (ax.ativo) { demoDados.ativo = true; demoDados.dm.ativo = true; } r0 = ax.id; }
+      var copiaR = JSON.parse(JSON.stringify(demoDados)); copiaR.autoId = r0; return copiaR;
+    }
     if (params.dias) demoDados.dm.dias = +params.dias;
     if (params.action === "vicchat_config") { var c = JSON.parse(params.config); c.postsRecentes = 12; c.minutos = 1; demoDados.config = c; }
     return JSON.parse(JSON.stringify(demoDados));
