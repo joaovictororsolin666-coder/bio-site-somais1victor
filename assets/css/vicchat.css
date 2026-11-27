@@ -459,3 +459,6 @@ body, .vc-card, .vc-tile, .vc-side, .vc-top, .fe-no, .vc-input { transition: bac
 .mc-mini { width: 30px; height: 30px; }
 .mc-mini svg { width: 15px; height: 15px; }
 .vc-modal__caixa .vc-input + .vc-modal__rodape { margin-top: 16px; }
+#fx-duplicar, #fx-apagar { min-height: 38px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text); }
+#fx-apagar { color: #e5484d; }
+#fx-duplicar:hover, #fx-apagar:hover { border-color: var(--line3); }
