@@ -577,9 +577,9 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(var(--green-rgb), 
 
 /* Tela inicial: hierarquia mais leve no celular (título menor, selo discreto, texto respirando) */
 .qz-is-intro .qz-title--lg {
-  max-width: 21ch;
+  max-width: 14ch;
   margin: 0 auto;
-  font-size: clamp(23px, 6.4vw, 30px);
+  font-size: clamp(31px, 8.8vw, 40px);
   font-weight: 750;
   line-height: 1.2;
   letter-spacing: -.022em;
