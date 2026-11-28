@@ -5,7 +5,7 @@
 window.QUIZ_DATA = {
 
   intro: {
-    title: 'Como faturar <span class="hl">R$300 ou mais por dia</span> vendendo produtos digitais na internet, sem precisar aparecer!',
+    title: 'Fature <span class="hl">R$300 ou mais por dia</span> sem precisar aparecer!',
     tag: 'Mesmo que você seja totalmente iniciante',
     image: { src: 'assets/img/quiz/capa-v2.webp', w: 800, h: 450, alt: 'Victor Gomes com notificações de vendas aprovadas' },
     sub: 'Os mesmos vídeos que você assiste o dia inteiro estão <strong>vendendo produtos digitais</strong> em perfis que não mostram o rosto de ninguém.',
