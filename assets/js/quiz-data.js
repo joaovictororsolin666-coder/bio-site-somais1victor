@@ -242,7 +242,7 @@ window.QUIZ_DATA = {
   },
 
   offer: {
-    banner: { src: 'assets/img/mpv-800.webp', w: 800, h: 336, alt: 'Método Primeira Venda' },
+    banner: { src: 'assets/img/mpv-painel-800.webp', w: 800, h: 336, alt: 'Victor Gomes ao lado de um painel de criador com visualizações e monetização em dólar crescendo' },
     eyebrow: 'MPV · Método Primeira Venda',
     title: 'Aprenda a faturar <span class="hl">R$300 ou mais por dia</span> vendendo produtos digitais sem precisar aparecer!',
     subtitle: 'Mesmo que você esteja começando do absoluto zero.',
