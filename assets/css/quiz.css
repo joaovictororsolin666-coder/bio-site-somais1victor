@@ -584,6 +584,8 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(var(--green-rgb), 
   line-height: 1.2;
   letter-spacing: -.022em;
 }
+.qz-is-intro .qz-intro-sub { max-width: 34ch; margin: 12px auto 0; color: var(--muted); font-size: 15.5px; line-height: 1.45; text-wrap: pretty; }
+.qz-is-intro .qz-intro-sub strong { font-weight: 650; }
 .qz-is-intro .qz-tagline { margin-top: 14px; }
 .qz-is-intro .qz-tagline span {
   padding: 5px 12px;

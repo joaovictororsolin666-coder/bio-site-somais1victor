@@ -667,6 +667,7 @@
       var s = D.intro;
       return '<section class="qz-screen qz-center">' +
         '<h1 class="qz-title qz-title--lg">' + s.title + "</h1>" +
+        (s.sub ? '<p class="qz-sub qz-intro-sub">' + s.sub + "</p>" : "") +
         '<p class="qz-tagline"><span>' + s.tag + "</span></p>" +
         (s.builder ? builderHtml() : '<div class="qz-media">' + img(s.image, "", true) + "</div>") +
         '<p class="qz-text">' + s.text + "</p>" +
