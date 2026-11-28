@@ -575,6 +575,40 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(var(--green-rgb), 
 .qz-footer p { margin: 0; }
 .qz-footer a { color: var(--muted); text-decoration: none; }
 
+/* Tela inicial: hierarquia mais leve no celular (título menor, selo discreto, texto respirando) */
+.qz-is-intro .qz-title--lg {
+  max-width: 21ch;
+  margin: 0 auto;
+  font-size: clamp(23px, 6.4vw, 30px);
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -.022em;
+}
+.qz-is-intro .qz-tagline { margin-top: 14px; }
+.qz-is-intro .qz-tagline span {
+  padding: 5px 12px;
+  border: 1px solid rgba(var(--green-rgb), .35);
+  border-radius: 99px;
+  background: rgba(var(--green-rgb), .1);
+  color: var(--green-tint);
+  font-size: 12.5px;
+  font-weight: 650;
+  letter-spacing: .01em;
+}
+.qz-is-intro .qz-media { margin-top: 20px; border-radius: 18px; }
+.qz-is-intro .qz-text {
+  max-width: 34ch;
+  margin: 18px auto 0;
+  color: var(--muted);
+  font-size: 15.5px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.qz-is-intro .qz-text + .qz-text { margin-top: 10px; }
+.qz-is-intro .qz-text strong { font-weight: 650; }
+.qz-is-intro .qz-cta { margin-top: 22px; min-height: 56px; border-radius: 16px; letter-spacing: .04em; }
+.qz-is-intro .qz-note { font-size: 12.5px; }
+
 /* Tela inicial em celulares de tela baixa: espaços menores para o botão de começar aparecer sem rolar */
 @media (max-height: 760px) {
   .qz-is-intro .qz-main { padding-top: 14px; }
