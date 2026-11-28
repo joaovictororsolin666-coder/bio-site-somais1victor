@@ -182,34 +182,29 @@ window.QUIZ_DATA = {
       vende: 'mas não do jeito que você vem fazendo'
     },
     titleFallback: 'O que te separa da sua primeira venda <span class="hl">não é o que você imagina</span>',
-    subtitle: 'Analisei suas respostas. Veja o que elas mostram 👇',
-    diagTitle: '📋 Seu diagnóstico',
+    compact: true,
+    // Diagnóstico enxuto: 1 cartão com 3 linhas, 1 frase de bloqueio e até 2 itens ✓ (sem repetir ideia)
+    diagTitle: 'Seu diagnóstico',
     diagRows: [
       { key: 'experiencia', label: 'Ponto de partida' },
       { key: 'tempo', label: 'Tempo por dia' },
-      { key: 'meta', label: 'Meta' },
-      { key: 'objecao', label: 'Maior obstáculo' }
+      { key: 'meta', label: 'Meta' }
     ],
-    alertTitle: 'O que está te impedindo de começar não é falta de esforço...',
-    alertText: '❌ É não ter um passo a passo e não saber quais estratégias realmente aplicar!',
-    fitTitle: '✅ Por que o método combina com você',
-    // Pela resposta de "experiencia" (id da opção)
+    alertTitle: 'O que falta não é esforço: é um passo a passo.',
+    // Item pela resposta de "experiencia" (id da opção)
     fit: {
-      zero: '🚀 O método foi feito para quem está <strong>começando do zero</strong>.',
-      tentou: '🎯 Você vai seguir <strong>estratégias prontas</strong>, sem tentativa e erro.',
-      vende: '📈 Você vai <strong>estruturar suas vendas</strong> para vender todos os dias.'
+      zero: 'Feito para quem está <strong>começando do zero</strong>',
+      tentou: '<strong>Estratégias prontas</strong>, sem tentativa e erro',
+      vende: '<strong>Estrutura</strong> para vender todos os dias'
     },
-    fitBase: '📱 Tudo pelo <strong>celular</strong>, com vídeos simples e <strong>sem precisar aparecer</strong>.',
     cta: 'QUERO APRENDER ESSE MÉTODO',
-    // Recado personalizado pela resposta da pergunta "objecao" (id da opção)
+    // Item pela resposta da pergunta "objecao" (id da opção)
     objection: {
-      comeco: '🧭 Não sabe por onde começar? O método é um <strong>passo a passo do zero</strong>, aula por aula.',
-      medo: '🛡️ Medo de investir? Você tem <strong>7 dias de garantia</strong>: se não gostar, recebe 100% de volta.',
-      tempo: '⏳ Pouco tempo? Dá para começar <strong>no seu ritmo</strong>, nos intervalos do dia.',
-      tentou: '🔁 Já tentou outras coisas? Aqui você aplica <strong>estratégias prontas</strong>, como a Poliana.'
-    },
-    // Recado para quem tem mais de 30 anos
-    over30: '🤝 <strong>Não precisa entender de tecnologia:</strong> você segue o passo a passo, aula por aula.'
+      comeco: '<strong>Passo a passo</strong>, aula por aula',
+      medo: '<strong>7 dias de garantia</strong>: não gostou, recebe 100% de volta',
+      tempo: 'Dá para fazer <strong>no seu ritmo</strong>, pelo celular',
+      tentou: '<strong>7 dias de garantia</strong>: não gostou, recebe 100% de volta'
+    }
   },
 
   gift: {

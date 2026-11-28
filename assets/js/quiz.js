@@ -789,7 +789,7 @@
         ? s.title.replace("{meta}", goal).replace("{fim}", (s.titleEnd || {})[ex] || s.titleEnd.zero)
         : s.titleFallback.replace("{nicho}", answerOf("nicho") || "");
       var nq = Q.filter(function (x) { return x.key === "nicho"; })[0];
-      return '<section class="qz-screen qz-center qz-result">' +
+      return '<section class="qz-screen qz-center qz-result' + (s.compact ? " qz-result--compact" : "") + '">' +
         '<p class="qz-badge"><span aria-hidden="true">✔</span> ' + s.badge + "</p>" +
         '<h1 class="qz-title">' + title + "</h1>" +
         (s.subtitle ? '<p class="qz-sub">' + s.subtitle + "</p>" : "") +
@@ -797,8 +797,8 @@
         (rows.length ? '<div class="qz-diag"><h2 class="qz-diag__title">' + s.diagTitle + "</h2>" + rows.map(function (r) {
           return '<div class="qz-diag__row"><span>' + r[0] + "</span><strong>" + r[1] + "</strong></div>";
         }).join("") + "</div>" : "") +
-        '<div class="qz-alert"><p class="qz-alert__title">⚠️ ' + s.alertTitle + "</p><p>" + s.alertText + "</p></div>" +
-        (fit.length ? '<div class="qz-fit"><h2 class="qz-fit__title">' + s.fitTitle + "</h2><ul>" +
+        (s.alertTitle ? '<div class="qz-alert"><p class="qz-alert__title">' + s.alertTitle + "</p>" + (s.alertText ? "<p>" + s.alertText + "</p>" : "") + "</div>" : "") +
+        (fit.length ? '<div class="qz-fit">' + (s.fitTitle ? '<h2 class="qz-fit__title">' + s.fitTitle + "</h2>" : "") + "<ul>" +
           fit.map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul></div>" : "") +
         cta(s.cta) +
         "</section>";

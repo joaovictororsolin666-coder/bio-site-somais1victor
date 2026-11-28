@@ -797,3 +797,28 @@ mark { padding: 0 .25em; border-radius: 4px; background: rgba(var(--green-rgb), 
   50% { text-shadow: 0 0 34px rgba(var(--green-rgb), .9), 0 0 60px rgba(var(--green-rgb), .35); transform: scale(1.04); }
 }
 @media (prefers-reduced-motion: reduce) { .qz-price__main--glow { animation: none; } }
+
+/* Diagnóstico enxuto (result.compact): respostas + bloqueio + itens ✓ num cartão só */
+.qz-result--compact .qz-diag,
+.qz-result--compact .qz-alert,
+.qz-result--compact .qz-fit { margin: 0; border: 1px solid var(--line-2); background: #101010; text-align: left; }
+.qz-result--compact .qz-diag { margin-top: 20px; padding: 4px 18px 2px; border-bottom: 0; border-radius: 20px 20px 0 0; }
+.qz-result--compact .qz-alert { padding: 0 18px; border-top: 0; border-bottom: 0; border-radius: 0; }
+.qz-result--compact .qz-fit { padding: 8px 18px 18px; border-top: 0; border-radius: 0 0 20px 20px; }
+.qz-result--compact .qz-diag__title { margin: 14px 0 4px; color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: .02em; text-transform: none; }
+.qz-result--compact .qz-diag__row { padding: 11px 0; }
+.qz-result--compact .qz-alert__title { margin: 0 !important; padding: 16px 0 6px; border-top: 1px solid var(--line); color: var(--text); font-size: 16px; font-weight: 700; line-height: 1.35; }
+.qz-result--compact .qz-fit ul { gap: 10px; }
+.qz-result--compact .qz-fit li { position: relative; padding-left: 28px; color: var(--muted); font-size: 15px; line-height: 1.4; }
+.qz-result--compact .qz-fit li strong { color: var(--text); }
+.qz-result--compact .qz-fit li::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 0;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 13px no-repeat;
+}
+.qz-result--compact .qz-cta { margin-top: 22px; }

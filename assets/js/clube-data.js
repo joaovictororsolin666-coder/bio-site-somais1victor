@@ -259,7 +259,7 @@ window.QUIZ_DATA = {
       { key: 'objetivo', label: 'Objetivo' },
       { key: 'objecao', label: 'Maior obstáculo' }
     ],
-    alertTitle: 'Ter a ideia é só o começo...',
+    alertTitle: '⚠️ Ter a ideia é só o começo...',
     alertText: '❌ O que trava a maioria é não saber como produzir, postar e crescer com constância!',
     fitTitle: '✅ Por que o Clube combina com você',
     fit: {
