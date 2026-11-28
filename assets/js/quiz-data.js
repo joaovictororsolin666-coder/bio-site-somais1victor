@@ -8,7 +8,7 @@ window.QUIZ_DATA = {
     title: 'Como faturar <span class="hl">R$300 ou mais por dia</span> vendendo produtos digitais na internet, sem precisar aparecer!',
     tag: 'Mesmo que você seja totalmente iniciante',
     image: { src: 'assets/img/quiz/capa-v2.webp', w: 800, h: 450, alt: 'Victor Gomes com notificações de vendas aprovadas' },
-    text: 'Não perca mais tempo apenas <mark>"rolando a tela"</mark> e vendo a vida dos outros. Chegou a hora de transformar <strong>visualizações em dinheiro no seu bolso</strong> com a fórmula que realmente funciona.',
+    text: 'Os mesmos vídeos que você assiste o dia inteiro estão <strong>vendendo produtos digitais</strong> em perfis que não mostram o rosto de ninguém.</p><p class="qz-text"><strong>Em 1 minuto</strong>, você descobre se esse caminho serve pra você e por onde começar.',
     cta: 'DESCOBRIR COMO FUNCIONA',
     note: '1 minuto · 10 perguntas · Resultado na hora'
   },
