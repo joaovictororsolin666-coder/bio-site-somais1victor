@@ -264,6 +264,7 @@ window.QUIZ_DATA = {
     proofTitle: 'Veja os resultados de quem decidiu colocar o método em prática! 🚀',
     proofs: [
       { src: 'assets/img/quiz/resultado-a.webp', w: 540, h: 957, name: 'Poliana' },
+      { src: 'assets/img/quiz/resultado-g.webp', w: 540, h: 920, name: 'Marcos' },
       { src: 'assets/img/quiz/resultado-b.webp', w: 540, h: 776, name: 'Xande' },
       { src: 'assets/img/quiz/resultado-c.webp', w: 540, h: 1005, name: 'Maurício' },
       { src: 'assets/img/quiz/resultado-d.webp', w: 540, h: 749, name: 'Gabriel' },
