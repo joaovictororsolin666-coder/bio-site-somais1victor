@@ -670,7 +670,7 @@
         (s.sub ? '<p class="qz-sub qz-intro-sub">' + s.sub + "</p>" : "") +
         '<p class="qz-tagline"><span>' + s.tag + "</span></p>" +
         (s.builder ? builderHtml() : '<div class="qz-media">' + img(s.image, "", true) + "</div>") +
-        '<p class="qz-text">' + s.text + "</p>" +
+        (s.text ? '<p class="qz-text">' + s.text + "</p>" : "") +
         cta(s.cta, "data-next data-start") +
         '<p class="qz-note">⏱ ' + s.note + "</p>" +
         "</section>";
